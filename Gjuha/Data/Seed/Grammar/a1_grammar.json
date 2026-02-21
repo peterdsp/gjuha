@@ -1,0 +1,62 @@
+[
+  {
+    "id": "g001",
+    "title": "The verb 'to be': jam",
+    "subtitle": "Present tense conjugation",
+    "cefrLevel": "a1",
+    "category": "verbs",
+    "explanation": "In Albanian, the verb 'to be' (jam) is irregular. It must agree with the subject in person and number. The six present tense forms are essential to learn first.",
+    "conjugationTable": [
+      ["Person", "Singular", "Plural"],
+      ["1st", "jam — I am", "jemi — we are"],
+      ["2nd", "je — you are", "jeni — you are (pl/formal)"],
+      ["3rd", "është — he/she/it is", "janë — they are"]
+    ],
+    "examples": [
+      "Unë jam student. — I am a student.",
+      "Ti je shqiptar. — You are Albanian.",
+      "Ai është mësues. — He is a teacher.",
+      "Ne jemi miq. — We are friends.",
+      "Ata janë këtu. — They are here."
+    ]
+  },
+  {
+    "id": "g002",
+    "title": "The verb 'to have': kam",
+    "subtitle": "Present tense conjugation",
+    "cefrLevel": "a1",
+    "category": "verbs",
+    "explanation": "The verb 'to have' (kam) is also irregular. It is used both for possession and, importantly, as an auxiliary to form perfect tenses later.",
+    "conjugationTable": [
+      ["Person", "Singular", "Plural"],
+      ["1st", "kam — I have", "kemi — we have"],
+      ["2nd", "ke — you have", "keni — you have (pl/formal)"],
+      ["3rd", "ka — he/she/it has", "kanë — they have"]
+    ],
+    "examples": [
+      "Unë kam një libër. — I have a book.",
+      "Ti ke kohë? — Do you have time?",
+      "Ai ka një makinë. — He has a car.",
+      "Ne kemi shumë miq. — We have many friends."
+    ]
+  },
+  {
+    "id": "g003",
+    "title": "Noun Definiteness",
+    "subtitle": "Indefinite vs. definite articles",
+    "cefrLevel": "a1",
+    "category": "nouns",
+    "explanation": "Unlike English, Albanian places its definite article as a suffix (postposed article) at the end of the noun, not before it. Indefinite nouns take no article. This is one of the most distinctive features of Albanian grammar.",
+    "conjugationTable": [
+      ["", "Masculine", "Feminine"],
+      ["Indefinite", "libër (a book)", "vajzë (a girl)"],
+      ["Definite", "libri (the book)", "vajza (the girl)"]
+    ],
+    "examples": [
+      "Kam një libër. — I have a book. (indefinite)",
+      "Libri është interesant. — The book is interesting. (definite)",
+      "Shoh një vajzë. — I see a girl. (indefinite)",
+      "Vajza është këtu. — The girl is here. (definite)"
+    ]
+  }
+]

@@ -1,0 +1,271 @@
+[
+  {
+    "id": "w001",
+    "albanian": "mirëdita",
+    "english": "good day / hello",
+    "cefrLevel": "a1",
+    "partOfSpeech": "interjection",
+    "exampleSentence": "Mirëdita! Si jeni?",
+    "exampleTranslation": "Good day! How are you?",
+    "frequency": 1
+  },
+  {
+    "id": "w002",
+    "albanian": "mirëmëngjes",
+    "english": "good morning",
+    "cefrLevel": "a1",
+    "partOfSpeech": "interjection",
+    "exampleSentence": "Mirëmëngjes! Keni fjetur mirë?",
+    "exampleTranslation": "Good morning! Did you sleep well?",
+    "frequency": 2
+  },
+  {
+    "id": "w003",
+    "albanian": "mirëmbrëma",
+    "english": "good evening",
+    "cefrLevel": "a1",
+    "partOfSpeech": "interjection",
+    "frequency": 3
+  },
+  {
+    "id": "w004",
+    "albanian": "natën e mirë",
+    "english": "good night",
+    "cefrLevel": "a1",
+    "partOfSpeech": "interjection",
+    "frequency": 4
+  },
+  {
+    "id": "w005",
+    "albanian": "mirupafshim",
+    "english": "goodbye",
+    "cefrLevel": "a1",
+    "partOfSpeech": "interjection",
+    "exampleSentence": "Mirupafshim! Shihemi nesër.",
+    "exampleTranslation": "Goodbye! See you tomorrow.",
+    "frequency": 5
+  },
+  {
+    "id": "w006",
+    "albanian": "faleminderit",
+    "english": "thank you",
+    "cefrLevel": "a1",
+    "partOfSpeech": "interjection",
+    "frequency": 6
+  },
+  {
+    "id": "w007",
+    "albanian": "ju lutem",
+    "english": "please / you're welcome",
+    "cefrLevel": "a1",
+    "partOfSpeech": "interjection",
+    "frequency": 7
+  },
+  {
+    "id": "w008",
+    "albanian": "po",
+    "english": "yes",
+    "cefrLevel": "a1",
+    "partOfSpeech": "particle",
+    "frequency": 8
+  },
+  {
+    "id": "w009",
+    "albanian": "jo",
+    "english": "no",
+    "cefrLevel": "a1",
+    "partOfSpeech": "particle",
+    "frequency": 9
+  },
+  {
+    "id": "w010",
+    "albanian": "unë",
+    "english": "I",
+    "cefrLevel": "a1",
+    "partOfSpeech": "pronoun",
+    "frequency": 10
+  },
+  {
+    "id": "w011",
+    "albanian": "ti",
+    "english": "you (singular informal)",
+    "cefrLevel": "a1",
+    "partOfSpeech": "pronoun",
+    "frequency": 11
+  },
+  {
+    "id": "w012",
+    "albanian": "ju",
+    "english": "you (plural / formal)",
+    "cefrLevel": "a1",
+    "partOfSpeech": "pronoun",
+    "frequency": 12
+  },
+  {
+    "id": "w013",
+    "albanian": "ai",
+    "english": "he",
+    "cefrLevel": "a1",
+    "partOfSpeech": "pronoun",
+    "frequency": 13
+  },
+  {
+    "id": "w014",
+    "albanian": "ajo",
+    "english": "she",
+    "cefrLevel": "a1",
+    "partOfSpeech": "pronoun",
+    "frequency": 14
+  },
+  {
+    "id": "w015",
+    "albanian": "ne",
+    "english": "we",
+    "cefrLevel": "a1",
+    "partOfSpeech": "pronoun",
+    "frequency": 15
+  },
+  {
+    "id": "w016",
+    "albanian": "ata",
+    "english": "they (masculine)",
+    "cefrLevel": "a1",
+    "partOfSpeech": "pronoun",
+    "frequency": 16
+  },
+  {
+    "id": "w017",
+    "albanian": "ato",
+    "english": "they (feminine)",
+    "cefrLevel": "a1",
+    "partOfSpeech": "pronoun",
+    "frequency": 17
+  },
+  {
+    "id": "w018",
+    "albanian": "jam",
+    "english": "I am / to be (1st sg)",
+    "cefrLevel": "a1",
+    "partOfSpeech": "verb",
+    "verbClass": "irregular",
+    "exampleSentence": "Unë jam shqiptar.",
+    "exampleTranslation": "I am Albanian.",
+    "frequency": 18
+  },
+  {
+    "id": "w019",
+    "albanian": "kam",
+    "english": "I have / to have (1st sg)",
+    "cefrLevel": "a1",
+    "partOfSpeech": "verb",
+    "verbClass": "irregular",
+    "exampleSentence": "Unë kam një libër.",
+    "exampleTranslation": "I have a book.",
+    "frequency": 19
+  },
+  {
+    "id": "w020",
+    "albanian": "dua",
+    "english": "I want / I love",
+    "cefrLevel": "a1",
+    "partOfSpeech": "verb",
+    "verbClass": "irregular",
+    "exampleSentence": "Dua kafe.",
+    "exampleTranslation": "I want coffee.",
+    "frequency": 20
+  },
+  {
+    "id": "w021",
+    "albanian": "flas",
+    "english": "I speak",
+    "cefrLevel": "a1",
+    "partOfSpeech": "verb",
+    "verbClass": "thirdConjugation",
+    "exampleSentence": "Flas shqip pak.",
+    "exampleTranslation": "I speak a little Albanian.",
+    "frequency": 21
+  },
+  {
+    "id": "w022",
+    "albanian": "punoj",
+    "english": "I work",
+    "cefrLevel": "a1",
+    "partOfSpeech": "verb",
+    "verbClass": "firstConjugation",
+    "exampleSentence": "Punoj çdo ditë.",
+    "exampleTranslation": "I work every day.",
+    "frequency": 22
+  },
+  {
+    "id": "w023",
+    "albanian": "shkoj",
+    "english": "I go",
+    "cefrLevel": "a1",
+    "partOfSpeech": "verb",
+    "verbClass": "firstConjugation",
+    "frequency": 23
+  },
+  {
+    "id": "w024",
+    "albanian": "ha",
+    "english": "I eat",
+    "cefrLevel": "a1",
+    "partOfSpeech": "verb",
+    "verbClass": "irregular",
+    "frequency": 24
+  },
+  {
+    "id": "w025",
+    "albanian": "pi",
+    "english": "I drink",
+    "cefrLevel": "a1",
+    "partOfSpeech": "verb",
+    "verbClass": "irregular",
+    "frequency": 25
+  },
+  {
+    "id": "w026",
+    "albanian": "ujë",
+    "english": "water",
+    "cefrLevel": "a1",
+    "partOfSpeech": "noun",
+    "gender": "m",
+    "frequency": 26
+  },
+  {
+    "id": "w027",
+    "albanian": "bukë",
+    "english": "bread",
+    "cefrLevel": "a1",
+    "partOfSpeech": "noun",
+    "gender": "f",
+    "frequency": 27
+  },
+  {
+    "id": "w028",
+    "albanian": "kafe",
+    "english": "coffee",
+    "cefrLevel": "a1",
+    "partOfSpeech": "noun",
+    "gender": "f",
+    "frequency": 28
+  },
+  {
+    "id": "w029",
+    "albanian": "shtëpi",
+    "english": "house",
+    "cefrLevel": "a1",
+    "partOfSpeech": "noun",
+    "gender": "f",
+    "frequency": 29
+  },
+  {
+    "id": "w030",
+    "albanian": "libër",
+    "english": "book",
+    "cefrLevel": "a1",
+    "partOfSpeech": "noun",
+    "gender": "m",
+    "frequency": 30
+  }
+]

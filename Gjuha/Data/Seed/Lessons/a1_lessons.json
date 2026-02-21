@@ -1,0 +1,85 @@
+[
+  {
+    "id": "unit1",
+    "title": "Unit 1 — Basics",
+    "description": "Greetings, introductions, and the verb 'to be'",
+    "cefrLevel": "a1",
+    "orderIndex": 0,
+    "lessons": [
+      {
+        "id": "l001",
+        "title": "Greetings",
+        "subtitle": "Say hello in Albanian",
+        "iconName": "hand.wave.fill",
+        "orderIndex": 0,
+        "lessonType": "vocabulary",
+        "vocabularyIds": ["w001", "w002", "w003", "w004", "w005", "w006", "w007"]
+      },
+      {
+        "id": "l002",
+        "title": "Yes, No & Pronouns",
+        "subtitle": "Core building blocks",
+        "iconName": "person.2.fill",
+        "orderIndex": 1,
+        "lessonType": "vocabulary",
+        "vocabularyIds": ["w008", "w009", "w010", "w011", "w012", "w013", "w014", "w015", "w016", "w017"]
+      },
+      {
+        "id": "l003",
+        "title": "To be: jam",
+        "subtitle": "The most important verb",
+        "iconName": "equal.circle.fill",
+        "orderIndex": 2,
+        "lessonType": "grammar",
+        "focusGrammarTopicId": "g001",
+        "vocabularyIds": ["w018"]
+      },
+      {
+        "id": "l004",
+        "title": "To have: kam",
+        "subtitle": "Express possession",
+        "iconName": "hand.raised.fill",
+        "orderIndex": 3,
+        "lessonType": "grammar",
+        "focusGrammarTopicId": "g002",
+        "vocabularyIds": ["w019"]
+      },
+      {
+        "id": "l005",
+        "title": "Food & Drink",
+        "subtitle": "Essential vocabulary",
+        "iconName": "fork.knife",
+        "orderIndex": 4,
+        "lessonType": "vocabulary",
+        "vocabularyIds": ["w026", "w027", "w028", "w024", "w025", "w020"]
+      }
+    ]
+  },
+  {
+    "id": "unit2",
+    "title": "Unit 2 — Everyday Life",
+    "description": "Family, home, numbers, and daily routines",
+    "cefrLevel": "a1",
+    "orderIndex": 1,
+    "lessons": [
+      {
+        "id": "l006",
+        "title": "Numbers 1–10",
+        "subtitle": "Count in Albanian",
+        "iconName": "number.circle.fill",
+        "orderIndex": 0,
+        "lessonType": "vocabulary",
+        "vocabularyIds": []
+      },
+      {
+        "id": "l007",
+        "title": "The Home",
+        "subtitle": "Rooms and objects",
+        "iconName": "house.fill",
+        "orderIndex": 1,
+        "lessonType": "vocabulary",
+        "vocabularyIds": ["w029"]
+      }
+    ]
+  }
+]

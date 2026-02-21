@@ -1,0 +1,42 @@
+[
+  {
+    "type": "mcq",
+    "ui": "single_choice",
+    "notes": "Prompt + 4 choices. Track distractors."
+  },
+  {
+    "type": "match",
+    "ui": "pair_matching",
+    "notes": "Word to translation, or phrase to phrase."
+  },
+  {
+    "type": "typing",
+    "ui": "text_input",
+    "notes": "Accept multiple correct variants; normalize punctuation."
+  },
+  {
+    "type": "word_order",
+    "ui": "chips_reorder",
+    "notes": "Learner reorders tokens to form correct sentence."
+  },
+  {
+    "type": "listening",
+    "ui": "audio_prompt",
+    "notes": "Play audio; user types or chooses."
+  },
+  {
+    "type": "case_pick",
+    "ui": "single_choice",
+    "notes": "Choose correct case/ending for noun."
+  },
+  {
+    "type": "conjugation",
+    "ui": "single_choice_or_typing",
+    "notes": "Conjugate verb for given subject/tense."
+  },
+  {
+    "type": "clitic_drag",
+    "ui": "drag_drop",
+    "notes": "Place clitics correctly inside sentence frame."
+  }
+]

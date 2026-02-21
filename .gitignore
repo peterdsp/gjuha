@@ -88,3 +88,7 @@ npm-debug.log*
 # Temporary files
 tmp/
 temp/
+
+# Content pipeline — raw source downloads (large, regeneratable)
+sources/
+content/generated/

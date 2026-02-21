@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "VocabularyItem",
+  "type": "object",
+  "required": [
+    "id",
+    "base_form",
+    "part_of_speech",
+    "english",
+    "cefr",
+    "tags"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "base_form": {
+      "type": "string"
+    },
+    "lemma": {
+      "type": "string"
+    },
+    "part_of_speech": {
+      "type": "string",
+      "enum": [
+        "noun",
+        "verb",
+        "adjective",
+        "adverb",
+        "pronoun",
+        "preposition",
+        "conjunction",
+        "interjection",
+        "numeral",
+        "phrase"
+      ]
+    },
+    "gender": {
+      "type": "string",
+      "enum": [
+        "masculine",
+        "feminine",
+        "neuter",
+        ""
+      ],
+      "default": ""
+    },
+    "plural": {
+      "type": "string"
+    },
+    "definite": {
+      "type": "string"
+    },
+    "forms": {
+      "type": "object",
+      "description": "Optional: case/tense forms keyed by a stable label."
+    },
+    "english": {
+      "type": "string"
+    },
+    "cefr": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2",
+        "C1",
+        "C2"
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notes": {
+      "type": "string"
+    },
+    "audio_key": {
+      "type": "string"
+    }
+  }
+}

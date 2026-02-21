@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SentenceTemplate",
+  "type": "object",
+  "required": [
+    "id",
+    "cefr",
+    "grammar_focus",
+    "template",
+    "slots",
+    "examples"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "cefr": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ]
+    },
+    "grammar_focus": {
+      "type": "string"
+    },
+    "template": {
+      "type": "string",
+      "description": "Templated surface form with slot names, e.g. '{SUBJ} {VERB.PRES.1SG} {OBJ.ACC}'"
+    },
+    "slots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "type",
+          "constraints"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "vocab_ref",
+              "morph_rule",
+              "free_text"
+            ]
+          },
+          "constraints": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "examples": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

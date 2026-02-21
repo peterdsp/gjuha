@@ -1,0 +1,206 @@
+[
+  {
+    "unit": 1,
+    "title": "Survival Basics",
+    "cefr": "A1",
+    "themes": [
+      "Greetings & introducing yourself",
+      "Pronouns & 'to be'",
+      "Numbers & time",
+      "Coffee & ordering",
+      "Family & people",
+      "Food & shopping",
+      "Directions",
+      "Home & daily routine",
+      "Weather & seasons",
+      "Simple past intro (high level)"
+    ]
+  },
+  {
+    "unit": 2,
+    "title": "Everyday Life",
+    "cefr": "A1",
+    "themes": [
+      "Work & study",
+      "Transport",
+      "Health basics",
+      "At the market",
+      "Hobbies",
+      "Plans (future with 'do')",
+      "Questions & negation",
+      "Places in town",
+      "Phone & messages",
+      "Review / checkpoint"
+    ]
+  },
+  {
+    "unit": 3,
+    "title": "Talking About You",
+    "cefr": "A1",
+    "themes": [
+      "Describe people",
+      "Adjectives agreement (intro)",
+      "Possession",
+      "Simple stories (past)",
+      "Politeness",
+      "Eating out",
+      "Small talk",
+      "Appointments",
+      "Travel basics",
+      "Review / checkpoint"
+    ]
+  },
+  {
+    "unit": 4,
+    "title": "Confidence Builder",
+    "cefr": "A1",
+    "themes": [
+      "Daily habits",
+      "Common verbs",
+      "Prepositions (intro)",
+      "Comparisons (intro)",
+      "Shopping dialogues",
+      "At home",
+      "At work",
+      "Requests",
+      "Listening sprint",
+      "A1 final review"
+    ]
+  },
+  {
+    "unit": 5,
+    "title": "Bigger Sentences",
+    "cefr": "A2",
+    "themes": [
+      "Past (imperfect intro)",
+      "Connectors (and/but/because)",
+      "More questions",
+      "Clitics (intro)",
+      "Cases (intro)",
+      "Making suggestions",
+      "Going out",
+      "Opinions",
+      "News snippets",
+      "Review / checkpoint"
+    ]
+  },
+  {
+    "unit": 6,
+    "title": "Real Conversations",
+    "cefr": "A2",
+    "themes": [
+      "Phone calls",
+      "Invitations",
+      "Travel situations",
+      "Health & pharmacy",
+      "At the bank",
+      "Renting/home",
+      "Work meetings",
+      "Shopping returns",
+      "Storytelling",
+      "Review / checkpoint"
+    ]
+  },
+  {
+    "unit": 7,
+    "title": "Grammar Power-ups",
+    "cefr": "A2",
+    "themes": [
+      "Definite/indefinite mastery",
+      "Prepositions + cases",
+      "Pronouns & clitics (more)",
+      "Future plans",
+      "Conditionals (intro)",
+      "Comparatives",
+      "Giving advice",
+      "Complaints politely",
+      "Listening sprint",
+      "Review / checkpoint"
+    ]
+  },
+  {
+    "unit": 8,
+    "title": "A2 Finish",
+    "cefr": "A2",
+    "themes": [
+      "Longer texts",
+      "Describing experiences",
+      "Formal vs informal",
+      "Idioms starter",
+      "Dialect Easter eggs (optional)",
+      "Culture pack: coffee/weddings",
+      "Writing short messages",
+      "Reading sprint",
+      "Speaking sprint",
+      "A2 final review"
+    ]
+  },
+  {
+    "unit": 9,
+    "title": "Complex Ideas",
+    "cefr": "B1",
+    "themes": [
+      "Subjunctive (intro)",
+      "Narratives in past",
+      "Reported speech (intro)",
+      "Arguments/opinions",
+      "Plans + reasons",
+      "Work & career",
+      "Learning & study",
+      "Culture pack",
+      "Listening longer",
+      "Review / checkpoint"
+    ]
+  },
+  {
+    "unit": 10,
+    "title": "Fluency Boost",
+    "cefr": "B1",
+    "themes": [
+      "Debate basics",
+      "Media & tech",
+      "Health & lifestyle",
+      "Travel deep",
+      "Social situations",
+      "Polite disagreement",
+      "Humor & slang",
+      "Writing longer messages",
+      "Reading sprint",
+      "Review / checkpoint"
+    ]
+  },
+  {
+    "unit": 11,
+    "title": "Everyday Mastery",
+    "cefr": "B1",
+    "themes": [
+      "Services & bureaucracy",
+      "Housing & contracts",
+      "Money & budgeting",
+      "Relationships",
+      "Food culture",
+      "Sports & leisure",
+      "City life",
+      "Nature & weather",
+      "Listening longer",
+      "Review / checkpoint"
+    ]
+  },
+  {
+    "unit": 12,
+    "title": "B1 Finish",
+    "cefr": "B1",
+    "themes": [
+      "Storytelling challenge",
+      "Real dialogues pack",
+      "Idioms & phrases",
+      "Case accuracy drills",
+      "Clitic accuracy drills",
+      "Speaking challenge",
+      "Reading challenge",
+      "Writing challenge",
+      "Full review",
+      "B1 final test"
+    ]
+  }
+]

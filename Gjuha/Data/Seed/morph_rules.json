@@ -1,0 +1,46 @@
+{
+  "version": "0.1",
+  "noun_patterns": [
+    {
+      "id": "NOUN_MASC_DEF_I",
+      "description": "Common masculine nouns with definite -i (e.g., qytet -> qyteti)",
+      "examples": [
+        "qytet/qyteti"
+      ]
+    },
+    {
+      "id": "NOUN_FEM_DEF_A",
+      "description": "Common feminine nouns with definite -a (e.g., bukë -> buka)",
+      "examples": [
+        "bukë/buka"
+      ]
+    },
+    {
+      "id": "NOUN_FEM_DEF_JA",
+      "description": "Common feminine nouns with definite -ja (e.g., kafe -> kafja)",
+      "examples": [
+        "kafe/kafja"
+      ]
+    },
+    {
+      "id": "NOUN_PATTERN_TODO",
+      "description": "Add more declension patterns with case forms (A2/B1)",
+      "examples": []
+    }
+  ],
+  "verb_patterns": [
+    {
+      "id": "VERB_PRESENT_SIMPLE",
+      "description": "Present tense pattern placeholders; fill from Wiktionary extraction",
+      "examples": [
+        "shkoj/shkon/shkon/shkojmë/shkoni/shkojnë"
+      ]
+    },
+    {
+      "id": "VERB_PATTERN_TODO",
+      "description": "Add past, imperfect, future, subjunctive patterns",
+      "examples": []
+    }
+  ],
+  "notes": "This is a starter pattern file. Production version should be generated from Wiktionary extraction + manual QA."
+}

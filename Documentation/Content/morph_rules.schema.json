@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MorphRules",
+  "type": "object",
+  "required": [
+    "version",
+    "noun_patterns",
+    "verb_patterns",
+    "notes"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "noun_patterns": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "verb_patterns": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

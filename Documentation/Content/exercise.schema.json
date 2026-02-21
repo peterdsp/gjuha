@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ExerciseItem",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "prompt",
+    "answer",
+    "cefr",
+    "tags"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "mcq",
+        "match",
+        "typing",
+        "word_order",
+        "listening",
+        "speaking",
+        "clitic_drag",
+        "case_pick",
+        "conjugation"
+      ]
+    },
+    "prompt": {
+      "type": "string"
+    },
+    "answer": {
+      "type": [
+        "string",
+        "array",
+        "object"
+      ]
+    },
+    "choices": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "audio_key": {
+      "type": "string"
+    },
+    "cefr": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "explanation": {
+      "type": "string"
+    }
+  }
+}

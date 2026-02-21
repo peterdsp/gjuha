@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Lesson",
+  "type": "object",
+  "required": [
+    "id",
+    "unit",
+    "order",
+    "title",
+    "cefr",
+    "objectives",
+    "exercise_plan",
+    "unlock"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "unit": {
+      "type": "integer"
+    },
+    "order": {
+      "type": "integer"
+    },
+    "title": {
+      "type": "string"
+    },
+    "cefr": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ]
+    },
+    "objectives": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "exercise_plan": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "unlock": {
+      "type": "object",
+      "properties": {
+        "requires_lesson_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

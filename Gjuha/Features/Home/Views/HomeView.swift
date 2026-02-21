@@ -61,7 +61,7 @@ private struct HomeHeaderView: View {
 
 private struct LearningUnitRowView: View {
     let unit: LearningUnit
-    let onLessonTap: (Lesson) -> Void
+    let onLessonTap: (LessonSummary) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -85,7 +85,7 @@ private struct LearningUnitRowView: View {
 }
 
 private struct LessonNodeView: View {
-    let lesson: Lesson
+    let lesson: LessonSummary
 
     var body: some View {
         HStack(spacing: 12) {

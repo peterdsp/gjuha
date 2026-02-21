@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 import ComposableArchitecture
 
 @main
@@ -10,7 +11,7 @@ struct GjuhaApp: App {
     var body: some Scene {
         WindowGroup {
             AppView(store: GjuhaApp.store)
+                .modelContainer(GjuhaSchema.container)
         }
-        .modelContainer(GjuhaSchema.container)
     }
 }

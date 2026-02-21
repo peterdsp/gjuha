@@ -3,10 +3,10 @@ import Dependencies
 
 // MARK: - Protocol
 
-protocol CurriculumRepository {
+protocol CurriculumRepository: Sendable {
     func fetchUnits() async -> [LearningUnit]
-    func fetchLessons(for unitId: UUID) async -> [Lesson]
-    func fetchLesson(_ lessonId: UUID) async -> Lesson?
+    func fetchLessons(for unitId: UUID) async -> [LessonSummary]
+    func fetchLesson(_ lessonId: UUID) async -> LessonSummary?
 }
 
 // MARK: - Dependency Key
@@ -25,35 +25,35 @@ extension DependencyValues {
 
 // MARK: - Live Implementation
 
-final class LiveCurriculumRepository: CurriculumRepository {
+final class LiveCurriculumRepository: CurriculumRepository, @unchecked Sendable {
     func fetchUnits() async -> [LearningUnit] {
         // TODO: Load from SwiftData seeded from JSON
         return []
     }
 
-    func fetchLessons(for unitId: UUID) async -> [Lesson] {
+    func fetchLessons(for unitId: UUID) async -> [LessonSummary] {
         return []
     }
 
-    func fetchLesson(_ lessonId: UUID) async -> Lesson? {
+    func fetchLesson(_ lessonId: UUID) async -> LessonSummary? {
         return nil
     }
 }
 
 // MARK: - Mock Implementation
 
-final class MockCurriculumRepository: CurriculumRepository {
+final class MockCurriculumRepository: CurriculumRepository, @unchecked Sendable {
     func fetchUnits() async -> [LearningUnit] {
         return LearningUnit.mockData
     }
 
-    func fetchLessons(for unitId: UUID) async -> [Lesson] {
+    func fetchLessons(for unitId: UUID) async -> [LessonSummary] {
         return LearningUnit.mockData
             .first { $0.id == unitId }?
             .lessons ?? []
     }
 
-    func fetchLesson(_ lessonId: UUID) async -> Lesson? {
+    func fetchLesson(_ lessonId: UUID) async -> LessonSummary? {
         return LearningUnit.mockData
             .flatMap { $0.lessons }
             .first { $0.id == lessonId }
@@ -70,7 +70,7 @@ extension LearningUnit {
             description: "Greetings, introductions, and the verb 'to be'",
             cefrLevel: .a1,
             orderIndex: 0,
-            lessons: Lesson.unit1Lessons
+            lessons: LessonSummary.unit1Summaries
         ),
         LearningUnit(
             id: UUID(),
@@ -83,33 +83,24 @@ extension LearningUnit {
     ]
 }
 
-extension Lesson {
-    static let unit1Lessons: [Lesson] = [
-        Lesson(
+extension LessonSummary {
+    static let unit1Summaries: [LessonSummary] = [
+        LessonSummary(
             title: "Greetings",
             subtitle: "Say hello in Albanian",
-            unitId: UUID(),
-            cefrLevel: .a1,
             iconName: "hand.wave.fill",
-            orderIndex: 0,
             lessonType: .vocabulary
         ),
-        Lesson(
+        LessonSummary(
             title: "To be: jam",
             subtitle: "Conjugate the verb 'jam'",
-            unitId: UUID(),
-            cefrLevel: .a1,
             iconName: "person.fill",
-            orderIndex: 1,
             lessonType: .grammar
         ),
-        Lesson(
+        LessonSummary(
             title: "Numbers 1–10",
             subtitle: "Count in Albanian",
-            unitId: UUID(),
-            cefrLevel: .a1,
             iconName: "number.circle.fill",
-            orderIndex: 2,
             lessonType: .vocabulary
         ),
     ]

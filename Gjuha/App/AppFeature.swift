@@ -4,7 +4,7 @@ import SwiftUI
 @Reducer
 struct AppFeature {
     @ObservableState
-    struct State: Equatable {
+    struct State {
         var path = StackState<Path.State>()
         var home = HomeFeature.State()
         var hasCompletedOnboarding: Bool = false

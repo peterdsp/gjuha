@@ -3,7 +3,7 @@ import Dependencies
 
 // MARK: - Protocol
 
-protocol VocabularyRepository {
+protocol VocabularyRepository: Sendable {
     func fetchAll() async -> [Word]
     func fetchByLevel(_ level: CEFRLevel) async -> [Word]
     func fetchByIds(_ ids: [UUID]) async -> [Word]
@@ -27,7 +27,7 @@ extension DependencyValues {
 
 // MARK: - Live Implementation
 
-final class LiveVocabularyRepository: VocabularyRepository {
+final class LiveVocabularyRepository: VocabularyRepository, @unchecked Sendable {
     func fetchAll() async -> [Word] {
         // TODO: Fetch from SwiftData container
         return []
@@ -52,7 +52,7 @@ final class LiveVocabularyRepository: VocabularyRepository {
 
 // MARK: - Mock Implementation (for tests and previews)
 
-final class MockVocabularyRepository: VocabularyRepository {
+final class MockVocabularyRepository: VocabularyRepository, @unchecked Sendable {
     func fetchAll() async -> [Word] {
         return Word.mockData
     }
@@ -78,7 +78,7 @@ final class MockVocabularyRepository: VocabularyRepository {
 // MARK: - Mock Data
 
 extension Word {
-    static let mockData: [Word] = [
+    nonisolated(unsafe) static let mockData: [Word] = [
         Word(albanian: "mirëdita", english: "good day / hello", cefrLevel: .a1, partOfSpeech: .interjection),
         Word(albanian: "faleminderit", english: "thank you", cefrLevel: .a1, partOfSpeech: .interjection),
         Word(albanian: "po", english: "yes", cefrLevel: .a1, partOfSpeech: .particle),

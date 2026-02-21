@@ -55,17 +55,50 @@ enum LessonType: String, Codable {
     case review
 }
 
-struct LearningUnit: Identifiable, Equatable {
+/// Lightweight value type used in TCA State — mirrors Lesson without @Model reference
+struct LessonSummary: Identifiable, Equatable, Sendable {
+    let id: UUID
+    let title: String
+    let subtitle: String
+    let iconName: String
+    let lessonType: LessonType
+    let isCompleted: Bool
+    let bestXP: Int
+
+    init(from lesson: Lesson) {
+        self.id = lesson.id
+        self.title = lesson.title
+        self.subtitle = lesson.subtitle
+        self.iconName = lesson.iconName
+        self.lessonType = lesson.lessonType
+        self.isCompleted = lesson.isCompleted
+        self.bestXP = lesson.bestXP
+    }
+
+    init(
+        id: UUID = UUID(),
+        title: String,
+        subtitle: String,
+        iconName: String,
+        lessonType: LessonType,
+        isCompleted: Bool = false,
+        bestXP: Int = 0
+    ) {
+        self.id = id
+        self.title = title
+        self.subtitle = subtitle
+        self.iconName = iconName
+        self.lessonType = lessonType
+        self.isCompleted = isCompleted
+        self.bestXP = bestXP
+    }
+}
+
+struct LearningUnit: Identifiable, Equatable, Sendable {
     let id: UUID
     let title: String
     let description: String
     let cefrLevel: CEFRLevel
     let orderIndex: Int
-    var lessons: [Lesson]
-}
-
-extension Lesson: Equatable {
-    static func == (lhs: Lesson, rhs: Lesson) -> Bool {
-        lhs.id == rhs.id
-    }
+    var lessons: [LessonSummary]
 }

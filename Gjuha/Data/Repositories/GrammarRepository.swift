@@ -3,7 +3,7 @@ import Dependencies
 
 // MARK: - Protocol
 
-protocol GrammarRepository {
+protocol GrammarRepository: Sendable {
     func fetchTopics() async -> [GrammarTopic]
     func fetchTopic(_ id: UUID) async -> GrammarTopic?
     func fetchTopicsByCategory(_ category: GrammarCategory) async -> [GrammarTopic]
@@ -25,7 +25,7 @@ extension DependencyValues {
 
 // MARK: - Live Implementation
 
-final class LiveGrammarRepository: GrammarRepository {
+final class LiveGrammarRepository: GrammarRepository, @unchecked Sendable {
     func fetchTopics() async -> [GrammarTopic] { [] }
     func fetchTopic(_ id: UUID) async -> GrammarTopic? { nil }
     func fetchTopicsByCategory(_ category: GrammarCategory) async -> [GrammarTopic] { [] }
@@ -33,7 +33,7 @@ final class LiveGrammarRepository: GrammarRepository {
 
 // MARK: - Mock Implementation
 
-final class MockGrammarRepository: GrammarRepository {
+final class MockGrammarRepository: GrammarRepository, @unchecked Sendable {
     func fetchTopics() async -> [GrammarTopic] { GrammarTopic.mockData }
 
     func fetchTopic(_ id: UUID) async -> GrammarTopic? {

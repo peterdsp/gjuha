@@ -5,7 +5,7 @@ import Foundation
 struct LessonFeature {
     @ObservableState
     struct State: Equatable {
-        var lesson: Lesson
+        var lesson: LessonSummary
         var exercises: [Exercise] = []
         var currentIndex: Int = 0
         var hearts: Int = 3

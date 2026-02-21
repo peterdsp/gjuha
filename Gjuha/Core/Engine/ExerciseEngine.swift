@@ -3,8 +3,8 @@ import Dependencies
 
 // MARK: - Protocol
 
-protocol ExerciseEngineProtocol {
-    func generateExercises(for lesson: Lesson) async -> [Exercise]
+protocol ExerciseEngineProtocol: Sendable {
+    func generateExercises(for lesson: LessonSummary) async -> [Exercise]
     func checkAnswer(_ answer: String, for exercise: Exercise) -> Bool
 }
 
@@ -24,8 +24,8 @@ extension DependencyValues {
 
 // MARK: - Live Engine
 
-final class ExerciseEngine: ExerciseEngineProtocol {
-    func generateExercises(for lesson: Lesson) async -> [Exercise] {
+final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
+    func generateExercises(for lesson: LessonSummary) async -> [Exercise] {
         switch lesson.lessonType {
         case .vocabulary:
             return await generateVocabularyExercises(lesson)
@@ -44,18 +44,18 @@ final class ExerciseEngine: ExerciseEngineProtocol {
         return normalizedAnswer == normalizedCorrect
     }
 
-    private func generateVocabularyExercises(_ lesson: Lesson) async -> [Exercise] {
+    private func generateVocabularyExercises(_ lesson: LessonSummary) async -> [Exercise] {
         // TODO: Load words for lesson, generate MCQ + translation exercises
         // Engine generates varied exercise types from the same word pool
         return Exercise.mockExercises
     }
 
-    private func generateGrammarExercises(_ lesson: Lesson) async -> [Exercise] {
+    private func generateGrammarExercises(_ lesson: LessonSummary) async -> [Exercise] {
         // TODO: Load grammar topic, generate conjugation + fill-in-blank exercises
         return []
     }
 
-    private func generateReviewExercises(_ lesson: Lesson) async -> [Exercise] {
+    private func generateReviewExercises(_ lesson: LessonSummary) async -> [Exercise] {
         // TODO: SRS-based selection of words due for review
         return []
     }
@@ -63,8 +63,8 @@ final class ExerciseEngine: ExerciseEngineProtocol {
 
 // MARK: - Mock Engine
 
-final class MockExerciseEngine: ExerciseEngineProtocol {
-    func generateExercises(for lesson: Lesson) async -> [Exercise] {
+final class MockExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
+    func generateExercises(for lesson: LessonSummary) async -> [Exercise] {
         return Exercise.mockExercises
     }
 

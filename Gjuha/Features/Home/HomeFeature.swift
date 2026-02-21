@@ -14,7 +14,7 @@ struct HomeFeature {
     enum Action {
         case onAppear
         case unitsLoaded([LearningUnit])
-        case lessonTapped(Lesson)
+        case lessonTapped(LessonSummary)
     }
 
     @Dependency(\.curriculumRepository) var curriculumRepository

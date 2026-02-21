@@ -2,7 +2,7 @@ import SwiftData
 import Foundation
 
 enum GjuhaSchema {
-    static var container: ModelContainer = {
+    nonisolated(unsafe) static var container: ModelContainer = {
         let schema = Schema([
             Word.self,
             Lesson.self,

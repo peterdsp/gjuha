@@ -3,7 +3,7 @@ import Dependencies
 
 // MARK: - Protocol
 
-protocol ProgressRepository {
+protocol ProgressRepository: Sendable {
     func fetchUserStats() async -> UserStats
     func markLessonCompleted(_ lessonId: UUID, xpEarned: Int) async
     func updateStreak() async
@@ -27,7 +27,7 @@ extension DependencyValues {
 
 // MARK: - Live Implementation
 
-final class LiveProgressRepository: ProgressRepository {
+final class LiveProgressRepository: ProgressRepository, @unchecked Sendable {
     func fetchUserStats() async -> UserStats {
         // TODO: Aggregate from SwiftData
         return .empty
@@ -47,7 +47,7 @@ final class LiveProgressRepository: ProgressRepository {
 
 // MARK: - Mock Implementation
 
-final class MockProgressRepository: ProgressRepository {
+final class MockProgressRepository: ProgressRepository, @unchecked Sendable {
     func fetchUserStats() async -> UserStats {
         return UserStats(
             currentStreak: 7,

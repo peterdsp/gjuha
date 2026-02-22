@@ -5,17 +5,20 @@ struct ProfileView: View {
     let store: StoreOf<ProfileFeature>
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                StatsGridView(stats: store.stats)
+        ZStack {
+            GjuhaLiquidGlassBackground()
 
-                GoalPickerView(selected: store.selectedGoal) { goal in
-                    store.send(.goalChanged(goal))
+            ScrollView {
+                VStack(spacing: 24) {
+                    StatsGridView(stats: store.stats)
+
+                    GoalPickerView(selected: store.selectedGoal) { goal in
+                        store.send(.goalChanged(goal))
+                    }
                 }
+                .padding(16)
             }
-            .padding(16)
         }
-        .background(Color.gjuha.background)
         .navigationTitle("Profile")
         .navigationBarTitleDisplayMode(.large)
         .onAppear { store.send(.onAppear) }
@@ -55,8 +58,7 @@ private struct StatCardView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(16)
-        .background(Color.gjuha.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .gjuhaLiquidGlassCard(cornerRadius: 14, tintOpacity: 0.06)
     }
 }
 
@@ -86,13 +88,17 @@ private struct GoalPickerView: View {
                         }
                     }
                     .padding(14)
-                    .background(selected == goal ? Color.gjuha.accentSubtle : Color.gjuha.surface)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .background(selected == goal ? Color.gjuha.accentSubtle.opacity(0.92) : Color.white.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(selected == goal ? Color.gjuha.accent.opacity(0.65) : Color.white.opacity(0.2), lineWidth: 0.8)
+                    )
                 }
+                .buttonStyle(.plain)
             }
         }
         .padding(16)
-        .background(Color.gjuha.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .gjuhaLiquidGlassCard(cornerRadius: 18, tintOpacity: 0.07)
     }
 }

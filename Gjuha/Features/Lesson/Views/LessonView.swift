@@ -6,7 +6,7 @@ struct LessonView: View {
 
     var body: some View {
         ZStack {
-            Color.gjuha.background.ignoresSafeArea()
+            GjuhaLiquidGlassBackground()
 
             switch store.phase {
             case .loading:
@@ -85,6 +85,9 @@ private struct LessonProgressBar: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
+        .gjuhaLiquidGlassCard(cornerRadius: 14, tintOpacity: 0.05)
+        .padding(.horizontal, 12)
+        .padding(.top, 8)
     }
 }
 
@@ -127,13 +130,9 @@ private struct MultipleChoiceAnswers: View {
                         .font(.gjuha.answerOption)
                         .foregroundStyle(Color.gjuha.textPrimary)
                         .frame(maxWidth: .infinity, minHeight: 64)
-                        .background(Color.gjuha.surface)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.gjuha.border, lineWidth: 1.5)
-                        )
+                        .gjuhaLiquidGlassCard(cornerRadius: 12, tintOpacity: 0.05)
                 }
+                .buttonStyle(.plain)
             }
         }
         .padding(.horizontal, 16)
@@ -150,9 +149,7 @@ private struct TextInputAnswer: View {
             TextField("Type your answer...", text: $text)
                 .font(.gjuha.bodyMedium)
                 .padding(16)
-                .background(Color.gjuha.surface)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gjuha.border, lineWidth: 1.5))
+                .gjuhaLiquidGlassCard(cornerRadius: 12, tintOpacity: 0.06)
                 .padding(.horizontal, 16)
                 .onSubmit { if !text.isEmpty { onSubmit(text) } }
 
@@ -198,7 +195,13 @@ private struct LessonCompletedView: View {
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(Color.gjuha.accent)
+                    .background(
+                        LinearGradient(
+                            colors: [Color.gjuha.accent, Color.gjuha.streak.opacity(0.94)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }
             .padding(.horizontal, 24)
@@ -236,7 +239,13 @@ private struct LessonFailedView: View {
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
-                        .background(Color.gjuha.accent)
+                        .background(
+                            LinearGradient(
+                                colors: [Color.gjuha.accent, Color.gjuha.streak.opacity(0.94)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
                 Button(action: onExit) {

@@ -23,6 +23,7 @@ struct AppView: View {
                     .zIndex(1)
             }
         }
+        .animation(.spring(response: 0.52, dampingFraction: 0.86), value: store.hasCompletedOnboarding)
         .task {
             guard !hasStartedLaunchSequence else { return }
             hasStartedLaunchSequence = true
@@ -44,7 +45,7 @@ struct AppView: View {
     private var mainFlow: some View {
         if store.hasCompletedOnboarding {
             NavigationStackStore(store.scope(state: \.path, action: \.path)) {
-                HomeView(store: store.scope(state: \.home, action: \.home))
+                RootTabView(store: store)
             } destination: { store in
                 switch store.case {
                 case .lesson(let store):
@@ -57,14 +58,155 @@ struct AppView: View {
                     ProfileView(store: store)
                 }
             }
+            .transition(.asymmetric(insertion: .opacity.combined(with: .move(edge: .trailing)), removal: .opacity))
         } else {
-            OnboardingView(
-                store: Store(initialState: OnboardingFeature.State()) {
-                    OnboardingFeature()
-                },
-                onCompleted: { store.send(.onboardingCompleted) }
-            )
+            OnboardingView(store: store.scope(state: \.onboarding, action: \.onboarding))
+                .transition(.asymmetric(insertion: .opacity, removal: .opacity.combined(with: .scale(scale: 1.02))))
         }
+    }
+}
+
+private struct RootTabView: View {
+    let store: StoreOf<AppFeature>
+
+    private var selectedTab: Binding<AppFeature.State.RootTab> {
+        Binding(
+            get: { store.selectedTab },
+            set: { store.send(.tabSelected($0)) }
+        )
+    }
+
+    var body: some View {
+        ZStack {
+            switch store.selectedTab {
+            case .home:
+                HomeView(store: store.scope(state: \.home, action: \.home))
+            case .vocabulary:
+                VocabularyView(store: store.scope(state: \.vocabulary, action: \.vocabulary))
+            case .grammar:
+                GrammarView(store: store.scope(state: \.grammar, action: \.grammar))
+            case .profile:
+                ProfileView(store: store.scope(state: \.profile, action: \.profile))
+            }
+        }
+        .id(store.selectedTab)
+        .transition(.opacity)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            FloatingPillTabBar(selectedTab: selectedTab)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 8)
+        }
+        .animation(.spring(response: 0.4, dampingFraction: 0.86), value: store.selectedTab)
+    }
+}
+
+private struct FloatingPillTabBar: View {
+    @Binding var selectedTab: AppFeature.State.RootTab
+    @Namespace private var activeTabAnimation
+
+    private struct TabItem: Identifiable {
+        let id: AppFeature.State.RootTab
+        let title: String
+        let icon: String
+    }
+
+    private let items: [TabItem] = [
+        .init(id: .home, title: "Learn", icon: "bolt.fill"),
+        .init(id: .vocabulary, title: "Words", icon: "text.book.closed.fill"),
+        .init(id: .grammar, title: "Grammar", icon: "book.pages.fill"),
+        .init(id: .profile, title: "Profile", icon: "person.crop.circle.fill")
+    ]
+
+    var body: some View {
+        HStack(spacing: 2) {
+            ForEach(items) { item in
+                tabButton(tab: item.id, title: item.title, icon: item.icon)
+            }
+        }
+        .frame(maxWidth: 560)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 6)
+        .background(
+            ZStack {
+                Capsule(style: .continuous)
+                    .fill(.ultraThinMaterial)
+
+                Capsule(style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color.black.opacity(0.58),
+                                Color.black.opacity(0.46)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+            }
+        )
+        .overlay(
+            Capsule(style: .continuous)
+                .stroke(Color.white.opacity(0.28), lineWidth: 1.0)
+        )
+        .overlay(
+            Capsule(style: .continuous)
+                .stroke(Color.white.opacity(0.08), lineWidth: 3)
+                .blur(radius: 1.2)
+                .clipShape(Capsule(style: .continuous))
+        )
+        .shadow(color: .black.opacity(0.36), radius: 24, y: 12)
+    }
+
+    @ViewBuilder
+    private func tabButton(
+        tab: AppFeature.State.RootTab,
+        title: String,
+        icon: String
+    ) -> some View {
+        let isSelected = selectedTab == tab
+
+        Button {
+            withAnimation(.spring(response: 0.36, dampingFraction: 0.82)) {
+                selectedTab = tab
+            }
+        } label: {
+            VStack(spacing: 2) {
+                Image(systemName: icon)
+                    .font(.system(size: 17, weight: .semibold))
+                    .symbolRenderingMode(.hierarchical)
+
+                Text(title)
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
+            }
+            .foregroundStyle(isSelected ? Color.gjuha.accent : Color.white.opacity(0.88))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .frame(maxWidth: .infinity)
+            .scaleEffect(isSelected ? 1.0 : 0.98)
+            .background {
+                if isSelected {
+                    Capsule(style: .continuous)
+                        .fill(Color.black.opacity(0.34))
+                        .overlay(
+                            Capsule(style: .continuous)
+                                .fill(Color.white.opacity(0.08))
+                        )
+                        .overlay(
+                            Capsule(style: .continuous)
+                                .stroke(Color.white.opacity(0.22), lineWidth: 0.8)
+                        )
+                        .matchedGeometryEffect(id: "active-pill-tab", in: activeTabAnimation)
+                }
+            }
+            .contentShape(Capsule(style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(title)
+        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 }
 

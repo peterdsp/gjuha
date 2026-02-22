@@ -5,30 +5,36 @@ struct VocabularyView: View {
     @Bindable var store: StoreOf<VocabularyFeature>
 
     var body: some View {
-        VStack(spacing: 0) {
-            SearchBar(text: $store.searchQuery)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
+        ZStack {
+            GjuhaLiquidGlassBackground()
 
-            CEFRFilterBar(selected: store.selectedCEFR) { level in
-                store.send(.cefrFilterTapped(level))
-            }
+            VStack(spacing: 0) {
+                SearchBar(text: $store.searchQuery)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
 
-            if store.isLoading {
-                Spacer()
-                ProgressView()
-                Spacer()
-            } else {
-                List(store.filteredWords) { word in
-                    WordRowView(word: word)
-                        .listRowBackground(Color.gjuha.surface)
-                        .listRowSeparatorTint(Color.gjuha.border)
+                CEFRFilterBar(selected: store.selectedCEFR) { level in
+                    store.send(.cefrFilterTapped(level))
                 }
-                .listStyle(.plain)
-                .background(Color.gjuha.background)
+
+                if store.isLoading {
+                    Spacer()
+                    ProgressView()
+                    Spacer()
+                } else {
+                    ScrollView {
+                        LazyVStack(spacing: 10) {
+                            ForEach(store.filteredWords) { word in
+                                WordRowView(word: word)
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 12)
+                        .padding(.bottom, 24)
+                    }
+                }
             }
         }
-        .background(Color.gjuha.background)
         .navigationTitle("Vocabulary")
         .navigationBarTitleDisplayMode(.large)
         .onAppear { store.send(.onAppear) }
@@ -46,8 +52,7 @@ private struct SearchBar: View {
                 .font(.gjuha.bodyRegular)
         }
         .padding(12)
-        .background(Color.gjuha.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .gjuhaLiquidGlassCard(cornerRadius: 14, tintOpacity: 0.08)
     }
 }
 
@@ -85,8 +90,12 @@ private struct FilterChip: View {
                 .foregroundStyle(isSelected ? .white : Color.gjuha.textSecondary)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(isSelected ? Color.gjuha.accent : Color.gjuha.surface)
+                .background(isSelected ? AnyShapeStyle(Color.gjuha.accent) : AnyShapeStyle(.ultraThinMaterial))
                 .clipShape(RoundedRectangle(cornerRadius: 20))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(isSelected ? Color.clear : Color.white.opacity(0.22), lineWidth: 0.8)
+                )
         }
     }
 }
@@ -119,6 +128,8 @@ private struct WordRowView: View {
                 .background(Color.gjuha.surfaceSecondary)
                 .clipShape(RoundedRectangle(cornerRadius: 6))
         }
-        .padding(.vertical, 4)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .gjuhaLiquidGlassCard(cornerRadius: 14, tintOpacity: 0.06)
     }
 }

@@ -6,43 +6,35 @@ struct HomeView: View {
     @State private var animateEntrance = false
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                HomeHeaderView(streak: store.currentStreak, xp: store.totalXP)
+        ZStack {
+            GjuhaLiquidGlassBackground()
 
-                if store.isLoading {
-                    ProgressView()
-                        .padding(.top, 48)
-                } else {
-                    LazyVStack(spacing: 24) {
-                        ForEach(Array(store.units.enumerated()), id: \.element.id) { index, unit in
-                            LearningUnitRowView(
-                                unit: unit,
-                                isVisible: animateEntrance,
-                                entranceDelay: Double(index) * 0.08
-                            ) { lesson in
-                                store.send(.lessonTapped(lesson))
+            ScrollView {
+                VStack(spacing: 0) {
+                    HomeHeaderView(streak: store.currentStreak, xp: store.totalXP)
+                        .padding(.horizontal, 16)
+                        .padding(.top, 12)
+
+                    if store.isLoading {
+                        ProgressView()
+                            .padding(.top, 48)
+                    } else {
+                        LazyVStack(spacing: 24) {
+                            ForEach(Array(store.units.enumerated()), id: \.element.id) { index, unit in
+                                LearningUnitRowView(
+                                    unit: unit,
+                                    isVisible: animateEntrance,
+                                    entranceDelay: Double(index) * 0.08
+                                ) { lesson in
+                                    store.send(.lessonTapped(lesson))
+                                }
                             }
                         }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 20)
+                        .padding(.bottom, 28)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 24)
                 }
-            }
-        }
-        .background {
-            ZStack(alignment: .top) {
-                Color.gjuha.background
-
-                LinearGradient(
-                    colors: [
-                        Color.gjuha.accentSubtle.opacity(0.35),
-                        Color.gjuha.background.opacity(0.0)
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .frame(height: 260)
             }
         }
         .navigationBarHidden(true)
@@ -84,12 +76,13 @@ private struct HomeHeaderView: View {
         }
         .padding(.horizontal, 24)
         .padding(.vertical, 16)
-        .background(Color.gjuha.surface)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(alignment: .bottom) {
-            Rectangle()
-                .fill(Color.gjuha.border.opacity(0.6))
-                .frame(height: 1)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Color.white.opacity(0.28), lineWidth: 0.8)
         }
+        .shadow(color: .black.opacity(0.12), radius: 14, y: 8)
         .onAppear {
             pulse = true
         }
@@ -113,18 +106,14 @@ private struct LearningUnitRowView: View {
                 .foregroundStyle(Color.gjuha.textSecondary)
 
             ForEach(unit.lessons) { lesson in
-                LessonNodeView(lesson: lesson)
-                    .onTapGesture { onLessonTap(lesson) }
+                Button(action: { onLessonTap(lesson) }) {
+                    LessonNodeView(lesson: lesson)
+                }
+                .buttonStyle(.plain)
             }
         }
         .padding(16)
-        .background(Color.gjuha.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.gjuha.border.opacity(0.75), lineWidth: 1)
-        )
-        .shadow(color: .black.opacity(0.06), radius: 10, y: 6)
+        .gjuhaLiquidGlassCard(cornerRadius: 20, tintOpacity: 0.06)
         .opacity(isVisible ? 1 : 0)
         .offset(y: isVisible ? 0 : 16)
         .scaleEffect(isVisible ? 1.0 : 0.98)
@@ -171,8 +160,17 @@ private struct LessonNodeView: View {
             if lesson.isCompleted {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundStyle(Color.gjuha.success)
+            } else {
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.gjuha.textTertiary)
             }
         }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(.white.opacity(0.12))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .onAppear {
             if lesson.isCompleted {
                 completedPulse = true

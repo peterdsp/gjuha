@@ -3,7 +3,6 @@ import ComposableArchitecture
 
 struct OnboardingView: View {
     let store: StoreOf<OnboardingFeature>
-    var onCompleted: (() -> Void)? = nil
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
@@ -43,13 +42,6 @@ struct OnboardingView: View {
                         removal: .move(edge: .leading).combined(with: .opacity)
                     )
                 )
-            case .complete:
-                EmptyView()
-            }
-        }
-        .onChange(of: store.step) { step in
-            if step == .complete {
-                onCompleted?()
             }
         }
         .animation(
@@ -66,7 +58,7 @@ private struct OnboardingBackdropView: View {
 
     var body: some View {
         ZStack {
-            Color.gjuha.background.ignoresSafeArea()
+            GjuhaLiquidGlassBackground()
 
             Circle()
                 .fill(Color.gjuha.accent.opacity(0.08))
@@ -195,11 +187,11 @@ private struct ReasonStepView: View {
                             }
                         }
                         .padding(16)
-                        .background(selected == reason ? Color.gjuha.accentSubtle : Color.gjuha.surface)
+                        .background(selected == reason ? Color.gjuha.accentSubtle.opacity(0.92) : Color.white.opacity(0.12))
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
-                                .stroke(selected == reason ? Color.gjuha.accent : Color.clear, lineWidth: 2)
+                                .stroke(selected == reason ? Color.gjuha.accent : Color.white.opacity(0.22), lineWidth: 1.2)
                         )
                         .shadow(
                             color: selected == reason ? Color.gjuha.accent.opacity(0.22) : .clear,
@@ -286,11 +278,11 @@ private struct GoalStepView: View {
                             }
                         }
                         .padding(16)
-                        .background(selected == goal ? Color.gjuha.accentSubtle : Color.gjuha.surface)
+                        .background(selected == goal ? Color.gjuha.accentSubtle.opacity(0.92) : Color.white.opacity(0.12))
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
-                                .stroke(selected == goal ? Color.gjuha.accent : Color.clear, lineWidth: 2)
+                                .stroke(selected == goal ? Color.gjuha.accent : Color.white.opacity(0.22), lineWidth: 1.2)
                         )
                         .shadow(
                             color: selected == goal ? Color.gjuha.accent.opacity(0.22) : .clear,

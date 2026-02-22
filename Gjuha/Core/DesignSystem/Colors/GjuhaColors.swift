@@ -41,3 +41,62 @@ extension Color {
     static var gjuhaBackgroundFallback: Color { Color(UIColor.systemBackground) }
     static var gjuhaSurfaceFallback: Color { Color(UIColor.secondarySystemBackground) }
 }
+
+// MARK: - Liquid Glass Styling
+
+private struct GjuhaLiquidGlassCardModifier: ViewModifier {
+    let cornerRadius: CGFloat
+    let tintOpacity: Double
+
+    func body(content: Content) -> some View {
+        content
+            .background(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                            .fill(Color.white.opacity(tintOpacity))
+                    )
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .stroke(Color.white.opacity(0.24), lineWidth: 0.8)
+            )
+            .shadow(color: .black.opacity(0.14), radius: 14, y: 8)
+    }
+}
+
+struct GjuhaLiquidGlassBackground: View {
+    var body: some View {
+        ZStack {
+            LinearGradient(
+                colors: [
+                    Color.gjuha.background,
+                    Color.gjuha.accentSubtle.opacity(0.45),
+                    Color.gjuha.background
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+
+            Circle()
+                .fill(Color.white.opacity(0.15))
+                .frame(width: 300, height: 300)
+                .blur(radius: 14)
+                .offset(x: -140, y: -240)
+
+            Circle()
+                .fill(Color.gjuha.accent.opacity(0.12))
+                .frame(width: 260, height: 260)
+                .blur(radius: 20)
+                .offset(x: 160, y: 260)
+        }
+        .ignoresSafeArea()
+    }
+}
+
+extension View {
+    func gjuhaLiquidGlassCard(cornerRadius: CGFloat = 16, tintOpacity: Double = 0.08) -> some View {
+        modifier(GjuhaLiquidGlassCardModifier(cornerRadius: cornerRadius, tintOpacity: tintOpacity))
+    }
+}

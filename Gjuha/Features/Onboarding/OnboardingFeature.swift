@@ -13,7 +13,6 @@ struct OnboardingFeature {
             case welcome
             case reason
             case goal
-            case complete
         }
     }
 
@@ -28,13 +27,13 @@ struct OnboardingFeature {
         Reduce { state, action in
             switch action {
             case .nextStepTapped:
+                if state.step == .goal {
+                    return .send(.completed)
+                }
                 let allSteps = State.Step.allCases
                 if let currentIdx = allSteps.firstIndex(of: state.step),
                    currentIdx + 1 < allSteps.count {
                     state.step = allSteps[currentIdx + 1]
-                }
-                if state.step == .complete {
-                    return .send(.completed)
                 }
                 return .none
 

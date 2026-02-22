@@ -5,17 +5,21 @@ struct GrammarView: View {
     let store: StoreOf<GrammarFeature>
 
     var body: some View {
-        Group {
-            if let topic = store.selectedTopic {
-                GrammarTopicDetailView(topic: topic) {
-                    store.send(.backTapped)
-                }
-            } else {
-                GrammarTopicListView(
-                    topics: store.topics,
-                    isLoading: store.isLoading
-                ) { topic in
-                    store.send(.topicSelected(topic))
+        ZStack {
+            GjuhaLiquidGlassBackground()
+
+            Group {
+                if let topic = store.selectedTopic {
+                    GrammarTopicDetailView(topic: topic) {
+                        store.send(.backTapped)
+                    }
+                } else {
+                    GrammarTopicListView(
+                        topics: store.topics,
+                        isLoading: store.isLoading
+                    ) { topic in
+                        store.send(.topicSelected(topic))
+                    }
                 }
             }
         }
@@ -33,26 +37,36 @@ private struct GrammarTopicListView: View {
     var body: some View {
         if isLoading {
             ProgressView()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
-            List(topics) { topic in
-                Button(action: { onSelect(topic) }) {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(topic.title)
-                                .font(.gjuha.labelBold)
-                                .foregroundStyle(Color.gjuha.textPrimary)
-                            Text(topic.subtitle)
-                                .font(.gjuha.caption)
-                                .foregroundStyle(Color.gjuha.textSecondary)
+            ScrollView {
+                LazyVStack(spacing: 12) {
+                    ForEach(topics) { topic in
+                        Button(action: { onSelect(topic) }) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(topic.title)
+                                        .font(.gjuha.labelBold)
+                                        .foregroundStyle(Color.gjuha.textPrimary)
+                                    Text(topic.subtitle)
+                                        .font(.gjuha.caption)
+                                        .foregroundStyle(Color.gjuha.textSecondary)
+                                }
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .foregroundStyle(Color.gjuha.textTertiary)
+                            }
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 12)
+                            .gjuhaLiquidGlassCard(cornerRadius: 14, tintOpacity: 0.06)
                         }
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundStyle(Color.gjuha.textTertiary)
+                        .buttonStyle(.plain)
                     }
                 }
-                .listRowBackground(Color.gjuha.surface)
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
+                .padding(.bottom, 24)
             }
-            .listStyle(.plain)
         }
     }
 }
@@ -86,8 +100,7 @@ private struct GrammarTopicDetailView: View {
                                 .foregroundStyle(Color.gjuha.textSecondary)
                                 .padding(12)
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .background(Color.gjuha.surface)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                .gjuhaLiquidGlassCard(cornerRadius: 12, tintOpacity: 0.05)
                         }
                     }
                     .padding(.horizontal, 16)
@@ -95,7 +108,6 @@ private struct GrammarTopicDetailView: View {
             }
             .padding(.top, 16)
         }
-        .background(Color.gjuha.background)
         .navigationBarBackButtonHidden()
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -127,7 +139,6 @@ private struct ConjugationTableView: View {
                 Divider()
             }
         }
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gjuha.border, lineWidth: 1))
+        .gjuhaLiquidGlassCard(cornerRadius: 12, tintOpacity: 0.05)
     }
 }

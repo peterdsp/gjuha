@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -72,7 +72,7 @@
 
 /* Begin PBXFileReference section */
 		03074DCCAB2314C9DEA2D700 /* VocabularyFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyFeature.swift; sourceTree = "<group>"; };
-		146EC61D6D8D4ED1086A3A2E /* sentences_sqi_50k.csv */ = {isa = PBXFileReference; path = sentences_sqi_50k.csv; sourceTree = "<group>"; };
+		146EC61D6D8D4ED1086A3A2E /* sentences_sqi_50k.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = sentences_sqi_50k.csv; sourceTree = "<group>"; };
 		17C1B7CF1DE1FE9647BED0EE /* GjuhaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GjuhaApp.swift; sourceTree = "<group>"; };
 		19DCBEA4497F8BF1A676D78C /* ProfileFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileFeature.swift; sourceTree = "<group>"; };
 		2CFDDA191EC2592A6DBCDBC4 /* VocabularyRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyRepository.swift; sourceTree = "<group>"; };
@@ -90,11 +90,11 @@
 		6B06A810E34B51182A1BDA5C /* GrammarFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarFeature.swift; sourceTree = "<group>"; };
 		6FFC860C5CF9F3C4BB286031 /* GjuhaColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GjuhaColors.swift; sourceTree = "<group>"; };
 		7AF761B0EBE9456459F5E43C /* LessonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonView.swift; sourceTree = "<group>"; };
-		7B2AF71B9560382C660EBF04 /* vocabulary_seed_600.csv */ = {isa = PBXFileReference; path = vocabulary_seed_600.csv; sourceTree = "<group>"; };
+		7B2AF71B9560382C660EBF04 /* vocabulary_seed_600.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = vocabulary_seed_600.csv; sourceTree = "<group>"; };
 		7B79C593CD7E9413AFCA9E55 /* morph_rules.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = morph_rules.json; sourceTree = "<group>"; };
 		7BB42A1B4980DF9F1D81AD0E /* lessons.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = lessons.json; sourceTree = "<group>"; };
 		88EE2AB0F0B8EAB44CC86A4E /* Word.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Word.swift; sourceTree = "<group>"; };
-		89CBC36224DC7B72439E5EFB /* Gjuha.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Gjuha.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		89CBC36224DC7B72439E5EFB /* Gjuha.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Gjuha.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8C7C8F01805342D81163BDF0 /* AppView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppView.swift; sourceTree = "<group>"; };
 		8D582E219B218127545746AC /* a1_lessons.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = a1_lessons.json; sourceTree = "<group>"; };
 		964F6F114F09EEBD358573A8 /* CurriculumRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurriculumRepository.swift; sourceTree = "<group>"; };
@@ -109,7 +109,7 @@
 		CEA826FE31BEA459913FF230 /* OnboardingFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingFeature.swift; sourceTree = "<group>"; };
 		D1E9D9F25830DD968FEFD5FF /* GrammarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarView.swift; sourceTree = "<group>"; };
 		D289A128F464DD34E654275F /* a1_vocabulary.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = a1_vocabulary.json; sourceTree = "<group>"; };
-		D363C272C9250C12494FAEAE /* word_frequency_top6000.csv */ = {isa = PBXFileReference; path = word_frequency_top6000.csv; sourceTree = "<group>"; };
+		D363C272C9250C12494FAEAE /* word_frequency_top6000.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = word_frequency_top6000.csv; sourceTree = "<group>"; };
 		D55D733FFF8AB417FADFB8D0 /* exercise_types.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = exercise_types.json; sourceTree = "<group>"; };
 		D64619B60B89E4FB14A9F8A7 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		D8C4E3FD1632C0420EA79851 /* GrammarTopic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarTopic.swift; sourceTree = "<group>"; };
@@ -723,7 +723,6 @@
 			packageReferences = (
 				ADA6957B6BFD6B52FDB2C090 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 			);
-			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -904,14 +903,17 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 0;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Gjuha/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Gjuha;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.gjuha.app;
 				SDKROOT = iphoneos;
 				SWIFT_STRICT_CONCURRENCY = complete;
@@ -926,14 +928,17 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 0;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Gjuha/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Gjuha;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.gjuha.app;
 				SDKROOT = iphoneos;
 				SWIFT_STRICT_CONCURRENCY = complete;

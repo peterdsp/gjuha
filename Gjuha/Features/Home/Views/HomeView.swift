@@ -5,23 +5,17 @@ struct HomeView: View {
     let store: StoreOf<HomeFeature>
     @State private var animateEntrance = false
 
-    private var totalLessons: Int {
-        store.units.reduce(0) { partial, unit in
-            partial + unit.lessons.count
-        }
+    private var currentUnit: LearningUnit? {
+        // Show the first unit that has at least one incomplete lesson
+        store.units.first(where: { unit in
+            !unit.isLocked && unit.lessons.contains(where: { !$0.isCompleted })
+        }) ?? store.units.first(where: { !$0.isLocked })
     }
 
-    private var completedLessons: Int {
-        store.units.reduce(0) { partial, unit in
-            partial + unit.lessons.filter(\.isCompleted).count
-        }
-    }
-
-    private var nextLesson: LessonSummary? {
-        store.units
-            .flatMap(\.lessons)
-            .first(where: { !$0.isCompleted })
-            ?? store.units.first?.lessons.first
+    private var completedUnitsCount: Int {
+        store.units.filter { unit in
+            !unit.lessons.isEmpty && unit.lessons.allSatisfy(\.isCompleted)
+        }.count
     }
 
     var body: some View {
@@ -37,35 +31,40 @@ struct HomeView: View {
                     if store.isLoading {
                         ProgressView()
                             .padding(.top, 48)
-                    } else {
-                        VStack(spacing: 18) {
-                            HomeHeroExperienceView(
-                                unitsCount: store.units.count,
-                                totalLessons: totalLessons,
-                                completedLessons: completedLessons,
-                                nextLessonTitle: nextLesson?.title
+                    } else if let unit = currentUnit {
+                        VStack(spacing: 20) {
+                            // Current unit header
+                            UnitHeaderCard(
+                                unit: unit,
+                                completedUnits: completedUnitsCount,
+                                totalUnits: store.units.count
                             )
 
-                            if store.units.isEmpty {
-                                HomeNoContentView()
-                                    .padding(.top, 10)
-                            } else {
-                                LazyVStack(spacing: 24) {
-                                    ForEach(Array(store.units.enumerated()), id: \.element.id) { index, unit in
-                                        LearningUnitRowView(
-                                            unit: unit,
-                                            isVisible: animateEntrance,
-                                            entranceDelay: Double(index) * 0.08
-                                        ) { lesson in
-                                            store.send(.lessonTapped(lesson))
-                                        }
-                                    }
+                            // Course path — zigzag lesson nodes
+                            CoursePathView(
+                                lessons: unit.lessons,
+                                onLessonTap: { lesson in
+                                    store.send(.lessonTapped(lesson))
                                 }
+                            )
+
+                            // Next unit preview
+                            if let nextUnit = nextLockedUnit(after: unit) {
+                                NextUnitPreview(unit: nextUnit)
                             }
                         }
                         .padding(.horizontal, 16)
                         .padding(.top, 20)
                         .padding(.bottom, 28)
+                    } else if store.units.isEmpty {
+                        HomeNoContentView()
+                            .padding(.horizontal, 16)
+                            .padding(.top, 20)
+                    } else {
+                        // All units done!
+                        AllCompleteView()
+                            .padding(.horizontal, 16)
+                            .padding(.top, 20)
                     }
                 }
             }
@@ -78,7 +77,16 @@ struct HomeView: View {
             store.send(.onAppear)
         }
     }
+
+    private func nextLockedUnit(after current: LearningUnit) -> LearningUnit? {
+        guard let index = store.units.firstIndex(where: { $0.id == current.id }) else { return nil }
+        let nextIndex = index + 1
+        guard nextIndex < store.units.count else { return nil }
+        return store.units[nextIndex]
+    }
 }
+
+// MARK: - Header
 
 private struct HomeHeaderView: View {
     let streak: Int
@@ -116,45 +124,48 @@ private struct HomeHeaderView: View {
                 .stroke(Color.white.opacity(0.28), lineWidth: 0.8)
         }
         .shadow(color: .black.opacity(0.12), radius: 14, y: 8)
-        .onAppear {
-            pulse = true
-        }
+        .onAppear { pulse = true }
     }
 }
 
-private struct HomeHeroExperienceView: View {
-    let unitsCount: Int
-    let totalLessons: Int
-    let completedLessons: Int
-    let nextLessonTitle: String?
-    @State private var glow = false
+// MARK: - Unit Header Card
+
+private struct UnitHeaderCard: View {
+    let unit: LearningUnit
+    let completedUnits: Int
+    let totalUnits: Int
+
+    private var completedLessons: Int {
+        unit.lessons.filter(\.isCompleted).count
+    }
 
     private var progress: Double {
-        guard totalLessons > 0 else { return 0 }
-        return Double(completedLessons) / Double(totalLessons)
+        guard !unit.lessons.isEmpty else { return 0 }
+        return Double(completedLessons) / Double(unit.lessons.count)
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 12) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Your Albanian Journey")
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(unit.title)
                         .font(.gjuha.headingMedium)
                         .foregroundStyle(Color.gjuha.textPrimary)
 
-                    Text(nextLessonTitle ?? "Ready for your next lesson")
-                        .font(.gjuha.bodyRegular)
+                    Text(unit.description)
+                        .font(.gjuha.caption)
                         .foregroundStyle(Color.gjuha.textSecondary)
                         .lineLimit(2)
                 }
 
                 Spacer(minLength: 8)
-                AnimatedMascotView(size: 94)
+                AnimatedMascotView(size: 74)
             }
 
-            VStack(alignment: .leading, spacing: 8) {
+            // Progress bar
+            VStack(alignment: .leading, spacing: 6) {
                 HStack {
-                    Text("\(completedLessons) / \(max(totalLessons, 1)) lessons")
+                    Text("\(completedLessons)/\(unit.lessons.count) lessons")
                         .font(.gjuha.captionBold)
                         .foregroundStyle(Color.gjuha.textPrimary)
                     Spacer()
@@ -163,57 +174,270 @@ private struct HomeHeroExperienceView: View {
                         .foregroundStyle(Color.gjuha.accent)
                 }
 
-                ZStack(alignment: .leading) {
-                    Capsule(style: .continuous)
-                        .fill(Color.white.opacity(0.2))
-                        .frame(height: 8)
-
-                    Capsule(style: .continuous)
-                        .fill(
-                            LinearGradient(
-                                colors: [Color.gjuha.accent, Color.gjuha.streak],
-                                startPoint: .leading,
-                                endPoint: .trailing
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        Capsule(style: .continuous)
+                            .fill(Color.white.opacity(0.2))
+                            .frame(height: 8)
+                        Capsule(style: .continuous)
+                            .fill(
+                                LinearGradient(
+                                    colors: [Color.gjuha.accent, Color.gjuha.streak],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
                             )
-                        )
-                        .frame(height: 8)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .mask(
-                            GeometryReader { geo in
-                                Rectangle()
-                                    .frame(width: geo.size.width * progress)
-                            }
-                        )
+                            .frame(width: geo.size.width * progress, height: 8)
+                    }
                 }
+                .frame(height: 8)
             }
 
+            // Course stats
             HStack(spacing: 8) {
-                HomeMetricChip(icon: "rectangle.stack.fill", text: "\(unitsCount) units")
-                HomeMetricChip(icon: "book.closed.fill", text: "\(totalLessons) lessons")
-                HomeMetricChip(icon: "sparkles", text: "50k sentence engine")
+                HomeMetricChip(icon: "checkmark.seal.fill", text: "\(completedUnits)/\(totalUnits) units")
+                HomeMetricChip(icon: "book.closed.fill", text: "\(unit.lessons.count) lessons")
+                HomeMetricChip(icon: "graduationcap.fill", text: unit.cefrLevel.rawValue.uppercased())
             }
         }
         .padding(16)
         .gjuhaLiquidGlassCard(cornerRadius: 22, tintOpacity: 0.09)
-        .overlay(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(
-                    LinearGradient(
-                        colors: [Color.white.opacity(0.45), Color.white.opacity(0.08)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: glow ? 1.1 : 0.7
+    }
+}
+
+// MARK: - Course Path (Duolingo-style zigzag)
+
+private struct CoursePathView: View {
+    let lessons: [LessonSummary]
+    let onLessonTap: (LessonSummary) -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ForEach(Array(lessons.enumerated()), id: \.element.id) { index, lesson in
+                VStack(spacing: 0) {
+                    // Connector line
+                    if index > 0 {
+                        PathConnector(
+                            isCompleted: lessons[index - 1].isCompleted,
+                            fromOffset: zigzagOffset(for: index - 1),
+                            toOffset: zigzagOffset(for: index)
+                        )
+                    }
+
+                    // Lesson node
+                    CourseNodeView(
+                        lesson: lesson,
+                        index: index,
+                        isNext: isNextLesson(index),
+                        onTap: { onLessonTap(lesson) }
+                    )
+                    .offset(x: zigzagOffset(for: index))
+                }
+            }
+        }
+        .padding(.vertical, 8)
+    }
+
+    private func zigzagOffset(for index: Int) -> CGFloat {
+        let pattern: [CGFloat] = [0, 60, 0, -60]
+        return pattern[index % pattern.count]
+    }
+
+    private func isNextLesson(_ index: Int) -> Bool {
+        // The "next" lesson is the first non-completed, non-locked one
+        let lesson = lessons[index]
+        guard !lesson.isCompleted && !lesson.isLocked else { return false }
+        return !lessons.prefix(index).contains(where: { !$0.isCompleted && !$0.isLocked })
+    }
+}
+
+// MARK: - Path Connector
+
+private struct PathConnector: View {
+    let isCompleted: Bool
+    let fromOffset: CGFloat
+    let toOffset: CGFloat
+
+    var body: some View {
+        GeometryReader { geo in
+            Path { path in
+                let midY = geo.size.height / 2
+                let centerX = geo.size.width / 2
+                path.move(to: CGPoint(x: centerX + fromOffset, y: 0))
+                path.addCurve(
+                    to: CGPoint(x: centerX + toOffset, y: geo.size.height),
+                    control1: CGPoint(x: centerX + fromOffset, y: midY),
+                    control2: CGPoint(x: centerX + toOffset, y: midY)
                 )
-        )
-        .shadow(color: Color.gjuha.accent.opacity(glow ? 0.22 : 0.1), radius: 14, y: 8)
+            }
+            .stroke(
+                isCompleted ? Color.gjuha.success.opacity(0.6) : Color.gjuha.textTertiary.opacity(0.3),
+                style: StrokeStyle(lineWidth: 3, lineCap: .round, dash: isCompleted ? [] : [6, 4])
+            )
+        }
+        .frame(height: 32)
+    }
+}
+
+// MARK: - Course Node (Single Lesson)
+
+private struct CourseNodeView: View {
+    let lesson: LessonSummary
+    let index: Int
+    let isNext: Bool
+    let onTap: () -> Void
+    @State private var breathe = false
+    @State private var appeared = false
+
+    private var nodeSize: CGFloat {
+        isNext ? 72 : 60
+    }
+
+    var body: some View {
+        Button(action: onTap) {
+            VStack(spacing: 6) {
+                ZStack {
+                    // Glow ring for next lesson
+                    if isNext {
+                        Circle()
+                            .fill(Color.gjuha.accent.opacity(0.3))
+                            .frame(width: nodeSize + 16, height: nodeSize + 16)
+                            .scaleEffect(breathe ? 1.15 : 1.0)
+                            .opacity(breathe ? 0.5 : 1.0)
+                    }
+
+                    // Main circle
+                    Circle()
+                        .fill(backgroundColor)
+                        .frame(width: nodeSize, height: nodeSize)
+                        .overlay(
+                            Circle()
+                                .stroke(borderColor, lineWidth: isNext ? 3 : 2)
+                        )
+                        .shadow(
+                            color: lesson.isCompleted
+                                ? Color.gjuha.success.opacity(0.3)
+                                : (isNext ? Color.gjuha.accent.opacity(0.4) : .clear),
+                            radius: 8, y: 4
+                        )
+
+                    // Icon
+                    if lesson.isLocked {
+                        Image(systemName: "lock.fill")
+                            .font(.system(size: 22, weight: .semibold))
+                            .foregroundStyle(Color.gjuha.textTertiary)
+                    } else if lesson.isCompleted {
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundStyle(.white)
+                    } else {
+                        Image(systemName: lesson.iconName)
+                            .font(.system(size: isNext ? 26 : 22, weight: .semibold))
+                            .foregroundStyle(isNext ? .white : Color.gjuha.textPrimary)
+                    }
+                }
+
+                Text(lesson.title)
+                    .font(isNext ? .gjuha.labelBold : .gjuha.caption)
+                    .foregroundStyle(
+                        lesson.isLocked
+                            ? Color.gjuha.textTertiary
+                            : Color.gjuha.textPrimary
+                    )
+                    .lineLimit(1)
+
+                if lesson.isCompleted && lesson.bestXP > 0 {
+                    HStack(spacing: 2) {
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 9))
+                        Text("\(lesson.bestXP)")
+                            .font(.system(size: 10, weight: .semibold))
+                    }
+                    .foregroundStyle(Color.gjuha.xp)
+                }
+            }
+        }
+        .buttonStyle(.plain)
+        .disabled(lesson.isLocked)
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 12)
         .onAppear {
-            withAnimation(.easeInOut(duration: 1.1).repeatForever(autoreverses: true)) {
-                glow = true
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.8).delay(Double(index) * 0.06)) {
+                appeared = true
+            }
+            if isNext {
+                withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                    breathe = true
+                }
             }
         }
     }
+
+    private var backgroundColor: some ShapeStyle {
+        if lesson.isCompleted {
+            return AnyShapeStyle(
+                LinearGradient(
+                    colors: [Color.gjuha.success, Color.gjuha.success.opacity(0.8)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+        }
+        if isNext {
+            return AnyShapeStyle(
+                LinearGradient(
+                    colors: [Color.gjuha.accent, Color.gjuha.streak.opacity(0.9)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+        }
+        if lesson.isLocked {
+            return AnyShapeStyle(Color.gjuha.surfaceSecondary.opacity(0.5))
+        }
+        return AnyShapeStyle(Color.gjuha.surface)
+    }
+
+    private var borderColor: Color {
+        if lesson.isCompleted { return Color.gjuha.success }
+        if isNext { return Color.gjuha.accent }
+        if lesson.isLocked { return Color.gjuha.textTertiary.opacity(0.3) }
+        return Color.gjuha.border
+    }
 }
+
+// MARK: - Next Unit Preview
+
+private struct NextUnitPreview: View {
+    let unit: LearningUnit
+
+    var body: some View {
+        VStack(spacing: 8) {
+            HStack(spacing: 8) {
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Color.gjuha.textTertiary)
+                Text("Next: \(unit.title)")
+                    .font(.gjuha.labelBold)
+                    .foregroundStyle(Color.gjuha.textTertiary)
+            }
+            Text("Complete all lessons above to unlock")
+                .font(.gjuha.caption)
+                .foregroundStyle(Color.gjuha.textTertiary.opacity(0.7))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(16)
+        .background(Color.gjuha.surfaceSecondary.opacity(0.3))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [6, 4]))
+                .foregroundStyle(Color.gjuha.textTertiary.opacity(0.3))
+        )
+    }
+}
+
+// MARK: - Utility Views
 
 private struct HomeMetricChip: View {
     let icon: String
@@ -252,92 +476,20 @@ private struct HomeNoContentView: View {
     }
 }
 
-private struct LearningUnitRowView: View {
-    let unit: LearningUnit
-    let isVisible: Bool
-    let entranceDelay: Double
-    let onLessonTap: (LessonSummary) -> Void
-
+private struct AllCompleteView: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(unit.title)
+        VStack(spacing: 16) {
+            AnimatedMascotView(size: 100)
+            Text("You've completed everything!")
                 .font(.gjuha.headingMedium)
                 .foregroundStyle(Color.gjuha.textPrimary)
-
-            Text(unit.description)
+            Text("More content coming soon. Review your lessons to keep your skills sharp.")
                 .font(.gjuha.bodyRegular)
                 .foregroundStyle(Color.gjuha.textSecondary)
-
-            ForEach(unit.lessons) { lesson in
-                Button(action: { onLessonTap(lesson) }) {
-                    LessonNodeView(lesson: lesson)
-                }
-                .buttonStyle(.plain)
-            }
+                .multilineTextAlignment(.center)
         }
-        .padding(16)
-        .gjuhaLiquidGlassCard(cornerRadius: 20, tintOpacity: 0.06)
-        .opacity(isVisible ? 1 : 0)
-        .offset(y: isVisible ? 0 : 16)
-        .scaleEffect(isVisible ? 1.0 : 0.98)
-        .animation(
-            .spring(response: 0.52, dampingFraction: 0.86, blendDuration: 0.2)
-            .delay(entranceDelay),
-            value: isVisible
-        )
-    }
-}
-
-private struct LessonNodeView: View {
-    let lesson: LessonSummary
-    @State private var completedPulse = false
-
-    var body: some View {
-        HStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(lesson.isCompleted ? Color.gjuha.accent : Color.gjuha.surfaceSecondary)
-                    .frame(width: 48, height: 48)
-                Image(systemName: lesson.iconName)
-                    .foregroundStyle(lesson.isCompleted ? .white : Color.gjuha.textSecondary)
-            }
-            .scaleEffect(lesson.isCompleted && completedPulse ? 1.08 : 1.0)
-            .animation(
-                lesson.isCompleted
-                ? .easeInOut(duration: 0.95).repeatForever(autoreverses: true)
-                : .default,
-                value: completedPulse
-            )
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(lesson.title)
-                    .font(.gjuha.labelBold)
-                    .foregroundStyle(Color.gjuha.textPrimary)
-                Text(lesson.subtitle)
-                    .font(.gjuha.caption)
-                    .foregroundStyle(Color.gjuha.textSecondary)
-            }
-
-            Spacer()
-
-            if lesson.isCompleted {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(Color.gjuha.success)
-            } else {
-                Image(systemName: "chevron.right")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(Color.gjuha.textTertiary)
-            }
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .background(.white.opacity(0.12))
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .onAppear {
-            if lesson.isCompleted {
-                completedPulse = true
-            }
-        }
+        .frame(maxWidth: .infinity)
+        .padding(24)
+        .gjuhaLiquidGlassCard(cornerRadius: 22, tintOpacity: 0.09)
     }
 }

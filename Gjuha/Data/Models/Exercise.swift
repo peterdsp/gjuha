@@ -49,3 +49,9 @@ enum ExerciseType: String, Codable, Equatable {
     case arrangeWords             // Put words in order
     case trueFalse                // Grammar statement T/F
 }
+
+/// Result of checking an answer — used for feedback UI
+enum AnswerResult: Equatable {
+    case correct
+    case wrong(correctAnswer: String)
+}

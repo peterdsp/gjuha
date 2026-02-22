@@ -5,7 +5,7 @@ import Dependencies
 
 protocol ProgressRepository: Sendable {
     func fetchUserStats() async -> UserStats
-    func markLessonCompleted(_ lessonId: UUID, xpEarned: Int) async
+    func markLessonCompleted(_ lessonId: UUID, seedId: String, xpEarned: Int) async
     func updateStreak() async
     func fetchCurrentStreak() async -> Int
     func fetchTotalXP() async -> Int
@@ -29,20 +29,28 @@ extension DependencyValues {
 
 final class LiveProgressRepository: ProgressRepository, @unchecked Sendable {
     func fetchUserStats() async -> UserStats {
-        // TODO: Aggregate from SwiftData
-        return .empty
+        let store = ProgressStore.shared
+        return UserStats(
+            currentStreak: store.currentStreak,
+            totalXP: store.totalXP,
+            wordsLearned: store.lessonsCompleted * 6,
+            lessonsCompleted: store.lessonsCompleted
+        )
     }
 
-    func markLessonCompleted(_ lessonId: UUID, xpEarned: Int) async {
-        // TODO: Persist to SwiftData, update XP, check streak
+    func markLessonCompleted(_ lessonId: UUID, seedId: String, xpEarned: Int) async {
+        ProgressStore.shared.markLessonCompleted(seedId: seedId, xpEarned: xpEarned)
     }
 
-    func updateStreak() async {
-        // TODO: Check last activity date, increment or reset streak
+    func updateStreak() async {}
+
+    func fetchCurrentStreak() async -> Int {
+        ProgressStore.shared.currentStreak
     }
 
-    func fetchCurrentStreak() async -> Int { 0 }
-    func fetchTotalXP() async -> Int { 0 }
+    func fetchTotalXP() async -> Int {
+        ProgressStore.shared.totalXP
+    }
 }
 
 // MARK: - Mock Implementation
@@ -57,7 +65,7 @@ final class MockProgressRepository: ProgressRepository, @unchecked Sendable {
         )
     }
 
-    func markLessonCompleted(_ lessonId: UUID, xpEarned: Int) async {}
+    func markLessonCompleted(_ lessonId: UUID, seedId: String, xpEarned: Int) async {}
     func updateStreak() async {}
     func fetchCurrentStreak() async -> Int { 7 }
     func fetchTotalXP() async -> Int { 340 }

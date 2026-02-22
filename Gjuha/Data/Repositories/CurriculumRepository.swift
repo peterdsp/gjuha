@@ -66,6 +66,14 @@ final class LiveCurriculumRepository: CurriculumRepository, @unchecked Sendable 
             return $0.order < $1.order
         }
 
+        // Build a lookup for unlock rules
+        let unlockRules: [String: [String]] = Dictionary(
+            uniqueKeysWithValues: seedLessons.map { ($0.id, $0.unlock.requires_lesson_ids) }
+        )
+
+        // Load completed lesson IDs from persistent store
+        let completedIds = ProgressStore.shared.completedLessonSeedIds
+
         var builtUnits: [LearningUnit] = []
         var lessonMapByUnit: [UUID: [LessonSummary]] = [:]
         var lessonMapById: [UUID: LessonSummary] = [:]
@@ -74,17 +82,32 @@ final class LiveCurriculumRepository: CurriculumRepository, @unchecked Sendable 
             let unitId = stableUUID(for: "unit-\(seedUnit.unit)")
             let unitLessons = orderedLessons
                 .filter { $0.unit == seedUnit.unit }
-                .map { seedLesson in
+                .enumerated()
+                .map { (localIndex, seedLesson) in
+                    let isCompleted = completedIds.contains(seedLesson.id)
+
+                    // A lesson is locked if its prerequisites are not all completed
+                    let prereqs = unlockRules[seedLesson.id] ?? []
+                    let isLocked = !prereqs.isEmpty && !prereqs.allSatisfy { completedIds.contains($0) }
+
                     let lesson = LessonSummary(
                         id: stableUUID(for: "lesson-\(seedLesson.id)"),
+                        seedId: seedLesson.id,
                         title: seedLesson.title,
                         subtitle: subtitle(for: seedLesson),
                         iconName: iconName(for: seedLesson.title),
-                        lessonType: lessonType(for: seedLesson.title)
+                        lessonType: lessonType(for: seedLesson.title),
+                        isCompleted: isCompleted,
+                        bestXP: isCompleted ? ProgressStore.shared.bestXP(for: seedLesson.id) : 0,
+                        isLocked: isLocked,
+                        orderIndex: localIndex
                     )
                     lessonMapById[lesson.id] = lesson
                     return lesson
                 }
+
+            // A unit is locked if ALL its lessons are locked
+            let unitIsLocked = !unitLessons.isEmpty && unitLessons.allSatisfy(\.isLocked)
 
             let description = seedUnit.themes.prefix(3).joined(separator: ", ")
             let unit = LearningUnit(
@@ -93,7 +116,8 @@ final class LiveCurriculumRepository: CurriculumRepository, @unchecked Sendable 
                 description: description.isEmpty ? "Core Albanian practice" : description,
                 cefrLevel: parseCEFR(seedUnit.cefr),
                 orderIndex: seedUnit.unit - 1,
-                lessons: unitLessons
+                lessons: unitLessons,
+                isLocked: unitIsLocked
             )
 
             lessonMapByUnit[unitId] = unitLessons
@@ -137,7 +161,7 @@ final class LiveCurriculumRepository: CurriculumRepository, @unchecked Sendable 
                 return stripped
             }
         }
-        return lesson.objectives.dropFirst().first ?? "Practice Albanian with mixed exercises"
+        return "Complete 5-min micro lessons with typing + listening."
     }
 
     private static func lessonType(for title: String) -> LessonType {
@@ -146,6 +170,9 @@ final class LiveCurriculumRepository: CurriculumRepository, @unchecked Sendable 
             "verb", "tense", "grammar", "pronoun", "adjective",
             "case", "conjug", "declension", "negation", "questions"
         ]
+        if lowered.contains("review") || lowered.contains("checkpoint") || lowered.contains("final") {
+            return .review
+        }
         return grammarHints.contains { lowered.contains($0) } ? .grammar : .vocabulary
     }
 
@@ -158,6 +185,7 @@ final class LiveCurriculumRepository: CurriculumRepository, @unchecked Sendable 
         if lowered.contains("direction") || lowered.contains("travel") || lowered.contains("transport") { return "map.fill" }
         if lowered.contains("work") || lowered.contains("study") { return "briefcase.fill" }
         if lowered.contains("culture") { return "globe.europe.africa.fill" }
+        if lowered.contains("review") || lowered.contains("checkpoint") || lowered.contains("final") { return "checkmark.seal.fill" }
         if lessonType(for: title) == .grammar { return "textformat.abc.dottedunderline" }
         return "book.closed.fill"
     }
@@ -176,7 +204,7 @@ final class LiveCurriculumRepository: CurriculumRepository, @unchecked Sendable 
         return try? JSONDecoder().decode(T.self, from: data)
     }
 
-    private static func stableUUID(for raw: String) -> UUID {
+    static func stableUUID(for raw: String) -> UUID {
         var bytes = [UInt8](repeating: 0, count: 16)
         for (index, value) in raw.utf8.enumerated() {
             bytes[index % 16] = bytes[index % 16] &+ value
@@ -198,13 +226,18 @@ final class LiveCurriculumRepository: CurriculumRepository, @unchecked Sendable 
         let themes: [String]
     }
 
-    private struct SeedLesson: Decodable {
+    struct SeedLesson: Decodable {
         let id: String
         let unit: Int
         let order: Int
         let title: String
         let cefr: String
         let objectives: [String]
+        let unlock: UnlockRule
+
+        struct UnlockRule: Decodable {
+            let requires_lesson_ids: [String]
+        }
     }
 }
 
@@ -246,7 +279,8 @@ extension LearningUnit {
             description: "Family, food, home, and daily routines",
             cefrLevel: .a1,
             orderIndex: 1,
-            lessons: []
+            lessons: [],
+            isLocked: true
         ),
     ]
 }
@@ -254,22 +288,29 @@ extension LearningUnit {
 extension LessonSummary {
     static let unit1Summaries: [LessonSummary] = [
         LessonSummary(
+            seedId: "L001",
             title: "Greetings",
             subtitle: "Say hello in Albanian",
             iconName: "hand.wave.fill",
             lessonType: .vocabulary
         ),
         LessonSummary(
+            seedId: "L002",
             title: "To be: jam",
             subtitle: "Conjugate the verb 'jam'",
             iconName: "person.fill",
-            lessonType: .grammar
+            lessonType: .grammar,
+            isLocked: true,
+            orderIndex: 1
         ),
         LessonSummary(
-            title: "Numbers 1–10",
+            seedId: "L003",
+            title: "Numbers 1-10",
             subtitle: "Count in Albanian",
             iconName: "number.circle.fill",
-            lessonType: .vocabulary
+            lessonType: .vocabulary,
+            isLocked: true,
+            orderIndex: 2
         ),
     ]
 }

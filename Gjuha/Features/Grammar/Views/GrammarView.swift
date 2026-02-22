@@ -38,9 +38,17 @@ private struct GrammarTopicListView: View {
         if isLoading {
             ProgressView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if topics.isEmpty {
+            GrammarEmptyStateView()
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         } else {
             ScrollView {
-                LazyVStack(spacing: 12) {
+                VStack(spacing: 12) {
+                    GrammarPulseBanner(topicsCount: topics.count)
+                        .padding(.bottom, 4)
+
                     ForEach(topics) { topic in
                         Button(action: { onSelect(topic) }) {
                             HStack {
@@ -68,6 +76,60 @@ private struct GrammarTopicListView: View {
                 .padding(.bottom, 24)
             }
         }
+    }
+}
+
+private struct GrammarPulseBanner: View {
+    let topicsCount: Int
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var pulse = false
+
+    var body: some View {
+        HStack(spacing: 10) {
+            AnimatedMascotView(size: 34, usesGlassOrb: false)
+                .scaleEffect(pulse ? 1.06 : 0.92)
+                .animation(
+                    reduceMotion
+                    ? .linear(duration: 0.01)
+                    : .easeInOut(duration: 0.95).repeatForever(autoreverses: true),
+                    value: pulse
+                )
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Grammar Lab")
+                    .font(.gjuha.labelBold)
+                    .foregroundStyle(Color.gjuha.textPrimary)
+                Text("\(topicsCount) transparent grammar guides available")
+                    .font(.gjuha.caption)
+                    .foregroundStyle(Color.gjuha.textSecondary)
+            }
+            Spacer()
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .gjuhaLiquidGlassCard(cornerRadius: 14, tintOpacity: 0.07)
+        .onAppear {
+            if reduceMotion { return }
+            pulse = true
+        }
+    }
+}
+
+private struct GrammarEmptyStateView: View {
+    var body: some View {
+        VStack(spacing: 12) {
+            AnimatedMascotView(size: 78, usesGlassOrb: false)
+
+            Text("Grammar topics are loading")
+                .font(.gjuha.headingSmall)
+                .foregroundStyle(Color.gjuha.textPrimary)
+            Text("Your Albanian grammar cards will appear here.")
+                .font(.gjuha.caption)
+                .foregroundStyle(Color.gjuha.textSecondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(18)
+        .gjuhaLiquidGlassCard(cornerRadius: 20, tintOpacity: 0.08)
     }
 }
 

@@ -9,6 +9,13 @@ struct VocabularyView: View {
             GjuhaLiquidGlassBackground()
 
             VStack(spacing: 0) {
+                VocabularyPulseBanner(
+                    totalWords: store.words.count,
+                    visibleWords: store.filteredWords.count
+                )
+                .padding(.horizontal, 16)
+                .padding(.top, 6)
+
                 SearchBar(text: $store.searchQuery)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
@@ -22,15 +29,22 @@ struct VocabularyView: View {
                     ProgressView()
                     Spacer()
                 } else {
-                    ScrollView {
-                        LazyVStack(spacing: 10) {
-                            ForEach(store.filteredWords) { word in
-                                WordRowView(word: word)
+                    if store.filteredWords.isEmpty {
+                        VocabularyEmptyStateView(query: store.searchQuery)
+                            .padding(.horizontal, 16)
+                            .padding(.top, 18)
+                        Spacer()
+                    } else {
+                        ScrollView {
+                            LazyVStack(spacing: 10) {
+                                ForEach(store.filteredWords) { word in
+                                    WordRowView(word: word)
+                                }
                             }
+                            .padding(.horizontal, 16)
+                            .padding(.top, 12)
+                            .padding(.bottom, 24)
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.top, 12)
-                        .padding(.bottom, 24)
                     }
                 }
             }
@@ -38,6 +52,66 @@ struct VocabularyView: View {
         .navigationTitle("Vocabulary")
         .navigationBarTitleDisplayMode(.large)
         .onAppear { store.send(.onAppear) }
+    }
+}
+
+private struct VocabularyPulseBanner: View {
+    let totalWords: Int
+    let visibleWords: Int
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var pulse = false
+
+    var body: some View {
+        HStack(spacing: 10) {
+            AnimatedMascotView(size: 34, usesGlassOrb: false)
+                .scaleEffect(pulse ? 1.08 : 0.92)
+                .animation(
+                    reduceMotion
+                    ? .linear(duration: 0.01)
+                    : .easeInOut(duration: 0.9).repeatForever(autoreverses: true),
+                    value: pulse
+                )
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Vocabulary Engine")
+                    .font(.gjuha.labelBold)
+                    .foregroundStyle(Color.gjuha.textPrimary)
+                Text("\(visibleWords) shown • \(totalWords) loaded from Albanian seed")
+                    .font(.gjuha.caption)
+                    .foregroundStyle(Color.gjuha.textSecondary)
+            }
+            Spacer()
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .gjuhaLiquidGlassCard(cornerRadius: 14, tintOpacity: 0.07)
+        .onAppear {
+            if reduceMotion { return }
+            pulse = true
+        }
+    }
+}
+
+private struct VocabularyEmptyStateView: View {
+    let query: String
+
+    var body: some View {
+        VStack(spacing: 12) {
+            AnimatedMascotView(size: 78, usesGlassOrb: false)
+                .shadow(color: .black.opacity(0.15), radius: 10, y: 6)
+
+            Text(query.isEmpty ? "Vocabulary is loading" : "No results for \"\(query)\"")
+                .font(.gjuha.headingSmall)
+                .foregroundStyle(Color.gjuha.textPrimary)
+
+            Text(query.isEmpty ? "The Albanian pack is ready. Pull to refresh or reopen the app." : "Try another spelling or switch CEFR filter.")
+                .font(.gjuha.caption)
+                .foregroundStyle(Color.gjuha.textSecondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(18)
+        .gjuhaLiquidGlassCard(cornerRadius: 20, tintOpacity: 0.08)
     }
 }
 

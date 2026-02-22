@@ -5,6 +5,25 @@ struct HomeView: View {
     let store: StoreOf<HomeFeature>
     @State private var animateEntrance = false
 
+    private var totalLessons: Int {
+        store.units.reduce(0) { partial, unit in
+            partial + unit.lessons.count
+        }
+    }
+
+    private var completedLessons: Int {
+        store.units.reduce(0) { partial, unit in
+            partial + unit.lessons.filter(\.isCompleted).count
+        }
+    }
+
+    private var nextLesson: LessonSummary? {
+        store.units
+            .flatMap(\.lessons)
+            .first(where: { !$0.isCompleted })
+            ?? store.units.first?.lessons.first
+    }
+
     var body: some View {
         ZStack {
             GjuhaLiquidGlassBackground()
@@ -19,14 +38,28 @@ struct HomeView: View {
                         ProgressView()
                             .padding(.top, 48)
                     } else {
-                        LazyVStack(spacing: 24) {
-                            ForEach(Array(store.units.enumerated()), id: \.element.id) { index, unit in
-                                LearningUnitRowView(
-                                    unit: unit,
-                                    isVisible: animateEntrance,
-                                    entranceDelay: Double(index) * 0.08
-                                ) { lesson in
-                                    store.send(.lessonTapped(lesson))
+                        VStack(spacing: 18) {
+                            HomeHeroExperienceView(
+                                unitsCount: store.units.count,
+                                totalLessons: totalLessons,
+                                completedLessons: completedLessons,
+                                nextLessonTitle: nextLesson?.title
+                            )
+
+                            if store.units.isEmpty {
+                                HomeNoContentView()
+                                    .padding(.top, 10)
+                            } else {
+                                LazyVStack(spacing: 24) {
+                                    ForEach(Array(store.units.enumerated()), id: \.element.id) { index, unit in
+                                        LearningUnitRowView(
+                                            unit: unit,
+                                            isVisible: animateEntrance,
+                                            entranceDelay: Double(index) * 0.08
+                                        ) { lesson in
+                                            store.send(.lessonTapped(lesson))
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -86,6 +119,136 @@ private struct HomeHeaderView: View {
         .onAppear {
             pulse = true
         }
+    }
+}
+
+private struct HomeHeroExperienceView: View {
+    let unitsCount: Int
+    let totalLessons: Int
+    let completedLessons: Int
+    let nextLessonTitle: String?
+    @State private var glow = false
+
+    private var progress: Double {
+        guard totalLessons > 0 else { return 0 }
+        return Double(completedLessons) / Double(totalLessons)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Your Albanian Journey")
+                        .font(.gjuha.headingMedium)
+                        .foregroundStyle(Color.gjuha.textPrimary)
+
+                    Text(nextLessonTitle ?? "Ready for your next lesson")
+                        .font(.gjuha.bodyRegular)
+                        .foregroundStyle(Color.gjuha.textSecondary)
+                        .lineLimit(2)
+                }
+
+                Spacer(minLength: 8)
+                AnimatedMascotView(size: 94)
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text("\(completedLessons) / \(max(totalLessons, 1)) lessons")
+                        .font(.gjuha.captionBold)
+                        .foregroundStyle(Color.gjuha.textPrimary)
+                    Spacer()
+                    Text("\(Int(progress * 100))%")
+                        .font(.gjuha.captionBold)
+                        .foregroundStyle(Color.gjuha.accent)
+                }
+
+                ZStack(alignment: .leading) {
+                    Capsule(style: .continuous)
+                        .fill(Color.white.opacity(0.2))
+                        .frame(height: 8)
+
+                    Capsule(style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                colors: [Color.gjuha.accent, Color.gjuha.streak],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(height: 8)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .mask(
+                            GeometryReader { geo in
+                                Rectangle()
+                                    .frame(width: geo.size.width * progress)
+                            }
+                        )
+                }
+            }
+
+            HStack(spacing: 8) {
+                HomeMetricChip(icon: "rectangle.stack.fill", text: "\(unitsCount) units")
+                HomeMetricChip(icon: "book.closed.fill", text: "\(totalLessons) lessons")
+                HomeMetricChip(icon: "sparkles", text: "50k sentence engine")
+            }
+        }
+        .padding(16)
+        .gjuhaLiquidGlassCard(cornerRadius: 22, tintOpacity: 0.09)
+        .overlay(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .stroke(
+                    LinearGradient(
+                        colors: [Color.white.opacity(0.45), Color.white.opacity(0.08)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: glow ? 1.1 : 0.7
+                )
+        )
+        .shadow(color: Color.gjuha.accent.opacity(glow ? 0.22 : 0.1), radius: 14, y: 8)
+        .onAppear {
+            withAnimation(.easeInOut(duration: 1.1).repeatForever(autoreverses: true)) {
+                glow = true
+            }
+        }
+    }
+}
+
+private struct HomeMetricChip: View {
+    let icon: String
+    let text: String
+
+    var body: some View {
+        HStack(spacing: 5) {
+            Image(systemName: icon)
+                .font(.system(size: 11, weight: .semibold))
+            Text(text)
+                .font(.gjuha.captionBold)
+                .lineLimit(1)
+        }
+        .foregroundStyle(Color.gjuha.textSecondary)
+        .padding(.horizontal, 9)
+        .padding(.vertical, 6)
+        .background(.white.opacity(0.15))
+        .clipShape(Capsule(style: .continuous))
+    }
+}
+
+private struct HomeNoContentView: View {
+    var body: some View {
+        VStack(spacing: 10) {
+            AnimatedMascotView(size: 84)
+            Text("Content pack is loading")
+                .font(.gjuha.headingSmall)
+                .foregroundStyle(Color.gjuha.textPrimary)
+            Text("Your first unit will appear here in a moment.")
+                .font(.gjuha.caption)
+                .foregroundStyle(Color.gjuha.textSecondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(18)
+        .gjuhaLiquidGlassCard(cornerRadius: 20, tintOpacity: 0.07)
     }
 }
 

@@ -23,6 +23,7 @@ struct HomeFeature {
         Reduce { state, action in
             switch action {
             case .onAppear:
+                guard !state.isLoading, state.units.isEmpty else { return .none }
                 state.isLoading = true
                 return .run { send in
                     let units = await curriculumRepository.fetchUnits()

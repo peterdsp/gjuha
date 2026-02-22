@@ -28,6 +28,10 @@ struct AppView: View {
             guard !hasStartedLaunchSequence else { return }
             hasStartedLaunchSequence = true
 
+            if store.hasCompletedOnboarding {
+                store.send(.bootstrapData)
+            }
+
             let launchDelay: UInt64 = reduceMotion ? 300_000_000 : 1_450_000_000
             try? await Task.sleep(nanoseconds: launchDelay)
 

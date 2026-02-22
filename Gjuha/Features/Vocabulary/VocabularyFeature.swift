@@ -35,6 +35,7 @@ struct VocabularyFeature {
         Reduce { state, action in
             switch action {
             case .onAppear:
+                guard !state.isLoading, state.words.isEmpty else { return .none }
                 state.isLoading = true
                 return .run { send in
                     let words = await vocabularyRepository.fetchAll()

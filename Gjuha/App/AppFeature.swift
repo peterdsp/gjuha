@@ -24,6 +24,7 @@ struct AppFeature {
         var profile = ProfileFeature.State()
         var selectedTab: RootTab = .home
         var hasCompletedOnboarding: Bool = UserDefaults.standard.bool(forKey: Keys.hasCompletedOnboarding)
+        var hasBootstrappedData: Bool = false
     }
 
     enum Action {
@@ -35,6 +36,7 @@ struct AppFeature {
         case profile(ProfileFeature.Action)
         case onboardingCompleted
         case tabSelected(State.RootTab)
+        case bootstrapData
     }
 
     @Reducer
@@ -69,7 +71,7 @@ struct AppFeature {
                 state.path = StackState<Path.State>()
                 state.profile.selectedGoal = state.onboarding.selectedGoal
                 UserDefaults.standard.set(true, forKey: Keys.hasCompletedOnboarding)
-                return .none
+                return .send(.bootstrapData)
 
             case .home(.lessonTapped(let lesson)):
                 state.path.append(.lesson(LessonFeature.State(lesson: lesson)))
@@ -84,6 +86,15 @@ struct AppFeature {
             case .tabSelected(let tab):
                 state.selectedTab = tab
                 return .none
+
+            case .bootstrapData:
+                guard !state.hasBootstrappedData else { return .none }
+                state.hasBootstrappedData = true
+                return .merge(
+                    .send(.home(.onAppear)),
+                    .send(.vocabulary(.onAppear)),
+                    .send(.grammar(.onAppear))
+                )
 
             case .onboarding, .home, .vocabulary, .grammar, .profile, .path:
                 return .none

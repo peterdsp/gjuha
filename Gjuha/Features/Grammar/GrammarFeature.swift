@@ -23,6 +23,7 @@ struct GrammarFeature {
         Reduce { state, action in
             switch action {
             case .onAppear:
+                guard !state.isLoading, state.topics.isEmpty else { return .none }
                 state.isLoading = true
                 return .run { send in
                     let topics = await grammarRepository.fetchTopics()

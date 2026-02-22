@@ -75,6 +75,12 @@ struct AppFeature {
                 state.path.append(.lesson(LessonFeature.State(lesson: lesson)))
                 return .none
 
+            case .path(.element(id: _, action: .lesson(.exitTapped))):
+                if !state.path.isEmpty {
+                    state.path.removeLast()
+                }
+                return .none
+
             case .tabSelected(let tab):
                 state.selectedTab = tab
                 return .none

@@ -26,17 +26,185 @@ extension DependencyValues {
 // MARK: - Live Implementation
 
 final class LiveCurriculumRepository: CurriculumRepository, @unchecked Sendable {
+    private let units: [LearningUnit]
+    private let lessonsByUnit: [UUID: [LessonSummary]]
+    private let lessonsById: [UUID: LessonSummary]
+
+    init(bundle: Bundle = .main) {
+        let loaded = Self.loadSeedContent(bundle: bundle)
+        self.units = loaded.units
+        self.lessonsByUnit = loaded.lessonsByUnit
+        self.lessonsById = loaded.lessonsById
+    }
+
     func fetchUnits() async -> [LearningUnit] {
-        // TODO: Load from SwiftData seeded from JSON
-        return []
+        units
     }
 
     func fetchLessons(for unitId: UUID) async -> [LessonSummary] {
-        return []
+        lessonsByUnit[unitId] ?? []
     }
 
     func fetchLesson(_ lessonId: UUID) async -> LessonSummary? {
-        return nil
+        lessonsById[lessonId]
+    }
+
+    private static func loadSeedContent(bundle: Bundle) -> (
+        units: [LearningUnit],
+        lessonsByUnit: [UUID: [LessonSummary]],
+        lessonsById: [UUID: LessonSummary]
+    ) {
+        guard
+            let seedUnits: [SeedUnit] = decodeJSON(named: "units", bundle: bundle),
+            let seedLessons: [SeedLesson] = decodeJSON(named: "lessons", bundle: bundle)
+        else {
+            return fallbackSeedContent()
+        }
+
+        let orderedLessons = seedLessons.sorted {
+            if $0.unit != $1.unit { return $0.unit < $1.unit }
+            return $0.order < $1.order
+        }
+
+        var builtUnits: [LearningUnit] = []
+        var lessonMapByUnit: [UUID: [LessonSummary]] = [:]
+        var lessonMapById: [UUID: LessonSummary] = [:]
+
+        for seedUnit in seedUnits.sorted(by: { $0.unit < $1.unit }) {
+            let unitId = stableUUID(for: "unit-\(seedUnit.unit)")
+            let unitLessons = orderedLessons
+                .filter { $0.unit == seedUnit.unit }
+                .map { seedLesson in
+                    let lesson = LessonSummary(
+                        id: stableUUID(for: "lesson-\(seedLesson.id)"),
+                        title: seedLesson.title,
+                        subtitle: subtitle(for: seedLesson),
+                        iconName: iconName(for: seedLesson.title),
+                        lessonType: lessonType(for: seedLesson.title)
+                    )
+                    lessonMapById[lesson.id] = lesson
+                    return lesson
+                }
+
+            let description = seedUnit.themes.prefix(3).joined(separator: ", ")
+            let unit = LearningUnit(
+                id: unitId,
+                title: "Unit \(seedUnit.unit) — \(seedUnit.title)",
+                description: description.isEmpty ? "Core Albanian practice" : description,
+                cefrLevel: parseCEFR(seedUnit.cefr),
+                orderIndex: seedUnit.unit - 1,
+                lessons: unitLessons
+            )
+
+            lessonMapByUnit[unitId] = unitLessons
+            builtUnits.append(unit)
+        }
+
+        if builtUnits.isEmpty {
+            return fallbackSeedContent()
+        }
+
+        return (builtUnits, lessonMapByUnit, lessonMapById)
+    }
+
+    private static func fallbackSeedContent() -> (
+        units: [LearningUnit],
+        lessonsByUnit: [UUID: [LessonSummary]],
+        lessonsById: [UUID: LessonSummary]
+    ) {
+        let units = LearningUnit.mockData
+        var byUnit: [UUID: [LessonSummary]] = [:]
+        var byId: [UUID: LessonSummary] = [:]
+        for unit in units {
+            byUnit[unit.id] = unit.lessons
+            for lesson in unit.lessons {
+                byId[lesson.id] = lesson
+            }
+        }
+        return (units, byUnit, byId)
+    }
+
+    private static func subtitle(for lesson: SeedLesson) -> String {
+        if let first = lesson.objectives.first {
+            let stripped = first
+                .replacingOccurrences(
+                    of: "Understand & use key phrases about: ",
+                    with: ""
+                )
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .trimmingCharacters(in: CharacterSet(charactersIn: "."))
+            if !stripped.isEmpty, stripped.lowercased() != lesson.title.lowercased() {
+                return stripped
+            }
+        }
+        return lesson.objectives.dropFirst().first ?? "Practice Albanian with mixed exercises"
+    }
+
+    private static func lessonType(for title: String) -> LessonType {
+        let lowered = title.lowercased()
+        let grammarHints = [
+            "verb", "tense", "grammar", "pronoun", "adjective",
+            "case", "conjug", "declension", "negation", "questions"
+        ]
+        return grammarHints.contains { lowered.contains($0) } ? .grammar : .vocabulary
+    }
+
+    private static func iconName(for title: String) -> String {
+        let lowered = title.lowercased()
+        if lowered.contains("greeting") || lowered.contains("introduc") { return "hand.wave.fill" }
+        if lowered.contains("number") || lowered.contains("time") { return "number.circle.fill" }
+        if lowered.contains("family") || lowered.contains("people") { return "person.2.fill" }
+        if lowered.contains("food") || lowered.contains("coffee") || lowered.contains("shop") { return "fork.knife.circle.fill" }
+        if lowered.contains("direction") || lowered.contains("travel") || lowered.contains("transport") { return "map.fill" }
+        if lowered.contains("work") || lowered.contains("study") { return "briefcase.fill" }
+        if lowered.contains("culture") { return "globe.europe.africa.fill" }
+        if lessonType(for: title) == .grammar { return "textformat.abc.dottedunderline" }
+        return "book.closed.fill"
+    }
+
+    private static func parseCEFR(_ raw: String) -> CEFRLevel {
+        CEFRLevel(rawValue: raw.lowercased()) ?? .a1
+    }
+
+    private static func decodeJSON<T: Decodable>(named name: String, bundle: Bundle) -> T? {
+        guard let url = bundle.url(forResource: name, withExtension: "json") else {
+            return nil
+        }
+        guard let data = try? Data(contentsOf: url) else {
+            return nil
+        }
+        return try? JSONDecoder().decode(T.self, from: data)
+    }
+
+    private static func stableUUID(for raw: String) -> UUID {
+        var bytes = [UInt8](repeating: 0, count: 16)
+        for (index, value) in raw.utf8.enumerated() {
+            bytes[index % 16] = bytes[index % 16] &+ value
+        }
+        bytes[6] = (bytes[6] & 0x0F) | 0x40
+        bytes[8] = (bytes[8] & 0x3F) | 0x80
+        return UUID(uuid: (
+            bytes[0], bytes[1], bytes[2], bytes[3],
+            bytes[4], bytes[5], bytes[6], bytes[7],
+            bytes[8], bytes[9], bytes[10], bytes[11],
+            bytes[12], bytes[13], bytes[14], bytes[15]
+        ))
+    }
+
+    private struct SeedUnit: Decodable {
+        let unit: Int
+        let title: String
+        let cefr: String
+        let themes: [String]
+    }
+
+    private struct SeedLesson: Decodable {
+        let id: String
+        let unit: Int
+        let order: Int
+        let title: String
+        let cefr: String
+        let objectives: [String]
     }
 }
 

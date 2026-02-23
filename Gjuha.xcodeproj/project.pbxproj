@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -40,6 +40,7 @@
 		AD4A43BFAC0640E64E917115 /* VocabularyFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03074DCCAB2314C9DEA2D700 /* VocabularyFeature.swift */; };
 		AE9BB6EA0172DC91816BEE9D /* ExerciseEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB8742C6E4D0AA587AF0E660 /* ExerciseEngine.swift */; };
 		B262ED45E030021638E3E8EB /* LessonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AF761B0EBE9456459F5E43C /* LessonView.swift */; };
+		C773242143A2ECE04E9105A7 /* ProgressStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7429D8078387001A24BAF936 /* ProgressStore.swift */; };
 		CA74F5B2BBE1BBED168EAC52 /* a1_grammar.json in Resources */ = {isa = PBXBuildFile; fileRef = C93F1D6598730E6CC29C6702 /* a1_grammar.json */; };
 		D6AF2EC3C005898B9E17BD41 /* GjuhaSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92AEB3EDF54D9925DC1E8F9 /* GjuhaSchema.swift */; };
 		D945479473E2E370BCEF9874 /* CurriculumRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 964F6F114F09EEBD358573A8 /* CurriculumRepository.swift */; };
@@ -72,7 +73,7 @@
 
 /* Begin PBXFileReference section */
 		03074DCCAB2314C9DEA2D700 /* VocabularyFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyFeature.swift; sourceTree = "<group>"; };
-		146EC61D6D8D4ED1086A3A2E /* sentences_sqi_50k.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = sentences_sqi_50k.csv; sourceTree = "<group>"; };
+		146EC61D6D8D4ED1086A3A2E /* sentences_sqi_50k.csv */ = {isa = PBXFileReference; path = sentences_sqi_50k.csv; sourceTree = "<group>"; };
 		17C1B7CF1DE1FE9647BED0EE /* GjuhaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GjuhaApp.swift; sourceTree = "<group>"; };
 		19DCBEA4497F8BF1A676D78C /* ProfileFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileFeature.swift; sourceTree = "<group>"; };
 		2CFDDA191EC2592A6DBCDBC4 /* VocabularyRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyRepository.swift; sourceTree = "<group>"; };
@@ -89,12 +90,13 @@
 		66B1C41B318C04C1459207B3 /* GrammarRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarRepository.swift; sourceTree = "<group>"; };
 		6B06A810E34B51182A1BDA5C /* GrammarFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarFeature.swift; sourceTree = "<group>"; };
 		6FFC860C5CF9F3C4BB286031 /* GjuhaColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GjuhaColors.swift; sourceTree = "<group>"; };
+		7429D8078387001A24BAF936 /* ProgressStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressStore.swift; sourceTree = "<group>"; };
 		7AF761B0EBE9456459F5E43C /* LessonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonView.swift; sourceTree = "<group>"; };
-		7B2AF71B9560382C660EBF04 /* vocabulary_seed_600.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = vocabulary_seed_600.csv; sourceTree = "<group>"; };
+		7B2AF71B9560382C660EBF04 /* vocabulary_seed_600.csv */ = {isa = PBXFileReference; path = vocabulary_seed_600.csv; sourceTree = "<group>"; };
 		7B79C593CD7E9413AFCA9E55 /* morph_rules.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = morph_rules.json; sourceTree = "<group>"; };
 		7BB42A1B4980DF9F1D81AD0E /* lessons.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = lessons.json; sourceTree = "<group>"; };
 		88EE2AB0F0B8EAB44CC86A4E /* Word.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Word.swift; sourceTree = "<group>"; };
-		89CBC36224DC7B72439E5EFB /* Gjuha.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Gjuha.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		89CBC36224DC7B72439E5EFB /* Gjuha.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Gjuha.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8C7C8F01805342D81163BDF0 /* AppView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppView.swift; sourceTree = "<group>"; };
 		8D582E219B218127545746AC /* a1_lessons.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = a1_lessons.json; sourceTree = "<group>"; };
 		964F6F114F09EEBD358573A8 /* CurriculumRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurriculumRepository.swift; sourceTree = "<group>"; };
@@ -109,7 +111,7 @@
 		CEA826FE31BEA459913FF230 /* OnboardingFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingFeature.swift; sourceTree = "<group>"; };
 		D1E9D9F25830DD968FEFD5FF /* GrammarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarView.swift; sourceTree = "<group>"; };
 		D289A128F464DD34E654275F /* a1_vocabulary.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = a1_vocabulary.json; sourceTree = "<group>"; };
-		D363C272C9250C12494FAEAE /* word_frequency_top6000.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = word_frequency_top6000.csv; sourceTree = "<group>"; };
+		D363C272C9250C12494FAEAE /* word_frequency_top6000.csv */ = {isa = PBXFileReference; path = word_frequency_top6000.csv; sourceTree = "<group>"; };
 		D55D733FFF8AB417FADFB8D0 /* exercise_types.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = exercise_types.json; sourceTree = "<group>"; };
 		D64619B60B89E4FB14A9F8A7 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		D8C4E3FD1632C0420EA79851 /* GrammarTopic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarTopic.swift; sourceTree = "<group>"; };
@@ -147,13 +149,6 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		0AD53D4A0A9D34E67EBB1DA0 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
 		0DD456F1ED6F1DC90F159874 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -186,7 +181,6 @@
 		30B51C699FC2BF434EB2D5DD /* Vocabulary */ = {
 			isa = PBXGroup;
 			children = (
-				CCBA96E0BE45FEC41C2BFC91 /* Model */,
 				7805FEC0996E4E97CBFCF6CF /* Views */,
 				03074DCCAB2314C9DEA2D700 /* VocabularyFeature.swift */,
 			);
@@ -196,10 +190,6 @@
 		324A15D2933300F7F9C32BC1 /* Engine */ = {
 			isa = PBXGroup;
 			children = (
-				505DC5CC8D8908D19BB7A692 /* Curriculum */,
-				FF11FF567BDEAADBEE1A2964 /* Generator */,
-				A62B37E48D2ADB9836D5BAA4 /* Progress */,
-				4F25C696ADFB1FCFE2717283 /* Scoring */,
 				BB8742C6E4D0AA587AF0E660 /* ExerciseEngine.swift */,
 			);
 			path = Engine;
@@ -208,13 +198,11 @@
 		3A46D0AFDE4764F86ED3C1E4 /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				F22ECC8C1913B0CA3B981C17 /* Exercise */,
 				615D258A097FDE904316037F /* Grammar */,
 				9C18363A5CC1953736A6ACFE /* Home */,
 				A0FA5C58FF5727D3EDCE2B66 /* Lesson */,
 				7EE22FA676E27A5D5AAD34C5 /* Onboarding */,
 				A850ECB1B2A0E021EE9D51D2 /* Profile */,
-				FE08276263AEBEEAD707905D /* Streak */,
 				30B51C699FC2BF434EB2D5DD /* Vocabulary */,
 			);
 			path = Features;
@@ -247,34 +235,6 @@
 			path = Typography;
 			sourceTree = "<group>";
 		};
-		4F25C696ADFB1FCFE2717283 /* Scoring */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Scoring;
-			sourceTree = "<group>";
-		};
-		505DC5CC8D8908D19BB7A692 /* Curriculum */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Curriculum;
-			sourceTree = "<group>";
-		};
-		56E68DDEE00E253E4CBAF718 /* Utilities */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Utilities;
-			sourceTree = "<group>";
-		};
-		581BCAC22663F5E2C3007462 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
 		5B71FDFB1108434494044384 /* GjuhaUITests */ = {
 			isa = PBXGroup;
 			children = (
@@ -286,7 +246,6 @@
 		615D258A097FDE904316037F /* Grammar */ = {
 			isa = PBXGroup;
 			children = (
-				D5394855DD566D3A7394DCB4 /* Model */,
 				A5084DAB26907B577D7BCE57 /* Views */,
 				6B06A810E34B51182A1BDA5C /* GrammarFeature.swift */,
 			);
@@ -321,26 +280,10 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		7A3E63E6769E76F71399997D /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		7A5A1AF1AEBE3538BB3636FA /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
 		7CCB8DEF2FA8FEE3A169C961 /* DesignSystem */ = {
 			isa = PBXGroup;
 			children = (
-				CA8EA40378E703BC188552B8 /* Animations */,
 				9E54FACF020EA21CF8FD1B89 /* Colors */,
-				D87201CEA74F290C015B88EF /* Components */,
 				4673FE665D609FB3CA71A166 /* Typography */,
 			);
 			path = DesignSystem;
@@ -349,7 +292,6 @@
 		7EE22FA676E27A5D5AAD34C5 /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
-				7A5A1AF1AEBE3538BB3636FA /* Model */,
 				2C3A1373DA49A511F97A14ED /* Views */,
 				CEA826FE31BEA459913FF230 /* OnboardingFeature.swift */,
 			);
@@ -364,20 +306,6 @@
 			path = Lessons;
 			sourceTree = "<group>";
 		};
-		88DF9CDE360BC7F34E8D9669 /* Fonts */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Fonts;
-			sourceTree = "<group>";
-		};
-		92FB19DAA26037B9DB4D7899 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
 		94A82CAF916BDDE346533661 /* SwiftData */ = {
 			isa = PBXGroup;
 			children = (
@@ -389,7 +317,6 @@
 		9C18363A5CC1953736A6ACFE /* Home */ = {
 			isa = PBXGroup;
 			children = (
-				0AD53D4A0A9D34E67EBB1DA0 /* Model */,
 				FF6705B1F6D6E14AC281B58E /* Views */,
 				B31B430FAFDBC9020F44E0D6 /* HomeFeature.swift */,
 			);
@@ -407,7 +334,6 @@
 		A0FA5C58FF5727D3EDCE2B66 /* Lesson */ = {
 			isa = PBXGroup;
 			children = (
-				DF109EFB88426406654312E6 /* Model */,
 				EE3F0AE70066D31E8D1C9498 /* Views */,
 				3B46CF2235D3481C8D62B570 /* LessonFeature.swift */,
 			);
@@ -422,17 +348,9 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		A62B37E48D2ADB9836D5BAA4 /* Progress */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Progress;
-			sourceTree = "<group>";
-		};
 		A850ECB1B2A0E021EE9D51D2 /* Profile */ = {
 			isa = PBXGroup;
 			children = (
-				BFBAA095966A0BC6C49EC4B0 /* Model */,
 				00C7C710AF9C3B0ADBB19CEE /* Views */,
 				19DCBEA4497F8BF1A676D78C /* ProfileFeature.swift */,
 			);
@@ -453,8 +371,6 @@
 			children = (
 				7CCB8DEF2FA8FEE3A169C961 /* DesignSystem */,
 				324A15D2933300F7F9C32BC1 /* Engine */,
-				DF0A09774C46E41B7CB91832 /* Extensions */,
-				56E68DDEE00E253E4CBAF718 /* Utilities */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -480,85 +396,12 @@
 			path = Gjuha;
 			sourceTree = "<group>";
 		};
-		BFBAA095966A0BC6C49EC4B0 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		C0256C3D1510BA378CED848E /* Localizable */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Localizable;
-			sourceTree = "<group>";
-		};
 		C8EA93D22C054BD1C21FAA63 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				DBE46F673CAC7199F6601777 /* Audio */,
-				88DF9CDE360BC7F34E8D9669 /* Fonts */,
-				C0256C3D1510BA378CED848E /* Localizable */,
 				5EF51FB37400856FDE7AEE98 /* Assets.xcassets */,
 			);
 			path = Resources;
-			sourceTree = "<group>";
-		};
-		CA8EA40378E703BC188552B8 /* Animations */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Animations;
-			sourceTree = "<group>";
-		};
-		CCBA96E0BE45FEC41C2BFC91 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		D5394855DD566D3A7394DCB4 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		D87201CEA74F290C015B88EF /* Components */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Components;
-			sourceTree = "<group>";
-		};
-		DBE46F673CAC7199F6601777 /* Audio */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Audio;
-			sourceTree = "<group>";
-		};
-		DF0A09774C46E41B7CB91832 /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Extensions;
-			sourceTree = "<group>";
-		};
-		DF109EFB88426406654312E6 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		E72CF7A35D622F624CE59366 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Views;
 			sourceTree = "<group>";
 		};
 		ECE612B66B8D6DA73FDCF377 /* Repositories */ = {
@@ -567,6 +410,7 @@
 				964F6F114F09EEBD358573A8 /* CurriculumRepository.swift */,
 				66B1C41B318C04C1459207B3 /* GrammarRepository.swift */,
 				BD7D8112A1BDFB25360A1668 /* ProgressRepository.swift */,
+				7429D8078387001A24BAF936 /* ProgressStore.swift */,
 				2CFDDA191EC2592A6DBCDBC4 /* VocabularyRepository.swift */,
 			);
 			path = Repositories;
@@ -578,15 +422,6 @@
 				7AF761B0EBE9456459F5E43C /* LessonView.swift */,
 			);
 			path = Views;
-			sourceTree = "<group>";
-		};
-		F22ECC8C1913B0CA3B981C17 /* Exercise */ = {
-			isa = PBXGroup;
-			children = (
-				581BCAC22663F5E2C3007462 /* Model */,
-				92FB19DAA26037B9DB4D7899 /* Views */,
-			);
-			path = Exercise;
 			sourceTree = "<group>";
 		};
 		F3E1CB6666FAE068D56778C2 /* Seed */ = {
@@ -605,22 +440,6 @@
 				7B2AF71B9560382C660EBF04 /* vocabulary_seed_600.csv */,
 			);
 			path = Seed;
-			sourceTree = "<group>";
-		};
-		FE08276263AEBEEAD707905D /* Streak */ = {
-			isa = PBXGroup;
-			children = (
-				7A3E63E6769E76F71399997D /* Model */,
-				E72CF7A35D622F624CE59366 /* Views */,
-			);
-			path = Streak;
-			sourceTree = "<group>";
-		};
-		FF11FF567BDEAADBEE1A2964 /* Generator */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Generator;
 			sourceTree = "<group>";
 		};
 		FF6705B1F6D6E14AC281B58E /* Views */ = {
@@ -723,6 +542,7 @@
 			packageReferences = (
 				ADA6957B6BFD6B52FDB2C090 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 			);
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -792,6 +612,7 @@
 				4EC332C4772E5AC5BADE0CA9 /* ProfileFeature.swift in Sources */,
 				FA02E52C347F24C4D2A222D2 /* ProfileView.swift in Sources */,
 				E4C4D017948EBBAC5E00172E /* ProgressRepository.swift in Sources */,
+				C773242143A2ECE04E9105A7 /* ProgressStore.swift in Sources */,
 				AD4A43BFAC0640E64E917115 /* VocabularyFeature.swift in Sources */,
 				EFB50411D617E2BD1740398E /* VocabularyRepository.swift in Sources */,
 				23BBA8D05104E4E642484A23 /* VocabularyView.swift in Sources */,
@@ -903,17 +724,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 0;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Gjuha/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Gjuha;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.gjuha.app;
 				SDKROOT = iphoneos;
 				SWIFT_STRICT_CONCURRENCY = complete;
@@ -928,17 +746,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 0;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Gjuha/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Gjuha;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.gjuha.app;
 				SDKROOT = iphoneos;
 				SWIFT_STRICT_CONCURRENCY = complete;

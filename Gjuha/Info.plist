@@ -28,7 +28,7 @@
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>
-		<string>AccentSubtle</string>
+		<string></string>
 	</dict>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>

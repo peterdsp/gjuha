@@ -74,6 +74,8 @@ struct AppFeature {
                 return .send(.bootstrapData)
 
             case .home(.lessonTapped(let lesson)):
+                // Don't open locked lessons
+                guard !lesson.isLocked else { return .none }
                 state.path.append(.lesson(LessonFeature.State(lesson: lesson)))
                 return .none
 
@@ -81,6 +83,11 @@ struct AppFeature {
                 if !state.path.isEmpty {
                     state.path.removeLast()
                 }
+                // Refresh home to show updated completion/unlock state
+                return .send(.home(.refreshAfterLessonComplete))
+
+            case .path(.element(id: _, action: .lesson(.lessonCompleted))):
+                // Will be handled when user exits
                 return .none
 
             case .tabSelected(let tab):

@@ -50,13 +50,15 @@ enum GrammarCategory: String, Codable, CaseIterable {
 struct UserStats: Equatable {
     let currentStreak: Int
     let totalXP: Int
-    let wordsLearned: Int
+    /// Distinct vocabulary words the user has been exposed to through completed
+    /// lessons. This is honest exposure ("seen"), not a mastery claim.
+    let wordsSeen: Int
     let lessonsCompleted: Int
 
     static let empty = UserStats(
         currentStreak: 0,
         totalXP: 0,
-        wordsLearned: 0,
+        wordsSeen: 0,
         lessonsCompleted: 0
     )
 }

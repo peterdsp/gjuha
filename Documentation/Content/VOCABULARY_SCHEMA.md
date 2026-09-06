@@ -39,6 +39,20 @@ Every word entry in `Data/Seed/Vocabulary/*.json` must conform to this schema.
 
 ---
 
+## Current Dataset Status (Phase 0)
+
+The bundled dataset the app actually loads is `Data/Seed/Vocabulary/a1_vocabulary.json`
+(350 entries, mostly A1 with a few A2). It currently populates the required fields
+plus `exampleSentence` / `exampleTranslation`, but does **not** yet populate the
+optional `gender` or `verbClass` fields.
+
+Because of this, exercise generation and distractor selection rely on the fields
+that are reliably present: `partOfSpeech`, `cefrLevel` and `frequency`. Gender and
+verb class are treated as optional and used only when present, so the schema above
+describes the target shape while the engine degrades gracefully when they are
+absent. Populate `gender` for nouns and `verbClass` for verbs before building
+features that depend on them (declension, conjugation drills).
+
 ## Albanian-Specific Notes
 
 ### Verb entries

@@ -47,6 +47,8 @@ struct AppFeature {
         case profile(ProfileFeature)
     }
 
+    @Dependency(\.progressRepository) var progressRepository
+
     var body: some ReducerOf<Self> {
         Scope(state: \.onboarding, action: \.onboarding) {
             OnboardingFeature()
@@ -69,9 +71,13 @@ struct AppFeature {
                 state.hasCompletedOnboarding = true
                 state.selectedTab = .home
                 state.path = StackState<Path.State>()
-                state.profile.selectedGoal = state.onboarding.selectedGoal
+                let chosenGoal = state.onboarding.selectedGoal
+                state.profile.selectedGoal = chosenGoal
                 UserDefaults.standard.set(true, forKey: Keys.hasCompletedOnboarding)
-                return .send(.bootstrapData)
+                return .merge(
+                    .run { _ in await progressRepository.saveLearningGoal(chosenGoal) },
+                    .send(.bootstrapData)
+                )
 
             case .home(.lessonTapped(let lesson)):
                 // Don't open locked lessons

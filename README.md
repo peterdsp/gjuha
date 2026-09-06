@@ -117,11 +117,12 @@ The content pipeline is already running:
 
 | Dataset | Status | Size |
 |---------|--------|------|
-| Curated vocabulary seed | ✅ Done | 600 entries (A1–A2) |
+| Curated vocabulary (bundled, used by the engine) | ✅ Done | 350 entries in `a1_vocabulary.json` (mostly A1, some A2) |
+| Frequency-seeded vocabulary CSV (pipeline) | 🔄 In progress | 600 rows, some still `__TODO__` placeholders |
 | Word frequency list | ✅ Generated | Top 6,000 from Tatoeba corpus |
 | Albanian sentence corpus | ✅ Generated | ~2,600 sentences (sqi) |
 | Sentence templates | ✅ Done | 300 templates |
-| Exercise seed | ✅ Done | 1,000 exercises |
+| Exercise seed (pipeline artifact, not loaded at runtime) | ✅ Done | 1,000 exercises |
 | Morphology rules | ✅ Done | Verb + noun patterns |
 | A1–B1 curriculum plan | ✅ Done | 120 lessons across 12 units |
 | Grammar topic dataset | 🔄 In progress | Conjugation tables, case rules |
@@ -129,6 +130,13 @@ The content pipeline is already running:
 
 **Target vocabulary:** 4,000–6,000 entries covering A1–B2.
 **Target exercises:** 30,000–60,000 generated variations.
+
+> **Runtime note.** At runtime the exercise engine generates multiple-choice,
+> typed-translation and fill-in-the-blank exercises from `a1_vocabulary.json`.
+> The 1,000-exercise seed and the sentence/frequency CSVs are content-pipeline
+> artifacts that are not yet loaded by the app. The curated A1 dataset does not
+> yet populate `gender` or `verbClass`, so exercise generation relies on
+> `partOfSpeech`, `cefrLevel` and `frequency` (see the Phase 0 notes below).
 
 ### Content Pipeline
 
@@ -143,6 +151,34 @@ python3 Scripts/tools/build_from_sources.py
 #   Gjuha/Data/Seed/Vocabulary/word_frequency_top6000.csv
 #   Gjuha/Data/Seed/sentences_sqi_50k.csv
 ```
+
+---
+
+## Learning Experience Behavior
+
+Verified runtime behavior of the core lesson flow (Phase 0 foundations):
+
+- **Stable options.** Answer choices keep a fixed order for the life of an
+  exercise. Feedback and unrelated state changes never reshuffle them.
+- **Plausible distractors.** Multiple-choice distractors are chosen from
+  vocabulary metadata (same part of speech, then CEFR level, then nearest
+  frequency), never at random. Options that would also be correct, or that
+  duplicate another option, are excluded. A small curated fallback keeps every
+  question answerable when the pool is too small.
+- **Meaning-preserving grading.** Typed answers are compared after trimming,
+  whitespace collapse, case folding and Unicode (NFC) normalization. Albanian
+  diacritics (ë, ç) and articles are required: dropping them is surfaced as a
+  *near miss* with targeted feedback, never accepted as correct.
+- **Honest feedback.** After each answer the app shows the actual XP awarded
+  (including combo bonus) and the exercise explanation when one exists.
+- **Honest stats.** Profile shows "Words seen", the distinct vocabulary covered
+  by completed lessons (exposure, not mastery), alongside streak, XP and lessons
+  completed read from stored progress.
+- **Persisted goal.** The daily goal chosen during onboarding is saved and
+  restored on relaunch.
+- **Accessible.** The lesson flow supports Dynamic Type, exposes VoiceOver
+  labels and focus order, and signals correct / near-miss / incorrect with icons
+  and text rather than color alone.
 
 ---
 

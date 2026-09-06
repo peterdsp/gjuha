@@ -32,7 +32,7 @@ private struct StatsGridView: View {
         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
             StatCardView(label: "Day Streak", value: "\(stats.currentStreak)", icon: "flame.fill", color: Color.gjuha.streak)
             StatCardView(label: "Total XP", value: "\(stats.totalXP)", icon: "star.fill", color: Color.gjuha.xp)
-            StatCardView(label: "Words Learned", value: "\(stats.wordsLearned)", icon: "book.fill", color: Color.gjuha.accent)
+            StatCardView(label: "Words seen", value: "\(stats.wordsSeen)", icon: "book.fill", color: Color.gjuha.accent)
             StatCardView(label: "Lessons Done", value: "\(stats.lessonsCompleted)", icon: "checkmark.seal.fill", color: Color.gjuha.success)
         }
     }
@@ -59,6 +59,9 @@ private struct StatCardView: View {
         .frame(maxWidth: .infinity)
         .padding(16)
         .gjuhaLiquidGlassCard(cornerRadius: 14, tintOpacity: 0.06)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(label)
+        .accessibilityValue(value)
     }
 }
 

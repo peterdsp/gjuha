@@ -80,54 +80,107 @@ private struct AnswerFeedbackBanner: View {
     @State private var scale: CGFloat = 0.8
 
     var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
-                .font(.system(size: 28, weight: .bold))
-                .foregroundStyle(.white)
-                .scaleEffect(scale)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(isCorrect ? "Correct!" : "Not quite...")
-                    .font(.gjuha.labelBold)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 12) {
+                Image(systemName: iconName)
+                    .font(.system(size: 28, weight: .bold))
                     .foregroundStyle(.white)
+                    .scaleEffect(scale)
+                    .accessibilityHidden(true)
 
-                if case .wrong(let correctAnswer) = result {
-                    Text("Answer: \(correctAnswer)")
-                        .font(.gjuha.caption)
-                        .foregroundStyle(.white.opacity(0.85))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.gjuha.labelBold)
+                        .foregroundStyle(.white)
+
+                    if let answerLine {
+                        Text(answerLine)
+                            .font(.gjuha.caption)
+                            .foregroundStyle(.white.opacity(0.9))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+
+                Spacer(minLength: 8)
+
+                if case let .correct(xpAwarded, _) = result {
+                    Text("+\(xpAwarded) XP")
+                        .font(.gjuha.labelBold)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(.white.opacity(0.2))
+                        .clipShape(Capsule())
                 }
             }
 
-            Spacer()
-
-            if isCorrect {
-                Text("+XP")
-                    .font(.gjuha.labelBold)
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(.white.opacity(0.2))
-                    .clipShape(Capsule())
+            if let explanation = result.explanation, !explanation.isEmpty {
+                Text(explanation)
+                    .font(.gjuha.caption)
+                    .foregroundStyle(.white.opacity(0.92))
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(isCorrect ? Color.gjuha.success : Color.gjuha.error)
+                .fill(bannerColor)
         )
         .padding(.horizontal, 16)
         .padding(.bottom, 24)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilityMessage)
         .onAppear {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
                 scale = 1.0
             }
+            // Announce the outcome for VoiceOver, since the banner auto-dismisses.
+            AccessibilityNotification.Announcement(accessibilityMessage).post()
         }
     }
 
-    private var isCorrect: Bool {
-        if case .correct = result { return true }
-        return false
+    private var iconName: String {
+        switch result {
+        case .correct: return "checkmark.circle.fill"
+        case .nearMiss: return "exclamationmark.triangle.fill"
+        case .wrong: return "xmark.circle.fill"
+        }
+    }
+
+    private var title: String {
+        switch result {
+        case .correct: return "Correct!"
+        case .nearMiss: return "Almost, check the spelling"
+        case .wrong: return "Not quite..."
+        }
+    }
+
+    private var bannerColor: Color {
+        switch result {
+        case .correct: return Color.gjuha.success
+        case .nearMiss: return Color.gjuha.warning
+        case .wrong: return Color.gjuha.error
+        }
+    }
+
+    private var answerLine: String? {
+        switch result {
+        case .correct:
+            return nil
+        case let .nearMiss(correctAnswer, _), let .wrong(correctAnswer, _):
+            return "Answer: \(correctAnswer)"
+        }
+    }
+
+    /// Full spoken description, independent of colour and haptics.
+    private var accessibilityMessage: String {
+        var parts: [String] = [title]
+        if let answerLine { parts.append(answerLine) }
+        if case let .correct(xpAwarded, _) = result { parts.append("\(xpAwarded) XP earned") }
+        if let explanation = result.explanation, !explanation.isEmpty { parts.append(explanation) }
+        return parts.joined(separator: ". ")
     }
 }
 
@@ -146,6 +199,7 @@ private struct LessonProgressBar: View {
                     .foregroundStyle(Color.gjuha.textSecondary)
                     .font(.body.weight(.semibold))
             }
+            .accessibilityLabel("Exit lesson")
 
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
@@ -164,12 +218,16 @@ private struct LessonProgressBar: View {
             }
             .frame(height: 12)
             .animation(.spring(response: 0.4), value: progress)
+            .accessibilityElement()
+            .accessibilityLabel("Lesson progress")
+            .accessibilityValue("\(Int((progress * 100).rounded())) percent")
 
             if combo >= 2 {
                 Text("\(combo)x")
                     .font(.gjuha.captionBold)
                     .foregroundStyle(Color.gjuha.xp)
                     .transition(.scale.combined(with: .opacity))
+                    .accessibilityLabel("\(combo) correct in a row")
             }
 
             HStack(spacing: 2) {
@@ -181,6 +239,9 @@ private struct LessonProgressBar: View {
                         .animation(.spring(response: 0.3, dampingFraction: 0.5), value: hearts)
                 }
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Hearts remaining")
+            .accessibilityValue("\(hearts) of 3")
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
@@ -209,15 +270,17 @@ private struct ExerciseView: View {
                 .font(.gjuha.exercisePrompt)
                 .foregroundStyle(Color.gjuha.textPrimary)
                 .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, 24)
                 .padding(.top, 32)
+                .accessibilityAddTraits(.isHeader)
 
             Spacer()
 
             switch exercise.type {
             case .multipleChoiceTranslate, .fillInBlank, .trueFalse:
                 MultipleChoiceAnswers(
-                    options: exercise.allOptions,
+                    options: exercise.orderedOptions,
                     correctAnswer: exercise.correctAnswer,
                     selectedAnswer: selectedAnswer,
                     answerResult: answerResult,
@@ -230,7 +293,7 @@ private struct ExerciseView: View {
                 )
             default:
                 MultipleChoiceAnswers(
-                    options: exercise.allOptions,
+                    options: exercise.orderedOptions,
                     correctAnswer: exercise.correctAnswer,
                     selectedAnswer: selectedAnswer,
                     answerResult: answerResult,
@@ -251,28 +314,73 @@ private struct MultipleChoiceAnswers: View {
     let answerResult: AnswerResult?
     let onSelect: (String) -> Void
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    /// Collapse to a single column at accessibility text sizes so long options
+    /// stay readable instead of truncating in a cramped two-column grid.
+    private var columns: [GridItem] {
+        dynamicTypeSize.isAccessibilitySize
+            ? [GridItem(.flexible())]
+            : [GridItem(.flexible()), GridItem(.flexible())]
+    }
+
     var body: some View {
-        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+        LazyVGrid(columns: columns, spacing: 12) {
             ForEach(options, id: \.self) { option in
                 Button(action: { onSelect(option) }) {
                     Text(option)
                         .font(.gjuha.answerOption)
                         .foregroundStyle(textColor(for: option))
+                        .multilineTextAlignment(.center)
+                        .minimumScaleFactor(0.7)
                         .frame(maxWidth: .infinity, minHeight: 64)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 10)
                         .background(backgroundColor(for: option))
                         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         .overlay(
                             RoundedRectangle(cornerRadius: 12, style: .continuous)
                                 .stroke(borderColor(for: option), lineWidth: borderWidth(for: option))
                         )
+                        .overlay(alignment: .topTrailing) {
+                            if let symbol = statusSymbol(for: option) {
+                                Image(systemName: symbol.name)
+                                    .font(.system(size: 18, weight: .bold))
+                                    .foregroundStyle(symbol.color)
+                                    .padding(6)
+                                    .accessibilityHidden(true)
+                            }
+                        }
                 }
                 .buttonStyle(.plain)
                 .scaleEffect(selectedAnswer == option ? 0.96 : 1.0)
                 .animation(.spring(response: 0.2, dampingFraction: 0.7), value: selectedAnswer)
+                .accessibilityLabel(option)
+                .accessibilityValue(accessibilityValue(for: option))
+                .accessibilityAddTraits(option == selectedAnswer ? [.isButton, .isSelected] : .isButton)
             }
         }
         .padding(.horizontal, 16)
         .padding(.bottom, 100)
+    }
+
+    /// Non-color status marker (checkmark / cross) shown once an answer is graded.
+    private func statusSymbol(for option: String) -> (name: String, color: Color)? {
+        guard answerResult != nil else { return nil }
+        if option == correctAnswer {
+            return ("checkmark.circle.fill", Color.gjuha.success)
+        }
+        if option == selectedAnswer {
+            return ("xmark.circle.fill", Color.gjuha.error)
+        }
+        return nil
+    }
+
+    private func accessibilityValue(for option: String) -> String {
+        guard answerResult != nil else { return "" }
+        if option == correctAnswer { return "correct answer" }
+        if option == selectedAnswer { return "your answer, incorrect" }
+        return ""
     }
 
     private func backgroundColor(for option: String) -> some ShapeStyle {
@@ -328,16 +436,26 @@ private struct TextInputAnswer: View {
     let onSubmit: (String) -> Void
     @State private var text = ""
 
+    private var trimmed: String {
+        text.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     private var borderColor: Color {
-        guard let result = answerResult else { return .clear }
-        if case .correct = result { return Color.gjuha.success }
-        return Color.gjuha.error
+        switch answerResult {
+        case .correct: return Color.gjuha.success
+        case .nearMiss: return Color.gjuha.warning
+        case .wrong: return Color.gjuha.error
+        case .none: return .clear
+        }
     }
 
     var body: some View {
         VStack(spacing: 16) {
             TextField("Type your answer...", text: $text)
                 .font(.gjuha.bodyMedium)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled(true)
+                .submitLabel(.done)
                 .padding(16)
                 .gjuhaLiquidGlassCard(cornerRadius: 12, tintOpacity: 0.06)
                 .overlay(
@@ -346,22 +464,24 @@ private struct TextInputAnswer: View {
                 )
                 .padding(.horizontal, 16)
                 .disabled(answerResult != nil)
-                .onSubmit { if !text.isEmpty { onSubmit(text) } }
+                .accessibilityLabel("Answer")
+                .accessibilityHint("Type your translation, then submit")
+                .onSubmit { if !trimmed.isEmpty { onSubmit(trimmed) } }
 
-            Button(action: { if !text.isEmpty { onSubmit(text) } }) {
+            Button(action: { if !trimmed.isEmpty { onSubmit(trimmed) } }) {
                 Text("Check")
                     .font(.gjuha.labelBold)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
                     .background(
-                        text.isEmpty
+                        trimmed.isEmpty
                             ? Color.gjuha.textTertiary
                             : Color.gjuha.accent
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }
-            .disabled(text.isEmpty || answerResult != nil)
+            .disabled(trimmed.isEmpty || answerResult != nil)
             .padding(.horizontal, 16)
             .padding(.bottom, 100)
         }

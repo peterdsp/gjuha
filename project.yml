@@ -64,12 +64,17 @@ targets:
       - path: GjuhaTests
     settings:
       base:
+        GENERATE_INFOPLIST_FILE: YES
         PRODUCT_BUNDLE_IDENTIFIER: com.gjuha.tests
         SWIFT_VERSION: "6.0"
+    # The unit tests are pure logic tests that resolve Gjuha's symbols through
+    # the test host. The test bundle intentionally does NOT link
+    # ComposableArchitecture: doing so builds it as a dynamic framework that
+    # fails to link swift-navigation symbols on this Xcode/TCA toolchain. If a
+    # future test needs TCA's TestStore, re-add the product here and resolve the
+    # framework linkage.
     dependencies:
       - target: Gjuha
-      - package: ComposableArchitecture
-        product: ComposableArchitecture
 
   GjuhaUITests:
     type: bundle.ui-testing
@@ -79,6 +84,7 @@ targets:
       - path: GjuhaUITests
     settings:
       base:
+        GENERATE_INFOPLIST_FILE: YES
         PRODUCT_BUNDLE_IDENTIFIER: com.gjuha.uitests
         SWIFT_VERSION: "6.0"
     dependencies:

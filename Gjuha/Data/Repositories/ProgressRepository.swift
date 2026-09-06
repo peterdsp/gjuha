@@ -9,6 +9,8 @@ protocol ProgressRepository: Sendable {
     func updateStreak() async
     func fetchCurrentStreak() async -> Int
     func fetchTotalXP() async -> Int
+    func fetchLearningGoal() async -> LearningGoal
+    func saveLearningGoal(_ goal: LearningGoal) async
 }
 
 // MARK: - Dependency Key
@@ -33,9 +35,21 @@ final class LiveProgressRepository: ProgressRepository, @unchecked Sendable {
         return UserStats(
             currentStreak: store.currentStreak,
             totalXP: store.totalXP,
-            wordsLearned: store.lessonsCompleted * 6,
+            wordsSeen: Self.wordsSeen(in: store.completedLessonSeedIds),
             lessonsCompleted: store.lessonsCompleted
         )
+    }
+
+    /// Honest exposure count: the distinct vocabulary words covered by the
+    /// lessons the user has actually completed, taken from the fixed
+    /// lesson-to-vocabulary mapping. Not a fabricated multiple of lesson count,
+    /// and not presented as mastery.
+    static func wordsSeen(in completedSeedIds: Set<String>) -> Int {
+        var ids = Set<String>()
+        for seedId in completedSeedIds {
+            ids.formUnion(LessonVocabularyMap.wordIds(for: seedId, lessonTitle: ""))
+        }
+        return ids.count
     }
 
     func markLessonCompleted(_ lessonId: UUID, seedId: String, xpEarned: Int) async {
@@ -51,6 +65,18 @@ final class LiveProgressRepository: ProgressRepository, @unchecked Sendable {
     func fetchTotalXP() async -> Int {
         ProgressStore.shared.totalXP
     }
+
+    func fetchLearningGoal() async -> LearningGoal {
+        guard let raw = ProgressStore.shared.learningGoalRawValue,
+              let goal = LearningGoal(rawValue: raw) else {
+            return .casual
+        }
+        return goal
+    }
+
+    func saveLearningGoal(_ goal: LearningGoal) async {
+        ProgressStore.shared.setLearningGoal(goal.rawValue)
+    }
 }
 
 // MARK: - Mock Implementation
@@ -60,7 +86,7 @@ final class MockProgressRepository: ProgressRepository, @unchecked Sendable {
         return UserStats(
             currentStreak: 7,
             totalXP: 340,
-            wordsLearned: 45,
+            wordsSeen: 45,
             lessonsCompleted: 12
         )
     }
@@ -69,4 +95,6 @@ final class MockProgressRepository: ProgressRepository, @unchecked Sendable {
     func updateStreak() async {}
     func fetchCurrentStreak() async -> Int { 7 }
     func fetchTotalXP() async -> Int { 340 }
+    func fetchLearningGoal() async -> LearningGoal { .regular }
+    func saveLearningGoal(_ goal: LearningGoal) async {}
 }

@@ -5,7 +5,15 @@ import Dependencies
 
 protocol ExerciseEngineProtocol: Sendable {
     func generateExercises(for lesson: LessonSummary) async -> [Exercise]
-    func checkAnswer(_ answer: String, for exercise: Exercise) -> Bool
+    /// Grades a submitted answer, distinguishing correct answers from near misses.
+    func grade(_ answer: String, for exercise: Exercise) -> AnswerGrade
+}
+
+extension ExerciseEngineProtocol {
+    /// Convenience wrapper: `true` only when the answer is fully correct.
+    func checkAnswer(_ answer: String, for exercise: Exercise) -> Bool {
+        grade(answer, for: exercise) == .correct
+    }
 }
 
 // MARK: - Dependency Key
@@ -315,27 +323,28 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
         return generateMixedExercises(from: lessonWords)
     }
 
-    func checkAnswer(_ answer: String, for exercise: Exercise) -> Bool {
-        let normalizedAnswer = answer
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .lowercased()
-            .replacingOccurrences(of: "\u{00eb}", with: "ë") // normalize ë
-        let normalizedCorrect = exercise.correctAnswer
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .lowercased()
+    func grade(_ answer: String, for exercise: Exercise) -> AnswerGrade {
+        let submitted = AnswerNormalizer.normalize(answer)
+        guard !submitted.isEmpty else { return .incorrect }
 
-        // Exact match
-        if normalizedAnswer == normalizedCorrect { return true }
+        let acceptedForms = AnswerNormalizer.acceptedForms(for: exercise.correctAnswer)
 
-        // Handle "x / y" style answers — accept either part
-        if normalizedCorrect.contains(" / ") {
-            let parts = normalizedCorrect
-                .components(separatedBy: " / ")
-                .map { $0.trimmingCharacters(in: .whitespaces).lowercased() }
-            if parts.contains(normalizedAnswer) { return true }
+        // Fully correct: matches an accepted form exactly, after normalising
+        // whitespace, case and Unicode (NFC). Diacritics are preserved, so a
+        // missing ë/ç is NOT accepted here.
+        if acceptedForms.contains(submitted) {
+            return .correct
         }
 
-        return false
+        // Near miss only applies to free-typed answers. For multiple choice the
+        // learner picked an option, so anything that is not the answer is simply
+        // incorrect (a distractor could otherwise be one edit away).
+        if exercise.type == .translateTextInput,
+           AnswerNormalizer.isNearMiss(submitted, acceptedForms: acceptedForms) {
+            return .nearMiss
+        }
+
+        return .incorrect
     }
 
     // MARK: - Exercise Generation
@@ -384,7 +393,7 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
             prompt: "What does '\(word.albanian)' mean?",
             correctAnswer: word.english,
             distractors: distractors,
-            explanation: word.exampleSentence.map { "Example: \($0)" },
+            explanation: Self.exampleExplanation(word),
             xpValue: 10
         )
     }
@@ -396,6 +405,7 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
             prompt: "How do you say '\(word.english)' in Albanian?",
             correctAnswer: word.albanian,
             distractors: distractors,
+            explanation: Self.exampleExplanation(word),
             xpValue: 10
         )
     }
@@ -409,6 +419,7 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
                 prompt: "Translate: '\(word.english)'",
                 correctAnswer: word.albanian,
                 hint: "Type in Albanian",
+                explanation: Self.exampleExplanation(word),
                 xpValue: 15
             )
         } else {
@@ -417,6 +428,7 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
                 prompt: "Translate: '\(word.albanian)'",
                 correctAnswer: word.english,
                 hint: "Type in English",
+                explanation: Self.exampleExplanation(word),
                 xpValue: 15
             )
         }
@@ -437,20 +449,116 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
             prompt: "\(blank) (\(translation))",
             correctAnswer: word.albanian,
             distractors: distractors,
+            explanation: "\(word.albanian) means \(word.english). Full sentence: \(sentence) (\(translation)).",
             xpValue: 12
         )
     }
 
-    private func pickDistractors(
+    /// Picks pedagogically plausible distractors instead of random words.
+    ///
+    /// Preference order, each tier a safe fallback for the previous one:
+    /// same part of speech (plus gender/verb class when that metadata exists),
+    /// then same part of speech, then same CEFR level, then any other word.
+    /// Within a tier, candidates near the target's frequency are preferred so
+    /// options feel comparable. Candidates that are also a valid answer, or that
+    /// duplicate another option, are excluded. If the pool cannot supply enough,
+    /// a small curated set pads the list so an exercise always has options.
+    func pickDistractors(
         for word: SeedWordEntry,
         from pool: [SeedWordEntry],
         count: Int,
         useEnglish: Bool
     ) -> [String] {
-        let candidates = pool.filter { $0.id != word.id }
-        let shuffled = candidates.shuffled()
-        let picked = shuffled.prefix(count)
-        return picked.map { useEnglish ? $0.english : $0.albanian }
+        let answerText: (SeedWordEntry) -> String = { useEnglish ? $0.english : $0.albanian }
+        let correctForms = AnswerNormalizer.acceptedForms(for: answerText(word))
+
+        func isUsable(_ candidate: SeedWordEntry) -> Bool {
+            guard candidate.id != word.id else { return false }
+            let text = answerText(candidate).trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !text.isEmpty else { return false }
+            // Reject anything that is also a correct/ambiguous answer for this prompt.
+            let candidateForms = AnswerNormalizer.acceptedForms(for: text)
+            return candidateForms.isDisjoint(with: correctForms)
+        }
+
+        let usable = pool.filter(isUsable)
+        let samePOSFeature = usable.filter { $0.partOfSpeech == word.partOfSpeech && Self.featureMatches($0, word) }
+        let samePOS = usable.filter { $0.partOfSpeech == word.partOfSpeech }
+        let sameLevel = usable.filter { $0.cefrLevel == word.cefrLevel }
+
+        var picked: [String] = []
+        var usedKeys = Set<String>()
+
+        func take(from candidates: [SeedWordEntry]) {
+            guard picked.count < count else { return }
+            let ranked = candidates.sorted {
+                Self.frequencyDistance($0, word) < Self.frequencyDistance($1, word)
+            }
+            // Take from the nearest-frequency band, shuffled for variety.
+            let band = Array(ranked.prefix(max(count * 4, 12))).shuffled()
+            for candidate in band {
+                guard picked.count < count else { break }
+                let text = answerText(candidate)
+                let key = AnswerNormalizer.normalize(text)
+                guard usedKeys.insert(key).inserted else { continue }
+                picked.append(text)
+            }
+        }
+
+        take(from: samePOSFeature)
+        take(from: samePOS)
+        take(from: sameLevel)
+        take(from: usable)
+
+        // Safe fallback for a pool too small to offer plausible options.
+        if picked.count < count {
+            for filler in Self.fallbackDistractors(useEnglish: useEnglish) {
+                guard picked.count < count else { break }
+                let key = AnswerNormalizer.normalize(filler)
+                guard !correctForms.contains(key), usedKeys.insert(key).inserted else { continue }
+                picked.append(filler)
+            }
+        }
+
+        return picked
+    }
+
+    /// Matches secondary grammatical features when the dataset provides them.
+    /// The current A1 seed omits gender/verb class, so this returns `true` and the
+    /// part-of-speech tier does the work. It future-proofs richer datasets.
+    private static func featureMatches(_ candidate: SeedWordEntry, _ word: SeedWordEntry) -> Bool {
+        if word.partOfSpeech == "noun", let g = word.gender, let cg = candidate.gender {
+            return g == cg
+        }
+        if word.partOfSpeech == "verb", let v = word.verbClass, let cv = candidate.verbClass {
+            return v == cv
+        }
+        return true
+    }
+
+    private static func frequencyDistance(_ a: SeedWordEntry, _ b: SeedWordEntry) -> Int {
+        let fa = a.frequency ?? 100_000
+        let fb = b.frequency ?? 100_000
+        return abs(fa - fb)
+    }
+
+    private static func fallbackDistractors(useEnglish: Bool) -> [String] {
+        useEnglish
+            ? ["yes", "no", "thank you", "please", "good day", "water"]
+            : ["po", "jo", "faleminderit", "ju lutem", "mirëdita", "ujë"]
+    }
+
+    /// Builds a valid, honest explanation from existing word metadata.
+    private static func exampleExplanation(_ word: SeedWordEntry) -> String {
+        var lines = ["\(word.albanian) means \(word.english)."]
+        if let sentence = word.exampleSentence {
+            if let translation = word.exampleTranslation {
+                lines.append("Example: \(sentence) (\(translation))")
+            } else {
+                lines.append("Example: \(sentence)")
+            }
+        }
+        return lines.joined(separator: "\n")
     }
 
     // MARK: - Load Vocabulary
@@ -462,6 +570,89 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
             return SeedWordEntry.fallback
         }
         return words.isEmpty ? SeedWordEntry.fallback : words
+    }
+}
+
+// MARK: - Answer Normalization & Grading Helpers
+
+/// Text handling for grading typed answers. Deliberately conservative: it
+/// normalises whitespace, case and Unicode form, but preserves Albanian
+/// diacritics (ë, ç) and articles because dropping them changes meaning and the
+/// skill being tested. Near-miss detection lives here too, kept separate from
+/// acceptance so a close answer is recognised without being counted correct.
+enum AnswerNormalizer {
+    /// Canonical comparison form: NFC Unicode, trimmed, lowercased, with internal
+    /// runs of whitespace collapsed to a single space. Diacritics are preserved.
+    static func normalize(_ raw: String) -> String {
+        raw.precomposedStringWithCanonicalMapping
+            .lowercased()
+            .components(separatedBy: .whitespacesAndNewlines)
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+    }
+
+    /// Every acceptable spelling of a correct answer, normalised.
+    /// Splits `/` and `;` alternates (e.g. "good day / hello") and also offers
+    /// each alternate with a trailing "(...)" gloss removed (e.g. "to be (1st sg)"
+    /// also accepts "to be").
+    static func acceptedForms(for correctAnswer: String) -> Set<String> {
+        var forms = Set<String>()
+        let parts = correctAnswer.components(separatedBy: CharacterSet(charactersIn: "/;"))
+        for part in parts {
+            let trimmed = part.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmed.isEmpty else { continue }
+            forms.insert(normalize(trimmed))
+            if let head = stripTrailingParenthetical(trimmed) {
+                forms.insert(normalize(head))
+            }
+        }
+        return forms
+    }
+
+    private static func stripTrailingParenthetical(_ s: String) -> String? {
+        guard let open = s.firstIndex(of: "("), s.contains(")") else { return nil }
+        let head = String(s[s.startIndex..<open]).trimmingCharacters(in: .whitespaces)
+        return head.isEmpty ? nil : head
+    }
+
+    /// A near miss is a typed answer that differs from an accepted form only by
+    /// diacritics (a missing/extra ë or ç), or by a single typo in a word long
+    /// enough for that to be meaningful. It is never accepted as correct.
+    static func isNearMiss(_ normalizedAnswer: String, acceptedForms: Set<String>) -> Bool {
+        for form in acceptedForms {
+            if foldDiacritics(normalizedAnswer) == foldDiacritics(form) {
+                return true
+            }
+            let threshold = form.count >= 5 ? 1 : 0
+            if threshold > 0, levenshtein(normalizedAnswer, form) <= threshold {
+                return true
+            }
+        }
+        return false
+    }
+
+    /// Folds diacritics to base letters so "faleminderit" folds equal to a form
+    /// that is missing an ë. Used only to *detect* near misses, never to accept.
+    static func foldDiacritics(_ s: String) -> String {
+        s.folding(options: .diacriticInsensitive, locale: Locale(identifier: "en_US"))
+    }
+
+    static func levenshtein(_ lhs: String, _ rhs: String) -> Int {
+        let a = Array(lhs)
+        let b = Array(rhs)
+        if a.isEmpty { return b.count }
+        if b.isEmpty { return a.count }
+        var prev = Array(0...b.count)
+        var curr = [Int](repeating: 0, count: b.count + 1)
+        for i in 1...a.count {
+            curr[0] = i
+            for j in 1...b.count {
+                let cost = a[i - 1] == b[j - 1] ? 0 : 1
+                curr[j] = Swift.min(prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + cost)
+            }
+            swap(&prev, &curr)
+        }
+        return prev[b.count]
     }
 }
 
@@ -498,8 +689,15 @@ final class MockExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
         return Exercise.mockExercises
     }
 
-    func checkAnswer(_ answer: String, for exercise: Exercise) -> Bool {
-        return answer.lowercased() == exercise.correctAnswer.lowercased()
+    func grade(_ answer: String, for exercise: Exercise) -> AnswerGrade {
+        let submitted = AnswerNormalizer.normalize(answer)
+        let forms = AnswerNormalizer.acceptedForms(for: exercise.correctAnswer)
+        if forms.contains(submitted) { return .correct }
+        if exercise.type == .translateTextInput,
+           AnswerNormalizer.isNearMiss(submitted, acceptedForms: forms) {
+            return .nearMiss
+        }
+        return .incorrect
     }
 }
 

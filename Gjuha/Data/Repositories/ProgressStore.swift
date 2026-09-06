@@ -5,7 +5,13 @@ import Foundation
 final class ProgressStore: @unchecked Sendable {
     static let shared = ProgressStore()
 
-    private let defaults = UserDefaults.standard
+    private let defaults: UserDefaults
+
+    /// Injectable defaults keep the store testable in isolation (a throwaway
+    /// suite) without touching the app's standard defaults.
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+    }
 
     private enum Keys {
         static let completedLessons = "gjuha.completedLessonSeedIds"
@@ -13,6 +19,7 @@ final class ProgressStore: @unchecked Sendable {
         static let totalXP = "gjuha.totalXP"
         static let currentStreak = "gjuha.currentStreak"
         static let lastActivityDate = "gjuha.lastActivityDate"
+        static let learningGoal = "gjuha.learningGoal"
     }
 
     // MARK: - Completed Lessons
@@ -91,5 +98,16 @@ final class ProgressStore: @unchecked Sendable {
 
     var lessonsCompleted: Int {
         completedLessonSeedIds.count
+    }
+
+    // MARK: - Learning Goal
+
+    /// Raw stored goal identifier, or nil if the user has not set one yet.
+    var learningGoalRawValue: String? {
+        defaults.string(forKey: Keys.learningGoal)
+    }
+
+    func setLearningGoal(_ rawValue: String) {
+        defaults.set(rawValue, forKey: Keys.learningGoal)
     }
 }

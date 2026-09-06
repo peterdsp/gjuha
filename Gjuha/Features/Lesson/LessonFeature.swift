@@ -73,20 +73,33 @@ struct LessonFeature {
                 guard let current = state.currentExercise else { return .none }
                 guard state.answerResult == nil else { return .none }
                 state.selectedAnswer = answer
-                let isCorrect = exerciseEngine.checkAnswer(answer, for: current)
 
-                if isCorrect {
-                    state.answerResult = .correct
-                    state.xpEarned += current.xpValue
+                switch exerciseEngine.grade(answer, for: current) {
+                case .correct:
                     state.combo += 1
-                    // Combo bonus: +5 XP for every 3 correct in a row
-                    if state.combo % 3 == 0 {
-                        state.xpEarned += 5
-                    }
-                } else {
-                    state.answerResult = .wrong(correctAnswer: current.correctAnswer)
+                    // Combo bonus: +5 XP for every 3 correct in a row.
+                    let comboBonus = state.combo % 3 == 0 ? 5 : 0
+                    let awarded = current.xpValue + comboBonus
+                    state.xpEarned += awarded
+                    state.answerResult = .correct(
+                        xpAwarded: awarded,
+                        explanation: current.explanation
+                    )
+                case .nearMiss:
+                    // Recognised but not accepted: no XP, distinct feedback.
                     state.hearts -= 1
                     state.combo = 0
+                    state.answerResult = .nearMiss(
+                        correctAnswer: current.correctAnswer,
+                        explanation: current.explanation
+                    )
+                case .incorrect:
+                    state.hearts -= 1
+                    state.combo = 0
+                    state.answerResult = .wrong(
+                        correctAnswer: current.correctAnswer,
+                        explanation: current.explanation
+                    )
                 }
 
                 // Auto-advance after delay
@@ -96,12 +109,7 @@ struct LessonFeature {
                 }
 
             case .answerFeedbackDismissed:
-                let wasCorrect: Bool
-                if case .correct = state.answerResult {
-                    wasCorrect = true
-                } else {
-                    wasCorrect = false
-                }
+                let wasCorrect = state.answerResult?.isCorrect ?? false
                 state.answerResult = nil
                 state.selectedAnswer = nil
 

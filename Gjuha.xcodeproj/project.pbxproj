@@ -15,7 +15,6 @@
 		24C09670E5F159D80B3414C2 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B82598DB6E5FAC930554260D /* HomeView.swift */; };
 		276BE94BADE844502CFE3B24 /* OnboardingFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA826FE31BEA459913FF230 /* OnboardingFeature.swift */; };
 		27A81FB1D34F99B7BA6AD8A2 /* sentences_sqi_50k.csv in Resources */ = {isa = PBXBuildFile; fileRef = 146EC61D6D8D4ED1086A3A2E /* sentences_sqi_50k.csv */; };
-		27E76A1AA6636A41112F884F /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 0380F4C6DD70FE8B69F4188C /* ComposableArchitecture */; };
 		29F117C82C3D3BD9FCAEA570 /* AppFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA576DEE9996DF103ABE9944 /* AppFeature.swift */; };
 		3404D6B83311FE3804F7F2A9 /* sentence_templates_300.json in Resources */ = {isa = PBXBuildFile; fileRef = CCA106E3EE4D8D41EA0612FD /* sentence_templates_300.json */; };
 		37A162D82B053A86CD9AD978 /* GrammarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E9D9F25830DD968FEFD5FF /* GrammarView.swift */; };
@@ -126,7 +125,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				27E76A1AA6636A41112F884F /* ComposableArchitecture in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -485,7 +483,6 @@
 			);
 			name = GjuhaTests;
 			packageProductDependencies = (
-				0380F4C6DD70FE8B69F4188C /* ComposableArchitecture */,
 			);
 			productName = GjuhaTests;
 			productReference = 52946A6304B4906FC0EC7BCA /* GjuhaTests.xctest */;
@@ -655,6 +652,7 @@
 					"@loader_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.gjuha.uitests;
+				GENERATE_INFOPLIST_FILE = YES;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -773,6 +771,7 @@
 					"@loader_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.gjuha.tests;
+				GENERATE_INFOPLIST_FILE = YES;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -854,6 +853,7 @@
 					"@loader_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.gjuha.tests;
+				GENERATE_INFOPLIST_FILE = YES;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -872,6 +872,7 @@
 					"@loader_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.gjuha.uitests;
+				GENERATE_INFOPLIST_FILE = YES;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -932,11 +933,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		0380F4C6DD70FE8B69F4188C /* ComposableArchitecture */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = ADA6957B6BFD6B52FDB2C090 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
-			productName = ComposableArchitecture;
-		};
 		E321AE751423622AD69CA351 /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = ADA6957B6BFD6B52FDB2C090 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;

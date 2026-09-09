@@ -3406,5 +3406,47 @@
     "partOfSpeech": "verb",
     "verbClass": "thirdConjugation",
     "frequency": 350
+  },
+  {
+    "id": "w351",
+    "albanian": "je",
+    "english": "you are (2nd sg)",
+    "cefrLevel": "a1",
+    "partOfSpeech": "verb",
+    "verbClass": "irregular",
+    "exampleSentence": "Ti je shqiptar.",
+    "exampleTranslation": "You are Albanian.",
+    "frequency": 17
+  },
+  {
+    "id": "w352",
+    "albanian": "është",
+    "english": "he/she/it is (3rd sg)",
+    "cefrLevel": "a1",
+    "partOfSpeech": "verb",
+    "verbClass": "irregular",
+    "exampleSentence": "Ai është mësues.",
+    "exampleTranslation": "He is a teacher.",
+    "frequency": 16
+  },
+  {
+    "id": "w353",
+    "albanian": "përshëndetje",
+    "english": "hello",
+    "cefrLevel": "a1",
+    "partOfSpeech": "interjection",
+    "exampleSentence": "Përshëndetje! Si je?",
+    "exampleTranslation": "Hello! How are you?",
+    "frequency": 7
+  },
+  {
+    "id": "w354",
+    "albanian": "të lutem",
+    "english": "please",
+    "cefrLevel": "a1",
+    "partOfSpeech": "interjection",
+    "exampleSentence": "Një kafe, të lutem.",
+    "exampleTranslation": "A coffee, please.",
+    "frequency": 12
   }
 ]

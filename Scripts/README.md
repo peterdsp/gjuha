@@ -8,9 +8,9 @@ Build and data tooling for the Gjuha content pipeline.
 
 ### `fetch_sources.sh`
 Pulls raw language data from open datasets:
-- **Tatoeba** — Albanian sentence corpus
-- **Wiktionary** — Albanian word entries with morphological data
-- **Leipzig Corpora** (optional) — frequency data
+- **Tatoeba** - Albanian sentence corpus
+- **Wiktionary** - Albanian word entries with morphological data
+- **Leipzig Corpora** (optional) - frequency data
 
 ### `build_from_sources.py`
 Processes raw data into structured Gjuha seed files:
@@ -47,4 +47,4 @@ python3 ./Scripts/tools/build_from_sources.py
 
 - Raw dataset files are **not committed** to the repo (too large, regeneratable)
 - Only the processed, validated JSON seed files are committed
-- The build pipeline is deterministic — same source data = same output
+- The build pipeline is deterministic - same source data = same output

@@ -89,6 +89,6 @@ npm-debug.log*
 tmp/
 temp/
 
-# Content pipeline — raw source downloads (large, regeneratable)
+# Content pipeline - raw source downloads (large, regeneratable)
 sources/
 content/generated/

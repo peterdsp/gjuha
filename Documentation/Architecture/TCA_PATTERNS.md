@@ -110,7 +110,7 @@ NavigationStackStore(store.scope(state: \.path, action: \.path)) {
 case .loadData:
     state.isLoading = true
     return .run { send in
-        // Async work — never touch state directly here
+        // Async work - never touch state directly here
         let result = await someRepository.fetch()
         await send(.dataLoaded(result))
     }

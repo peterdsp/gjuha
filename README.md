@@ -2,7 +2,7 @@
 
 # gjuha
 
-### *gjuha* (Albanian) — *the language*
+### *gjuha* (Albanian) - *the language*
 
 **The most modern Albanian language learning experience ever built.**
 
@@ -28,7 +28,7 @@ Albanian is spoken by 8 million people. It has no major learning app. No Duoling
 
 Built for the foreign partners of Albanians, the diaspora reconnecting with their roots, the expats living in Tirana, and the language nerds drawn to one of the oldest surviving Indo-European languages on earth.
 
-This is not a hobby project. It is a long-term platform designed to reach **Duolingo-scale depth** — A1 through B2 — with better grammar transparency, real cultural immersion, and an engine that generates exercises rather than hardcoding sentences.
+This is not a hobby project. It is a long-term platform designed to reach **Duolingo-scale depth** - A1 through B2 - with better grammar transparency, real cultural immersion, and an engine that generates exercises rather than hardcoding sentences.
 
 ---
 
@@ -41,7 +41,7 @@ This is not a hobby project. It is a long-term platform designed to reach **Duol
 ✦  Translation input               ✦  Fill-in-the-blank
 ✦  Word matching                   ✦  Spaced repetition (planned)
 ✦  Streak + XP system              ✦  Cultural immersion modules (planned)
-✦  Offline-first — always works    ✦  Audio pronunciation (planned)
+✦  Offline-first - always works    ✦  Audio pronunciation (planned)
 ✦  Dark mode adaptive UI           ✦  Gheg dialect mode (planned)
 ```
 
@@ -88,7 +88,7 @@ Gjuha/
 │   ├── Models/                 # SwiftData @Model classes (Word, Lesson)
 │   ├── Repositories/           # Protocol + Live + Mock implementations
 │   ├── SwiftData/              # Schema, container, migrations
-│   └── Seed/                   # JSON datasets — the content engine fuel
+│   └── Seed/                   # JSON datasets - the content engine fuel
 │       ├── Vocabulary/         # word_frequency_top6000.csv + curated entries
 │       ├── Lessons/            # Unit + lesson definitions
 │       └── Grammar/            # Morphology rules, conjugation tables
@@ -103,7 +103,7 @@ Gjuha/
 
 **TCA everywhere.** No MVVM, no Combine, no ViewModels. Every screen is a `@Reducer` with typed `State`, `Action`, and an `Effect`-based body.
 
-**Value types in State.** SwiftData `@Model` classes never enter TCA State. `LessonSummary` is a `Sendable` value type that mirrors `Lesson` for use in reducers — keeping Swift 6 strict concurrency clean throughout.
+**Value types in State.** SwiftData `@Model` classes never enter TCA State. `LessonSummary` is a `Sendable` value type that mirrors `Lesson` for use in reducers - keeping Swift 6 strict concurrency clean throughout.
 
 **Protocol-based repositories.** Every data source is behind a `protocol: Sendable` with a `Live` implementation and a `Mock` for tests and previews. Wired via `@Dependency`.
 
@@ -124,12 +124,12 @@ The content pipeline is already running:
 | Sentence templates | ✅ Done | 300 templates |
 | Exercise seed (pipeline artifact, not loaded at runtime) | ✅ Done | 1,000 exercises |
 | Morphology rules | ✅ Done | Verb + noun patterns |
-| A1–B1 curriculum plan | ✅ Done | 120 lessons across 12 units |
+| A1-B1 curriculum plan | ✅ Done | 120 lessons across 12 units |
 | Grammar topic dataset | 🔄 In progress | Conjugation tables, case rules |
 | Audio recordings | 📋 Planned | Phase 2 |
 
-**Target vocabulary:** 4,000–6,000 entries covering A1–B2.
-**Target exercises:** 30,000–60,000 generated variations.
+**Target vocabulary:** 4,000-6,000 entries covering A1-B2.
+**Target exercises:** 30,000-60,000 generated variations.
 
 > **Runtime note.** At runtime the exercise engine generates multiple-choice,
 > typed-translation and fill-in-the-blank exercises from `a1_vocabulary.json`.
@@ -182,12 +182,12 @@ Verified runtime behavior of the core lesson flow (Phase 0 foundations):
 
 ---
 
-## Albanian — Why It's Interesting
+## Albanian - Why It's Interesting
 
-Albanian is one of the oldest surviving branches of Indo-European — an entire branch unto itself, not a sub-family. It has no close living relatives.
+Albanian is one of the oldest surviving branches of Indo-European - an entire branch unto itself, not a sub-family. It has no close living relatives.
 
 ```
-mirëdita        →  good day (mirë + ditë — "good" + "day")
+mirëdita        →  good day (mirë + ditë - "good" + "day")
 faleminderit    →  thank you (via Ottoman Turkish, from Arabic)
 ju lutem        →  please / you're welcome
 shtëpi          →  house (one of the oldest IE root words still in use)
@@ -195,7 +195,7 @@ shtëpi          →  house (one of the oldest IE root words still in use)
 
 It features **postposed definite articles** (the article attaches to the end of the noun), **five grammatical cases**, **two major dialects** (Tosk in the south, Gheg in the north), and verb moods that most Western learners have never encountered.
 
-Gjuha teaches all of it — clearly, progressively, with cultural context.
+Gjuha teaches all of it - clearly, progressively, with cultural context.
 
 ---
 
@@ -204,40 +204,40 @@ Gjuha teaches all of it — clearly, progressively, with cultural context.
 12 units · 120 lessons · A1 → B2
 
 ```
-Unit 01  — Survival Basics        [A1]  Greetings, pronouns, to be/have
-Unit 02  — Everyday Life          [A1]  Work, transport, health, market
-Unit 03  — Talking About You      [A1]  People, adjectives, past tense
-Unit 04  — Getting Around         [A2]  Directions, places, plans
-Unit 05  — People & Relationships [A2]  Family, feelings, social life
-Unit 06  — Language in Action     [A2]  Opinions, requests, comparison
-Unit 07  — Albanian Society       [B1]  Culture, media, current affairs
-Unit 08  — Work & Ambition        [B1]  Career, formal register
-Unit 09  — Nature & Environment   [B1]  Climate, geography, seasons
-Unit 10  — Deeper Connections     [B1]  Abstract emotions, storytelling
-Unit 11  — Fluency Building       [B2]  Idioms, nuance, debate
-Unit 12  — Cultural Mastery       [B2]  Literature, history, identity
+Unit 01  - Survival Basics        [A1]  Greetings, pronouns, to be/have
+Unit 02  - Everyday Life          [A1]  Work, transport, health, market
+Unit 03  - Talking About You      [A1]  People, adjectives, past tense
+Unit 04  - Getting Around         [A2]  Directions, places, plans
+Unit 05  - People & Relationships [A2]  Family, feelings, social life
+Unit 06  - Language in Action     [A2]  Opinions, requests, comparison
+Unit 07  - Albanian Society       [B1]  Culture, media, current affairs
+Unit 08  - Work & Ambition        [B1]  Career, formal register
+Unit 09  - Nature & Environment   [B1]  Climate, geography, seasons
+Unit 10  - Deeper Connections     [B1]  Abstract emotions, storytelling
+Unit 11  - Fluency Building       [B2]  Idioms, nuance, debate
+Unit 12  - Cultural Mastery       [B2]  Literature, history, identity
 ```
 
 ---
 
 ## Design System
 
-A semantic token system built around Albanian character — not borrowed from Duolingo.
+A semantic token system built around Albanian character - not borrowed from Duolingo.
 
 ```swift
 // Colors
-Color.gjuha.accent          // Deep Albanian red — primary actions
-Color.gjuha.streak          // Flame orange — motivation layer
-Color.gjuha.xp              // Gold — reward moments
+Color.gjuha.accent          // Deep Albanian red - primary actions
+Color.gjuha.streak          // Flame orange - motivation layer
+Color.gjuha.xp              // Gold - reward moments
 Color.gjuha.background      // Off-white / near-black (adaptive)
 Color.gjuha.surface         // Card background (adaptive)
 
 // Typography
-Font.gjuha.displayLarge     // 48pt Black Rounded — hero moments
-Font.gjuha.headingLarge     // 28pt Bold Rounded — screen titles
-Font.gjuha.exercisePrompt   // 26pt Semibold — the question
-Font.gjuha.answerOption     // 18pt Medium — tappable answers
-Font.gjuha.bodyRegular      // 16pt Regular — body copy
+Font.gjuha.displayLarge     // 48pt Black Rounded - hero moments
+Font.gjuha.headingLarge     // 28pt Bold Rounded - screen titles
+Font.gjuha.exercisePrompt   // 26pt Semibold - the question
+Font.gjuha.answerOption     // 18pt Medium - tappable answers
+Font.gjuha.bodyRegular      // 16pt Regular - body copy
 ```
 
 All 14 colors are defined as named asset pairs with automatic light/dark variants.
@@ -247,33 +247,33 @@ All spacing follows a strict **4pt grid** (4, 8, 12, 16, 24, 32, 48).
 
 ## Roadmap
 
-### Phase 1 — Foundation *(current)*
-- [x] Project scaffold — TCA feature modules for all 8 screens
+### Phase 1 - Foundation *(current)*
+- [x] Project scaffold - TCA feature modules for all 8 screens
 - [x] SwiftData schema (Word, Lesson)
-- [x] Repository layer — protocol + live + mock for all domains
+- [x] Repository layer - protocol + live + mock for all domains
 - [x] Exercise engine foundation (MCQ, translate, fill-blank)
-- [x] Design system — 14 semantic color tokens, typography scale
+- [x] Design system - 14 semantic color tokens, typography scale
 - [x] A1 vocabulary seed + curriculum dataset (120 lessons planned)
-- [x] Content pipeline — Tatoeba + Wiktionary data processing
+- [x] Content pipeline - Tatoeba + Wiktionary data processing
 - [ ] Skill tree home screen (UI)
 - [ ] Working lesson session end-to-end
 - [ ] SwiftData seed loader from JSON
 - [ ] App Store submission
 
-### Phase 2 — Content Depth
+### Phase 2 - Content Depth
 - [ ] Full A1 curriculum (30 lessons)
 - [ ] Verb conjugation exercise type
 - [ ] Noun case system exercises
 - [ ] Grammar reference module
 - [ ] Audio pronunciation
 
-### Phase 3 — Engagement
+### Phase 3 - Engagement
 - [ ] Spaced repetition vocabulary review
 - [ ] Streak mechanics + daily notifications
 - [ ] Achievements system
 - [ ] Cultural immersion modules
 
-### Phase 4 — Scale
+### Phase 4 - Scale
 - [ ] A2 full curriculum
 - [ ] Remote content packs (downloadable A2, B1)
 - [ ] User accounts + sync
@@ -291,7 +291,7 @@ cd gjuha
 open Gjuha.xcodeproj
 ```
 
-On first build, Xcode will ask to trust TCA macros — click **Trust & Enable Macros**, then run.
+On first build, Xcode will ask to trust TCA macros - click **Trust & Enable Macros**, then run.
 
 ### Regenerate the Xcode project
 
@@ -305,7 +305,7 @@ xcodegen generate --spec project.yml
 ### Run the content pipeline
 
 ```bash
-# 1. Download open datasets (~1.8 GB total — Tatoeba + Wiktionary)
+# 1. Download open datasets (~1.8 GB total - Tatoeba + Wiktionary)
 bash Scripts/tools/fetch_sources.sh
 
 # 2. Build frequency list + sentence corpus
@@ -317,7 +317,7 @@ python3 Scripts/tools/build_from_sources.py
 ## Design Principles
 
 **Grammar transparency.**
-Albanian grammar is complex and systematic. Gjuha explains the *why* — declension cases, verb moods, definiteness — not just the surface forms. Better than Duolingo's surface-level approach.
+Albanian grammar is complex and systematic. Gjuha explains the *why* - declension cases, verb moods, definiteness - not just the surface forms. Better than Duolingo's surface-level approach.
 
 **Cultural authenticity.**
 Real Albanian life: coffee culture, *besa* (the code of honour), *xhiro* (the evening walk), regional identity, hospitality. Not textbook sentences about going to the library.
@@ -335,4 +335,4 @@ One vocabulary entry powers dozens of exercise variations. The engine generates 
 
 ## License
 
-Private — All rights reserved. © 2026 Gjuha.
+Private - All rights reserved. © 2026 Gjuha.

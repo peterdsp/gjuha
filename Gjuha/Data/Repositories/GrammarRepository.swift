@@ -141,10 +141,10 @@ extension GrammarTopic {
                 ["3rd", "është (he/she/it is)", "janë (they are)"],
             ],
             examples: [
-                "Unë jam student. — I am a student.",
-                "Ti je shqiptar. — You are Albanian.",
-                "Ai është mësues. — He is a teacher.",
-                "Ne jemi miq. — We are friends.",
+                "Unë jam student. - I am a student.",
+                "Ti je shqiptar. - You are Albanian.",
+                "Ai është mësues. - He is a teacher.",
+                "Ne jemi miq. - We are friends.",
             ]
         ),
         GrammarTopic(
@@ -159,13 +159,13 @@ extension GrammarTopic {
             Masculine nouns often end in a consonant in indefinite form: libër (book), mik (friend).
             Feminine nouns often end in -ë or -e: vajzë (girl), shtëpi (house).
 
-            There are exceptions — learning gender by association with vocabulary is recommended.
+            There are exceptions - learning gender by association with vocabulary is recommended.
             """,
             examples: [
-                "libri (the book) — masculine",
-                "vajza (the girl) — feminine",
-                "miku (the friend) — masculine",
-                "shtëpia (the house) — feminine",
+                "libri (the book) - masculine",
+                "vajza (the girl) - feminine",
+                "miku (the friend) - masculine",
+                "shtëpia (the house) - feminine",
             ]
         ),
     ]

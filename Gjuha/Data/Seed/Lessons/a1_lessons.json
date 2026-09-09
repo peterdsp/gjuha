@@ -1,7 +1,7 @@
 [
   {
     "id": "unit1",
-    "title": "Unit 1 — Basics",
+    "title": "Unit 1 - Basics",
     "description": "Greetings, introductions, and the verb 'to be'",
     "cefrLevel": "a1",
     "orderIndex": 0,
@@ -57,14 +57,14 @@
   },
   {
     "id": "unit2",
-    "title": "Unit 2 — Everyday Life",
+    "title": "Unit 2 - Everyday Life",
     "description": "Family, home, numbers, and daily routines",
     "cefrLevel": "a1",
     "orderIndex": 1,
     "lessons": [
       {
         "id": "l006",
-        "title": "Numbers 1–10",
+        "title": "Numbers 1-10",
         "subtitle": "Count in Albanian",
         "iconName": "number.circle.fill",
         "orderIndex": 0,

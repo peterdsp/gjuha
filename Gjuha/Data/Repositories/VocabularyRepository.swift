@@ -61,92 +61,48 @@ final class LiveVocabularyRepository: VocabularyRepository, @unchecked Sendable 
         }
     }
 
+    /// Loads the browser's vocabulary from the single canonical source,
+    /// `a1_vocabulary.json`. These are the same `wNNN` identifiers the exercise
+    /// engine and lesson map use, so a word has one stable identity everywhere.
+    ///
+    /// The old dual source (this JSON plus `vocabulary_seed_600.csv`) is gone: the
+    /// CSV was mostly `__TODO_WORD__` placeholders and near-duplicates of the JSON,
+    /// which surfaced fake entries in the browser. Its few real curated rows now
+    /// live in the JSON. Reviewed pronunciation audio is attached from the audio
+    /// manifest so a word carries its clip only when one genuinely ships.
     private static func loadSeedWords(bundle: Bundle) -> [Word] {
-        var result: [Word] = []
-        var seenKeys = Set<String>()
-
-        if let seededJson: [SeedWordJSON] = decodeJSON(named: "a1_vocabulary", bundle: bundle) {
-            for item in seededJson {
-                let key = "json-\(item.id)"
-                guard seenKeys.insert(key).inserted else { continue }
-                result.append(
-                    Word(
-                        id: stableUUID(for: "word-\(item.id)"),
-                        albanian: item.albanian,
-                        english: item.english,
-                        cefrLevel: parseCEFR(item.cefrLevel),
-                        partOfSpeech: parsePartOfSpeech(item.partOfSpeech),
-                        gender: parseGender(item.gender),
-                        verbClass: parseVerbClass(item.verbClass),
-                        exampleSentence: item.exampleSentence,
-                        exampleTranslation: item.exampleTranslation,
-                        frequency: item.frequency ?? 0
-                    )
-                )
-            }
+        guard let seededJson: [SeedWordJSON] = decodeJSON(named: "a1_vocabulary", bundle: bundle),
+              !seededJson.isEmpty else {
+            return Word.mockData
         }
 
-        if let csvUrl = bundle.url(forResource: "vocabulary_seed_600", withExtension: "csv"),
-           let rawCsv = try? String(contentsOf: csvUrl, encoding: .utf8) {
-            let lines = rawCsv.components(separatedBy: .newlines).filter { !$0.isEmpty }
-            for (index, line) in lines.enumerated() where index > 0 {
-                let cols = parseCSVLine(line)
-                guard cols.count >= 10 else { continue }
-                let seedId = cols[0]
-                let albanian = cols[1].isEmpty ? cols[2] : cols[1]
-                let english = cols[8]
-                guard !seedId.isEmpty, !albanian.isEmpty, !english.isEmpty else { continue }
+        let audio = AudioLibrary(bundle: bundle)
+        var result: [Word] = []
+        var seenIds = Set<String>()
 
-                let key = "csv-\(seedId)"
-                guard seenKeys.insert(key).inserted else { continue }
-
-                result.append(
-                    Word(
-                        id: stableUUID(for: "word-\(seedId)"),
-                        albanian: albanian,
-                        english: english,
-                        cefrLevel: parseCEFR(cols[9]),
-                        partOfSpeech: parsePartOfSpeech(cols[3]),
-                        gender: parseGender(cols[4]),
-                        exampleSentence: nil,
-                        exampleTranslation: nil,
-                        audioFileName: cols[safe: 12],
-                        frequency: max(1, 600 - index)
-                    )
+        for item in seededJson {
+            guard seenIds.insert(item.id).inserted else { continue }
+            let audioFileName = audio.hasReviewedAudio(forWordId: item.id)
+                ? audio.asset(forWordId: item.id)?.file
+                : item.audioFileName
+            result.append(
+                Word(
+                    id: stableUUID(for: "word-\(item.id)"),
+                    albanian: item.albanian,
+                    english: item.english,
+                    cefrLevel: parseCEFR(item.cefrLevel),
+                    partOfSpeech: parsePartOfSpeech(item.partOfSpeech),
+                    gender: parseGender(item.gender),
+                    verbClass: parseVerbClass(item.verbClass),
+                    exampleSentence: item.exampleSentence,
+                    exampleTranslation: item.exampleTranslation,
+                    audioFileName: audioFileName,
+                    frequency: item.frequency ?? 0
                 )
-            }
+            )
         }
 
         return result.isEmpty ? Word.mockData : result
-    }
-
-    private static func parseCSVLine(_ line: String) -> [String] {
-        let chars = Array(line)
-        var fields: [String] = []
-        var current = ""
-        var inQuotes = false
-        var index = 0
-
-        while index < chars.count {
-            let char = chars[index]
-            if char == "\"" {
-                if inQuotes, index + 1 < chars.count, chars[index + 1] == "\"" {
-                    current.append("\"")
-                    index += 1
-                } else {
-                    inQuotes.toggle()
-                }
-            } else if char == "," && !inQuotes {
-                fields.append(current.trimmingCharacters(in: .whitespaces))
-                current = ""
-            } else {
-                current.append(char)
-            }
-            index += 1
-        }
-
-        fields.append(current.trimmingCharacters(in: .whitespaces))
-        return fields
     }
 
     private static func parseCEFR(_ raw: String?) -> CEFRLevel {
@@ -228,13 +184,8 @@ final class LiveVocabularyRepository: VocabularyRepository, @unchecked Sendable 
         let verbClass: String?
         let exampleSentence: String?
         let exampleTranslation: String?
+        let audioFileName: String?
         let frequency: Int?
-    }
-}
-
-private extension Array {
-    subscript(safe index: Int) -> Element? {
-        indices.contains(index) ? self[index] : nil
     }
 }
 

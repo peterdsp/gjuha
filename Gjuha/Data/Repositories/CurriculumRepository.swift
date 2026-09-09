@@ -100,7 +100,8 @@ final class LiveCurriculumRepository: CurriculumRepository, @unchecked Sendable 
                         isCompleted: isCompleted,
                         bestXP: isCompleted ? ProgressStore.shared.bestXP(for: seedLesson.id) : 0,
                         isLocked: isLocked,
-                        orderIndex: localIndex
+                        orderIndex: localIndex,
+                        exercisePlan: seedLesson.exercise_plan ?? []
                     )
                     lessonMapById[lesson.id] = lesson
                     return lesson
@@ -112,7 +113,7 @@ final class LiveCurriculumRepository: CurriculumRepository, @unchecked Sendable 
             let description = seedUnit.themes.prefix(3).joined(separator: ", ")
             let unit = LearningUnit(
                 id: unitId,
-                title: "Unit \(seedUnit.unit) — \(seedUnit.title)",
+                title: "Unit \(seedUnit.unit) - \(seedUnit.title)",
                 description: description.isEmpty ? "Core Albanian practice" : description,
                 cefrLevel: parseCEFR(seedUnit.cefr),
                 orderIndex: seedUnit.unit - 1,
@@ -233,6 +234,7 @@ final class LiveCurriculumRepository: CurriculumRepository, @unchecked Sendable 
         let title: String
         let cefr: String
         let objectives: [String]
+        let exercise_plan: [String]?
         let unlock: UnlockRule
 
         struct UnlockRule: Decodable {
@@ -267,7 +269,7 @@ extension LearningUnit {
     static let mockData: [LearningUnit] = [
         LearningUnit(
             id: UUID(),
-            title: "Unit 1 — Basics",
+            title: "Unit 1 - Basics",
             description: "Greetings, introductions, and the verb 'to be'",
             cefrLevel: .a1,
             orderIndex: 0,
@@ -275,7 +277,7 @@ extension LearningUnit {
         ),
         LearningUnit(
             id: UUID(),
-            title: "Unit 2 — Everyday Life",
+            title: "Unit 2 - Everyday Life",
             description: "Family, food, home, and daily routines",
             cefrLevel: .a1,
             orderIndex: 1,

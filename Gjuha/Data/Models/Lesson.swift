@@ -55,7 +55,7 @@ enum LessonType: String, Codable {
     case review
 }
 
-/// Lightweight value type used in TCA State — mirrors Lesson without @Model reference
+/// Lightweight value type used in TCA State - mirrors Lesson without @Model reference
 struct LessonSummary: Identifiable, Equatable, Sendable {
     let id: UUID
     let seedId: String
@@ -67,6 +67,10 @@ struct LessonSummary: Identifiable, Equatable, Sendable {
     var bestXP: Int
     var isLocked: Bool
     let orderIndex: Int
+    /// Exercise plan declared by the lesson seed (e.g. mcq, match, word_order,
+    /// typing, listening). The exercise engine honours this when it can back a
+    /// requested type with validated content; unsupported requests are skipped.
+    let exercisePlan: [String]
 
     init(from lesson: Lesson) {
         self.id = lesson.id
@@ -79,6 +83,7 @@ struct LessonSummary: Identifiable, Equatable, Sendable {
         self.bestXP = lesson.bestXP
         self.isLocked = false
         self.orderIndex = lesson.orderIndex
+        self.exercisePlan = []
     }
 
     init(
@@ -91,7 +96,8 @@ struct LessonSummary: Identifiable, Equatable, Sendable {
         isCompleted: Bool = false,
         bestXP: Int = 0,
         isLocked: Bool = false,
-        orderIndex: Int = 0
+        orderIndex: Int = 0,
+        exercisePlan: [String] = []
     ) {
         self.id = id
         self.seedId = seedId
@@ -103,6 +109,7 @@ struct LessonSummary: Identifiable, Equatable, Sendable {
         self.bestXP = bestXP
         self.isLocked = isLocked
         self.orderIndex = orderIndex
+        self.exercisePlan = exercisePlan
     }
 }
 

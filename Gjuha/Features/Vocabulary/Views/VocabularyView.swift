@@ -38,7 +38,11 @@ struct VocabularyView: View {
                         ScrollView {
                             LazyVStack(spacing: 10) {
                                 ForEach(store.filteredWords) { word in
-                                    WordRowView(word: word)
+                                    WordRowView(
+                                        word: word,
+                                        canPlay: word.audioFileName != nil || store.canSpeakAlbanian,
+                                        onPlay: { store.send(.playPronunciation(word)) }
+                                    )
                                 }
                             }
                             .padding(.horizontal, 16)
@@ -176,9 +180,24 @@ private struct FilterChip: View {
 
 private struct WordRowView: View {
     let word: Word
+    var canPlay: Bool = false
+    var onPlay: () -> Void = {}
 
     var body: some View {
         HStack(spacing: 12) {
+            if canPlay {
+                Button(action: onPlay) {
+                    Image(systemName: "speaker.wave.2.fill")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(Color.gjuha.accent)
+                        .frame(width: 34, height: 34)
+                        .background(Color.gjuha.accent.opacity(0.12))
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Play pronunciation of \(word.albanian)")
+            }
+
             VStack(alignment: .leading, spacing: 4) {
                 Text(word.albanian)
                     .font(.gjuha.labelBold)

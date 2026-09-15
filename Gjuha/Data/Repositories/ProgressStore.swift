@@ -1,7 +1,7 @@
 import Foundation
 
 /// Lightweight UserDefaults-backed persistence for lesson completion and XP.
-/// Phase 1 solution — will migrate to SwiftData in Phase 2.
+/// Phase 1 solution - will migrate to SwiftData in Phase 2.
 final class ProgressStore: @unchecked Sendable {
     static let shared = ProgressStore()
 

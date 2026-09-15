@@ -42,10 +42,12 @@ struct LessonFeature {
         case lessonCompleted
         case lessonFailed
         case exitTapped
+        case playAudioTapped
     }
 
     @Dependency(\.exerciseEngine) var exerciseEngine
     @Dependency(\.progressRepository) var progressRepository
+    @Dependency(\.audioPlayer) var audioPlayer
     @Dependency(\.continuousClock) var clock
 
     var body: some ReducerOf<Self> {
@@ -86,12 +88,21 @@ struct LessonFeature {
                         explanation: current.explanation
                     )
                 case .nearMiss:
-                    // Recognised but not accepted: no XP, distinct feedback.
+                    // Recognised but not accepted: no XP, distinct feedback. When
+                    // the miss is a dropped diacritic, prepend a hint tied to the
+                    // exact answer the learner typed.
                     state.hearts -= 1
                     state.combo = 0
+                    let hint = AnswerNormalizer.diacriticHint(
+                        submitted: answer,
+                        correctAnswer: current.correctAnswer
+                    )
+                    let explanation = [hint, current.explanation]
+                        .compactMap { $0 }
+                        .joined(separator: "\n")
                     state.answerResult = .nearMiss(
                         correctAnswer: current.correctAnswer,
-                        explanation: current.explanation
+                        explanation: explanation.isEmpty ? nil : explanation
                     )
                 case .incorrect:
                     state.hearts -= 1
@@ -144,6 +155,14 @@ struct LessonFeature {
 
             case .exitTapped:
                 return .none
+
+            case .playAudioTapped:
+                guard let exercise = state.currentExercise else { return .none }
+                let url = exercise.audioFileName.flatMap { AudioLibrary.shared.url(forFile: $0) }
+                let spoken = exercise.correctAnswer
+                return .run { _ in
+                    await audioPlayer.playOrSpeak(url: url, albanianText: spoken)
+                }
             }
         }
     }

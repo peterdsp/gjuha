@@ -1,4 +1,4 @@
-# CLAUDE.md — Gjuha Project Guide
+# CLAUDE.md - Gjuha Project Guide
 
 This file defines conventions, architecture decisions, and working rules for AI-assisted development on this project.
 
@@ -10,7 +10,7 @@ This file defines conventions, architecture decisions, and working rules for AI-
 - iOS-native SwiftUI + TCA (The Composable Architecture)
 - Offline-first with SwiftData
 - Content engine driven (not hardcoded sentences)
-- Solo founder project — prioritize simplicity and scalability over cleverness
+- Solo founder project - prioritize simplicity and scalability over cleverness
 
 ---
 
@@ -71,7 +71,7 @@ extension DependencyValues {
 - Each TCA feature lives in its own folder under `Features/`
 - Keep `State`, `Action`, `Reducer` body in one file unless it exceeds ~200 lines
 - Views always in a `Views/` subfolder within the feature
-- No business logic in Views — all logic in reducers
+- No business logic in Views - all logic in reducers
 - Data models in `Data/Models/`, never in feature folders
 
 ---
@@ -96,10 +96,10 @@ extension DependencyValues {
 
 ## Do Not
 
-- Do not use Combine — use TCA Effects and async/await only
+- Do not use Combine - use TCA Effects and async/await only
 - Do not add backend networking until Phase 3
-- Do not hardcode exercise content — always drive from dataset
-- Do not use MVVM — we use TCA exclusively
+- Do not hardcode exercise content - always drive from dataset
+- Do not use MVVM - we use TCA exclusively
 - Do not add third-party dependencies without documenting why
 
 ---
@@ -115,6 +115,6 @@ extension DependencyValues {
 
 ## Current Phase
 
-**Phase 1 — Foundation**
+**Phase 1 - Foundation**
 
 Focus: Core TCA architecture, basic exercise engine, A1 vocabulary dataset, SwiftData persistence.

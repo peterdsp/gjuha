@@ -11,6 +11,13 @@ struct Exercise: Identifiable, Equatable {
     let xpValue: Int
     let wordId: UUID?
 
+    /// Pairs for a `wordMatch` exercise (Albanian ↔ English). Empty for other types.
+    let pairs: [MatchPair]
+
+    /// Manifest audio asset name (without extension) for a `tapWhatYouHear`
+    /// exercise, or a prompt that can be spoken. `nil` when no audio is attached.
+    let audioFileName: String?
+
     /// Answer options (correct + distractors) in a single, fixed order.
     ///
     /// The order is decided once, when the exercise is created, and then stored.
@@ -30,6 +37,8 @@ struct Exercise: Identifiable, Equatable {
         explanation: String? = nil,
         xpValue: Int = 10,
         wordId: UUID? = nil,
+        pairs: [MatchPair] = [],
+        audioFileName: String? = nil,
         orderedOptions: [String]? = nil
     ) {
         self.id = id
@@ -41,6 +50,8 @@ struct Exercise: Identifiable, Equatable {
         self.explanation = explanation
         self.xpValue = xpValue
         self.wordId = wordId
+        self.pairs = pairs
+        self.audioFileName = audioFileName
         self.orderedOptions = orderedOptions
             ?? Exercise.makeOrderedOptions(correctAnswer: correctAnswer, distractors: distractors)
     }
@@ -70,6 +81,33 @@ enum ExerciseType: String, Codable, Equatable {
     case conjugationTable         // Fill in verb form
     case arrangeWords             // Put words in order
     case trueFalse                // Grammar statement T/F
+}
+
+/// One Albanian ↔ English pair inside a `wordMatch` exercise.
+struct MatchPair: Identifiable, Equatable {
+    let id: UUID
+    let albanian: String
+    let english: String
+
+    init(id: UUID = UUID(), albanian: String, english: String) {
+        self.id = id
+        self.albanian = albanian
+        self.english = english
+    }
+}
+
+extension Exercise {
+    /// Canonical, order independent serialization of matched pairs. The engine
+    /// builds `correctAnswer` from the intended pairs with this function, and the
+    /// matching view submits the learner's pairs through the same function, so
+    /// grading is a plain string comparison that ignores the order the learner
+    /// matched them in.
+    static func matchAnswer(from pairs: [MatchPair]) -> String {
+        pairs
+            .map { "\(AnswerNormalizer.normalize($0.albanian))=\(AnswerNormalizer.normalize($0.english))" }
+            .sorted()
+            .joined(separator: "|")
+    }
 }
 
 /// Outcome of grading a submitted answer.

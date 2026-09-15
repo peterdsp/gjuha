@@ -40,7 +40,7 @@ struct HomeView: View {
                                 totalUnits: store.units.count
                             )
 
-                            // Course path — zigzag lesson nodes
+                            // Course path - zigzag lesson nodes
                             CoursePathView(
                                 lessons: unit.lessons,
                                 onLessonTap: { lesson in

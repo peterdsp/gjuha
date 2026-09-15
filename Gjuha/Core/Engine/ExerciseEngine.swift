@@ -44,11 +44,11 @@ enum LessonVocabularyMap {
 
     // MARK: - Explicit mapping for all 120 lessons
     private static let explicitMapping: [String: [String]] = [
-        // Unit 1 — A1 Basics
-        "L001": ["w001", "w002", "w003", "w004", "w005", "w006", "w007", "w008", "w009"],  // Greetings
-        "L002": ["w010", "w011", "w012", "w013", "w014", "w015", "w016", "w017", "w018"],  // Pronouns & to be
+        // Unit 1 - A1 Basics
+        "L001": ["w001", "w002", "w003", "w004", "w005", "w006", "w007", "w008", "w009", "w353"],  // Greetings
+        "L002": ["w010", "w011", "w012", "w013", "w014", "w015", "w016", "w017", "w018", "w351", "w352"],  // Pronouns & to be
         "L003": ["w031", "w032", "w033", "w034", "w035", "w036", "w037", "w038", "w039", "w040", "w041", "w042", "w043"],  // Numbers & time
-        "L004": ["w028", "w046", "w047", "w048", "w049", "w050", "w020", "w025"],  // Coffee & ordering
+        "L004": ["w028", "w046", "w047", "w048", "w049", "w050", "w020", "w025", "w354"],  // Coffee & ordering
         "L005": ["w051", "w052", "w053", "w054", "w055", "w056", "w057", "w058", "w059", "w060"],  // Family & people
         "L006": ["w061", "w062", "w063", "w064", "w065", "w066", "w067", "w068", "w069", "w070"],  // Food & shopping
         "L007": ["w071", "w072", "w073", "w074", "w075", "w076", "w077", "w078", "w079", "w080"],  // Directions
@@ -56,7 +56,7 @@ enum LessonVocabularyMap {
         "L009": ["w091", "w092", "w093", "w094", "w095", "w096", "w097", "w098", "w099", "w100", "w101"],  // Weather & seasons
         "L010": ["w102", "w103", "w104", "w105", "w106", "w107", "w108", "w109"],  // Simple past intro
 
-        // Unit 2 — A1 Expanding
+        // Unit 2 - A1 Expanding
         "L011": ["w110", "w111", "w112", "w113", "w114", "w115", "w116", "w117", "w118", "w119"],  // Work & study
         "L012": ["w120", "w121", "w122", "w123", "w124", "w125", "w126", "w127", "w128"],  // Transport
         "L013": ["w129", "w130", "w131", "w132", "w133", "w134", "w135", "w306"],  // Health basics
@@ -68,7 +68,7 @@ enum LessonVocabularyMap {
         "L019": ["w175", "w176", "w177", "w178", "w179", "w338", "w339"],  // Phone & messages
         "L020": ["w110", "w120", "w129", "w136", "w144", "w159", "w166", "w175"],  // Review
 
-        // Unit 3 — A1 Descriptions & Past
+        // Unit 3 - A1 Descriptions & Past
         "L021": ["w180", "w181", "w182", "w183", "w184", "w185", "w186", "w187", "w188"],  // Describe people
         "L022": ["w189", "w190", "w191", "w192", "w193", "w194", "w195", "w196", "w197", "w198"],  // Adjectives
         "L023": ["w199", "w200", "w201", "w202", "w203", "w204", "w205", "w029"],  // Possession
@@ -80,7 +80,7 @@ enum LessonVocabularyMap {
         "L029": ["w231", "w232", "w233", "w234", "w235", "w236", "w237", "w238"],  // Travel basics
         "L030": ["w180", "w189", "w199", "w206", "w212", "w215", "w222", "w231"],  // Review
 
-        // Unit 4 — A1 Daily Life & Grammar
+        // Unit 4 - A1 Daily Life & Grammar
         "L031": ["w081", "w239", "w240", "w241", "w242", "w342", "w343", "w087"],  // Daily habits
         "L032": ["w243", "w244", "w245", "w246", "w247", "w248", "w249", "w250", "w251"],  // Common verbs
         "L033": ["w252", "w253", "w254", "w255", "w256", "w257", "w258"],  // Prepositions
@@ -92,7 +92,7 @@ enum LessonVocabularyMap {
         "L039": ["w286", "w287", "w288", "w289", "w290", "w291", "w103", "w104"],  // Listening sprint (time words)
         "L040": ["w001", "w018", "w031", "w051", "w071", "w091", "w110", "w136", "w180", "w243"],  // A1 final review
 
-        // Unit 5 — A2 Past & Connectors
+        // Unit 5 - A2 Past & Connectors
         "L041": ["w313", "w314", "w315", "w316", "w317", "w105", "w206", "w211"],  // Past imperfect
         "L042": ["w296", "w297", "w298", "w299", "w318", "w319", "w320", "w321"],  // Connectors
         "L043": ["w322", "w323", "w324", "w159", "w160", "w161", "w162", "w163", "w165"],  // More questions
@@ -104,7 +104,7 @@ enum LessonVocabularyMap {
         "L049": ["w339", "w340", "w166", "w301", "w302", "w155", "w245"],  // News snippets
         "L050": ["w313", "w296", "w322", "w010", "w252", "w152", "w170", "w155"],  // Review
 
-        // Unit 6 — A2 Practical Situations
+        // Unit 6 - A2 Practical Situations
         "L051": ["w175", "w176", "w177", "w178", "w229", "w286", "w227"],  // Phone calls
         "L052": ["w157", "w226", "w227", "w228", "w230", "w285", "w303"],  // Invitations
         "L053": ["w231", "w232", "w233", "w234", "w235", "w236", "w126"],  // Travel situations
@@ -116,7 +116,7 @@ enum LessonVocabularyMap {
         "L059": ["w102", "w206", "w207", "w208", "w211", "w301", "w303"],  // Storytelling
         "L060": ["w175", "w157", "w231", "w129", "w173", "w268", "w274", "w263"],  // Review
 
-        // Unit 7 — A2 Grammar Deep Dive
+        // Unit 7 - A2 Grammar Deep Dive
         "L061": ["w029", "w030", "w088", "w076", "w166", "w110", "w117"],  // Definite/indefinite
         "L062": ["w252", "w253", "w254", "w255", "w256", "w257", "w258", "w323", "w324"],  // Prepositions + cases
         "L063": ["w010", "w011", "w012", "w013", "w014", "w199", "w200", "w334"],  // Pronouns & clitics
@@ -128,7 +128,7 @@ enum LessonVocabularyMap {
         "L069": ["w247", "w293", "w294", "w245", "w160", "w164", "w165"],  // Listening sprint
         "L070": ["w029", "w252", "w010", "w152", "w280", "w259", "w212", "w247"],  // Review
 
-        // Unit 8 — A2 Culture & Skills
+        // Unit 8 - A2 Culture & Skills
         "L071": ["w115", "w293", "w155", "w296", "w297", "w299", "w301"],  // Longer texts
         "L072": ["w102", "w206", "w207", "w301", "w237", "w238", "w158"],  // Describing experiences
         "L073": ["w012", "w007", "w212", "w284", "w285", "w006", "w225"],  // Formal vs informal
@@ -140,7 +140,7 @@ enum LessonVocabularyMap {
         "L079": ["w021", "w332", "w333", "w293", "w164", "w001", "w160"],  // Speaking sprint
         "L080": ["w115", "w102", "w012", "w330", "w332", "w028", "w175", "w021"],  // A2 final review
 
-        // Unit 9 — B1 Grammar & Narrative
+        // Unit 9 - B1 Grammar & Narrative
         "L081": ["w280", "w281", "w020", "w154", "w155", "w156", "w327"],  // Subjunctive intro
         "L082": ["w313", "w314", "w315", "w316", "w317", "w102", "w206"],  // Narratives in past
         "L083": ["w208", "w245", "w155", "w293", "w248", "w249", "w299"],  // Reported speech
@@ -152,7 +152,7 @@ enum LessonVocabularyMap {
         "L089": ["w247", "w293", "w294", "w155", "w245", "w160", "w164"],  // Listening longer
         "L090": ["w280", "w313", "w208", "w155", "w152", "w110", "w114", "w028"],  // Review
 
-        // Unit 10 — B1 Communication
+        // Unit 10 - B1 Communication
         "L091": ["w155", "w297", "w299", "w319", "w191", "w192", "w245"],  // Debate basics
         "L092": ["w340", "w119", "w175", "w176", "w339", "w302", "w301"],  // Media & tech
         "L093": ["w306", "w129", "w131", "w134", "w135", "w307", "w239"],  // Health & lifestyle
@@ -164,7 +164,7 @@ enum LessonVocabularyMap {
         "L099": ["w115", "w339", "w030", "w293", "w302", "w301", "w155"],  // Reading sprint
         "L100": ["w155", "w340", "w306", "w231", "w303", "w297", "w116", "w115"],  // Review
 
-        // Unit 11 — B1 Real World
+        // Unit 11 - B1 Real World
         "L101": ["w174", "w173", "w283", "w282", "w281", "w229", "w230"],  // Services & bureaucracy
         "L102": ["w268", "w029", "w269", "w270", "w276", "w140", "w283"],  // Housing & contracts
         "L103": ["w140", "w173", "w276", "w137", "w138", "w139", "w141"],  // Money & budgeting
@@ -176,7 +176,7 @@ enum LessonVocabularyMap {
         "L109": ["w247", "w293", "w294", "w245", "w155", "w160", "w164"],  // Listening longer
         "L110": ["w174", "w268", "w140", "w303", "w307", "w144", "w166", "w091"],  // Review
 
-        // Unit 12 — B1 Mastery
+        // Unit 12 - B1 Mastery
         "L111": ["w206", "w207", "w208", "w211", "w301", "w303", "w102"],  // Storytelling challenge
         "L112": ["w001", "w160", "w164", "w225", "w300", "w141", "w050"],  // Real dialogues
         "L113": ["w330", "w331", "w304", "w305", "w287", "w288", "w289"],  // Idioms & phrases
@@ -299,9 +299,11 @@ enum LessonVocabularyMap {
 
 final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
     private let allWords: [SeedWordEntry]
+    private let audioLibrary: AudioLibrary
 
-    init(bundle: Bundle = .main) {
+    init(bundle: Bundle = .main, audioLibrary: AudioLibrary? = nil) {
         self.allWords = Self.loadAllVocabulary(bundle: bundle)
+        self.audioLibrary = audioLibrary ?? AudioLibrary(bundle: bundle)
     }
 
     func generateExercises(for lesson: LessonSummary) async -> [Exercise] {
@@ -310,22 +312,32 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
             lessonTitle: lesson.title
         )
 
-        let lessonWords = targetWordIds.compactMap { wId in
+        var lessonWords = targetWordIds.compactMap { wId in
             allWords.first { $0.id == wId }
         }
 
-        guard !lessonWords.isEmpty else {
+        if lessonWords.isEmpty {
             // Use first 8 words as fallback for any lesson
-            let fallback = Array(allWords.prefix(8))
-            return generateMixedExercises(from: fallback)
+            lessonWords = Array(allWords.prefix(8))
         }
 
-        return generateMixedExercises(from: lessonWords)
+        return generatePlannedExercises(from: lessonWords, plan: lesson.exercisePlan)
     }
 
     func grade(_ answer: String, for exercise: Exercise) -> AnswerGrade {
         let submitted = AnswerNormalizer.normalize(answer)
         guard !submitted.isEmpty else { return .incorrect }
+
+        // Matching and word ordering carry a single canonical answer string built
+        // by the engine (a serialized pair set, or a joined sentence). The
+        // learner's construction is serialized the same way, so grading is an
+        // exact normalized comparison with no "/;" alternate splitting or
+        // near-miss leniency: a wrong pairing or word order is simply incorrect.
+        if exercise.type == .wordMatch || exercise.type == .arrangeWords {
+            return submitted == AnswerNormalizer.normalize(exercise.correctAnswer)
+                ? .correct
+                : .incorrect
+        }
 
         let acceptedForms = AnswerNormalizer.acceptedForms(for: exercise.correctAnswer)
 
@@ -349,41 +361,144 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
 
     // MARK: - Exercise Generation
 
-    private func generateMixedExercises(from words: [SeedWordEntry]) -> [Exercise] {
-        var exercises: [Exercise] = []
-        let shuffled = words.shuffled()
-        let pool = allWords // for distractors
-        let exerciseCount = min(shuffled.count, 8) // Up to 8 exercises per lesson
+    /// Maximum exercises produced for one lesson.
+    private static let maxExercises = 9
 
-        for (index, word) in shuffled.prefix(exerciseCount).enumerated() {
-            switch index % 4 {
-            case 0:
-                exercises.append(makeMCQAlbanianToEnglish(word: word, pool: pool))
-            case 1:
-                exercises.append(makeMCQEnglishToAlbanian(word: word, pool: pool))
-            case 2:
-                exercises.append(makeTranslateTextInput(word: word))
-            case 3:
-                // Try fill-in-blank, fall back to MCQ
-                if word.exampleSentence != nil {
-                    exercises.append(makeFillInBlank(word: word, pool: pool))
-                } else {
-                    exercises.append(makeMCQAlbanianToEnglish(word: word, pool: pool))
-                }
-            default:
-                break
+    /// Turns a lesson's declared `exercise_plan` into the concrete exercise types
+    /// the engine actually supports, preserving plan order and removing
+    /// duplicates. Unknown tokens are ignored. An empty or fully unrecognised
+    /// plan falls back to a sensible default rotation.
+    static func plannedTypes(from plan: [String]) -> [ExerciseType] {
+        var seen = Set<ExerciseType>()
+        var result: [ExerciseType] = []
+        for token in plan {
+            guard let type = mapPlanToken(token), seen.insert(type).inserted else { continue }
+            result.append(type)
+        }
+        if result.isEmpty {
+            return [.multipleChoiceTranslate, .translateTextInput, .fillInBlank]
+        }
+        return result
+    }
+
+    private static func mapPlanToken(_ token: String) -> ExerciseType? {
+        switch token.lowercased() {
+        case "mcq": return .multipleChoiceTranslate
+        case "match": return .wordMatch
+        case "word_order", "wordorder": return .arrangeWords
+        case "typing", "type": return .translateTextInput
+        case "listening", "listen": return .tapWhatYouHear
+        case "cloze", "fill_in_blank", "fillinblank": return .fillInBlank
+        default: return nil
+        }
+    }
+
+    /// Generates a lesson's exercises by honouring its plan and the content each
+    /// word can actually back. A requested type that the data cannot support for
+    /// a given word (word order without a usable example, listening without
+    /// reviewed audio) is skipped in favour of the next supported type, so the
+    /// learner never sees an empty or degenerate exercise.
+    private func generatePlannedExercises(from words: [SeedWordEntry], plan: [String]) -> [Exercise] {
+        let planTypes = Self.plannedTypes(from: plan)
+        let pool = allWords
+        let shuffled = words.shuffled()
+        var exercises: [Exercise] = []
+        var usedWordIds = Set<String>()
+
+        // Matching is a grouped exercise over several words, so it is built once
+        // up front from the lesson's words when the plan asks for it.
+        if planTypes.contains(.wordMatch), let match = makeWordMatch(from: shuffled) {
+            exercises.append(match)
+            usedWordIds.formUnion(match.pairs.compactMap { pair in
+                shuffled.first { $0.albanian == pair.albanian }?.id
+            })
+        }
+
+        // The remaining types are produced per word, rotating through the plan so
+        // a lesson mixes formats instead of repeating one.
+        let perWordTypes = planTypes.filter { $0 != .wordMatch }
+        if !perWordTypes.isEmpty {
+            // Prefer words not already used by the match exercise, so a lesson
+            // covers more of its vocabulary; fall back to all words if too few.
+            var candidates = shuffled.filter { !usedWordIds.contains($0.id) }
+            if candidates.count < min(shuffled.count, 4) { candidates = shuffled }
+            var rotation = 0
+            for word in candidates {
+                guard exercises.count < Self.maxExercises else { break }
+                guard let (type, nextRotation) = nextSupportedType(
+                    perWordTypes, startingAt: rotation, for: word
+                ) else { continue }
+                rotation = nextRotation
+                exercises.append(makeExercise(of: type, word: word, pool: pool))
             }
         }
 
-        // Add extra fill-in-blank exercises for words with example sentences
-        let wordsWithExamples = shuffled.filter { $0.exampleSentence != nil }
-        for word in wordsWithExamples.prefix(2) {
-            if exercises.count < 10 {
-                exercises.append(makeFillInBlank(word: word, pool: pool))
+        // Safety net: a plan that no word could satisfy (e.g. listening only, with
+        // no audio yet) still yields lesson-relevant practice rather than nothing.
+        if exercises.isEmpty {
+            for word in shuffled.prefix(Self.maxExercises) {
+                exercises.append(makeMCQAlbanianToEnglish(word: word, pool: pool))
             }
         }
 
         return exercises.isEmpty ? Exercise.mockExercises : exercises
+    }
+
+    /// Finds the next plan type (from `rotation`) that `word` can support, so the
+    /// rotation advances fairly across words while skipping unsupported formats.
+    private func nextSupportedType(
+        _ types: [ExerciseType],
+        startingAt rotation: Int,
+        for word: SeedWordEntry
+    ) -> (ExerciseType, Int)? {
+        guard !types.isEmpty else { return nil }
+        for offset in 0..<types.count {
+            let index = (rotation + offset) % types.count
+            let type = types[index]
+            if supports(type, word) {
+                return (type, index + 1)
+            }
+        }
+        return nil
+    }
+
+    /// Whether a word can back a given exercise type with validated content.
+    private func supports(_ type: ExerciseType, _ word: SeedWordEntry) -> Bool {
+        switch type {
+        case .arrangeWords:
+            return arrangeableTokens(for: word) != nil
+        case .tapWhatYouHear:
+            return audioLibrary.hasReviewedAudio(forWordId: word.id)
+        case .fillInBlank:
+            return clozeSentence(for: word) != nil
+        default:
+            return true
+        }
+    }
+
+    private func makeExercise(of type: ExerciseType, word: SeedWordEntry, pool: [SeedWordEntry]) -> Exercise {
+        switch type {
+        case .multipleChoiceTranslate:
+            // Alternate direction deterministically by word id so a lesson has both.
+            return Self.isEvenId(word.id)
+                ? makeMCQAlbanianToEnglish(word: word, pool: pool)
+                : makeMCQEnglishToAlbanian(word: word, pool: pool)
+        case .translateTextInput:
+            return makeTranslateTextInput(word: word)
+        case .fillInBlank:
+            return makeFillInBlank(word: word, pool: pool)
+        case .arrangeWords:
+            return makeArrangeWords(word: word) ?? makeMCQAlbanianToEnglish(word: word, pool: pool)
+        case .tapWhatYouHear:
+            return makeListening(word: word, pool: pool) ?? makeMCQAlbanianToEnglish(word: word, pool: pool)
+        default:
+            return makeMCQAlbanianToEnglish(word: word, pool: pool)
+        }
+    }
+
+    private static func isEvenId(_ id: String) -> Bool {
+        let digits = id.drop { !$0.isNumber }
+        return (Int(digits) ?? 0) % 2 == 0
     }
 
     private func makeMCQAlbanianToEnglish(word: SeedWordEntry, pool: [SeedWordEntry]) -> Exercise {
@@ -393,7 +508,7 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
             prompt: "What does '\(word.albanian)' mean?",
             correctAnswer: word.english,
             distractors: distractors,
-            explanation: Self.exampleExplanation(word),
+            explanation: Self.explanation(for: word),
             xpValue: 10
         )
     }
@@ -405,21 +520,21 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
             prompt: "How do you say '\(word.english)' in Albanian?",
             correctAnswer: word.albanian,
             distractors: distractors,
-            explanation: Self.exampleExplanation(word),
+            explanation: Self.explanation(for: word),
             xpValue: 10
         )
     }
 
     private func makeTranslateTextInput(word: SeedWordEntry) -> Exercise {
-        // Randomly choose direction
-        let toAlbanian = Bool.random()
+        // Deterministic direction by word id so a lesson has a stable mix.
+        let toAlbanian = Self.isEvenId(word.id)
         if toAlbanian {
             return Exercise(
                 type: .translateTextInput,
                 prompt: "Translate: '\(word.english)'",
                 correctAnswer: word.albanian,
                 hint: "Type in Albanian",
-                explanation: Self.exampleExplanation(word),
+                explanation: Self.explanation(for: word),
                 xpValue: 15
             )
         } else {
@@ -428,30 +543,125 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
                 prompt: "Translate: '\(word.albanian)'",
                 correctAnswer: word.english,
                 hint: "Type in English",
-                explanation: Self.exampleExplanation(word),
+                explanation: Self.explanation(for: word),
                 xpValue: 15
             )
         }
     }
 
+    /// The example sentence with the headword blanked, or nil when the sentence
+    /// cannot support a cloze (no example, or the headword does not appear in it).
+    private func clozeSentence(for word: SeedWordEntry) -> (blanked: String, sentence: String, translation: String)? {
+        guard let sentence = word.exampleSentence, let translation = word.exampleTranslation else { return nil }
+        let blanked = sentence.replacingOccurrences(
+            of: word.albanian,
+            with: "___",
+            options: [.caseInsensitive]
+        )
+        guard blanked != sentence else { return nil }
+        return (blanked, sentence, translation)
+    }
+
     private func makeFillInBlank(word: SeedWordEntry, pool: [SeedWordEntry]) -> Exercise {
-        guard let sentence = word.exampleSentence, let translation = word.exampleTranslation else {
-            return makeMCQAlbanianToEnglish(word: word, pool: pool)
-        }
-        let blank = sentence.replacingOccurrences(of: word.albanian, with: "___")
-        // Only create fill-in-blank if we actually replaced something
-        guard blank != sentence else {
+        guard let cloze = clozeSentence(for: word) else {
             return makeMCQAlbanianToEnglish(word: word, pool: pool)
         }
         let distractors = pickDistractors(for: word, from: pool, count: 3, useEnglish: false)
         return Exercise(
             type: .fillInBlank,
-            prompt: "\(blank) (\(translation))",
+            prompt: "\(cloze.blanked) (\(cloze.translation))",
             correctAnswer: word.albanian,
             distractors: distractors,
-            explanation: "\(word.albanian) means \(word.english). Full sentence: \(sentence) (\(translation)).",
+            explanation: Self.explanation(for: word, extra: "Full sentence: \(cloze.sentence) (\(cloze.translation))."),
             xpValue: 12
         )
+    }
+
+    // MARK: - Matching, ordering, listening
+
+    /// Tokens for a word-order exercise, or nil when the example sentence cannot
+    /// support one: it must exist, contain the headword, and split into a
+    /// manageable number of tokens.
+    private func arrangeableTokens(for word: SeedWordEntry) -> [String]? {
+        guard let raw = word.exampleSentence else { return nil }
+        let cleaned = raw.trimmingCharacters(in: CharacterSet(charactersIn: " .!?…"))
+        guard cleaned.lowercased().contains(word.albanian.lowercased()) else { return nil }
+        let tokens = cleaned.split(separator: " ").map(String.init)
+        guard (3...7).contains(tokens.count) else { return nil }
+        return tokens
+    }
+
+    private func makeArrangeWords(word: SeedWordEntry) -> Exercise? {
+        guard let tokens = arrangeableTokens(for: word),
+              let translation = word.exampleTranslation else { return nil }
+        let correct = tokens.joined(separator: " ")
+        // Shuffle into a starting order that differs from the answer.
+        var shuffled = tokens
+        var attempts = 0
+        while shuffled == tokens && attempts < 8 {
+            shuffled.shuffle()
+            attempts += 1
+        }
+        guard shuffled != tokens else { return nil } // e.g. all tokens identical
+        return Exercise(
+            type: .arrangeWords,
+            prompt: "Arrange the words to say: \"\(translation)\"",
+            correctAnswer: correct,
+            hint: "Tap the words in order",
+            explanation: Self.explanation(for: word, extra: "Correct order: \(correct)."),
+            xpValue: 15,
+            orderedOptions: shuffled
+        )
+    }
+
+    /// Builds a single matching exercise from a lesson's words. Chooses up to four
+    /// words with distinct, unambiguous Albanian forms and short English glosses.
+    private func makeWordMatch(from words: [SeedWordEntry]) -> Exercise? {
+        var pairs: [MatchPair] = []
+        var albSeen = Set<String>()
+        var engSeen = Set<String>()
+        for word in words {
+            let alb = AnswerNormalizer.normalize(word.albanian)
+            let gloss = Self.shortGloss(word.english)
+            let eng = AnswerNormalizer.normalize(gloss)
+            guard !alb.isEmpty, !eng.isEmpty,
+                  albSeen.insert(alb).inserted, engSeen.insert(eng).inserted else { continue }
+            pairs.append(MatchPair(albanian: word.albanian, english: gloss))
+            if pairs.count == 4 { break }
+        }
+        guard pairs.count >= 3 else { return nil }
+        return Exercise(
+            type: .wordMatch,
+            prompt: "Match each word to its meaning",
+            correctAnswer: Exercise.matchAnswer(from: pairs),
+            explanation: "Matching builds fast recognition of new words before you produce them.",
+            xpValue: 12,
+            pairs: pairs
+        )
+    }
+
+    /// A listening exercise, only when reviewed audio exists for the word.
+    private func makeListening(word: SeedWordEntry, pool: [SeedWordEntry]) -> Exercise? {
+        guard audioLibrary.hasReviewedAudio(forWordId: word.id),
+              let asset = audioLibrary.asset(forWordId: word.id) else { return nil }
+        let distractors = pickDistractors(for: word, from: pool, count: 3, useEnglish: false)
+        return Exercise(
+            type: .tapWhatYouHear,
+            prompt: "Tap what you hear",
+            correctAnswer: word.albanian,
+            distractors: distractors,
+            explanation: Self.explanation(for: word),
+            xpValue: 12,
+            audioFileName: asset.file
+        )
+    }
+
+    /// First, shortest sense of an English gloss, for compact match tiles.
+    private static func shortGloss(_ english: String) -> String {
+        let head = english.components(separatedBy: "/").first ?? english
+        let noParen = head.components(separatedBy: "(").first ?? head
+        let trimmed = noParen.trimmingCharacters(in: .whitespaces)
+        return trimmed.isEmpty ? english : trimmed
     }
 
     /// Picks pedagogically plausible distractors instead of random words.
@@ -548,9 +758,14 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
             : ["po", "jo", "faleminderit", "ju lutem", "mirëdita", "ujë"]
     }
 
-    /// Builds a valid, honest explanation from existing word metadata.
-    private static func exampleExplanation(_ word: SeedWordEntry) -> String {
+    /// Builds a valid, honest explanation from existing word metadata, adding a
+    /// short grammar note tied to the concept the word illustrates (noun gender
+    /// and the postposed definite article, verb citation form, fixed phrases).
+    static func explanation(for word: SeedWordEntry, extra: String? = nil) -> String {
         var lines = ["\(word.albanian) means \(word.english)."]
+        if let note = grammarNote(for: word) {
+            lines.append(note)
+        }
         if let sentence = word.exampleSentence {
             if let translation = word.exampleTranslation {
                 lines.append("Example: \(sentence) (\(translation))")
@@ -558,7 +773,36 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
                 lines.append("Example: \(sentence)")
             }
         }
+        if let extra {
+            lines.append(extra)
+        }
         return lines.joined(separator: "\n")
+    }
+
+    /// A one line grammar note connected to the part of speech being practiced.
+    /// Kept factual and derived only from populated metadata, so it never claims
+    /// more than the dataset supports.
+    static func grammarNote(for word: SeedWordEntry) -> String? {
+        switch word.partOfSpeech {
+        case "noun":
+            switch word.gender {
+            case "m":
+                return "Masculine noun. Albanian marks 'the' as a suffix: the definite form usually adds -i or -u (libër → libri)."
+            case "f":
+                return "Feminine noun. Albanian marks 'the' as a suffix: the definite form usually adds -a or -ja (bukë → buka)."
+            default:
+                return "Albanian marks 'the' as a suffix on the noun, not a separate word before it."
+            }
+        case "verb":
+            if word.verbClass == "irregular" {
+                return "Irregular verb, given in the 1st person singular present (jam, kam). Learn its forms as a set."
+            }
+            return "Verb given in its Albanian citation form, the 1st person singular present."
+        case "interjection", "particle":
+            return "A fixed expression: learn it as a whole, not word by word."
+        default:
+            return nil
+        }
     }
 
     // MARK: - Load Vocabulary
@@ -631,6 +875,19 @@ enum AnswerNormalizer {
         return false
     }
 
+    /// When a near miss is only a dropped or added Albanian diacritic, returns a
+    /// hint naming the letters that matter and the correct spelling. Returns nil
+    /// for a plain typo, so the caller only shows this when it is actually about
+    /// ë/ç. This ties the feedback to what the learner actually typed.
+    static func diacriticHint(submitted: String, correctAnswer: String) -> String? {
+        let normalized = normalize(submitted)
+        for form in acceptedForms(for: correctAnswer)
+        where normalized != form && foldDiacritics(normalized) == foldDiacritics(form) {
+            return "Mind the Albanian letters ë and ç: the correct spelling is \"\(form)\"."
+        }
+        return nil
+    }
+
     /// Folds diacritics to base letters so "faleminderit" folds equal to a form
     /// that is missing an ë. Used only to *detect* near misses, never to accept.
     static func foldDiacritics(_ s: String) -> String {
@@ -691,6 +948,10 @@ final class MockExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
 
     func grade(_ answer: String, for exercise: Exercise) -> AnswerGrade {
         let submitted = AnswerNormalizer.normalize(answer)
+        guard !submitted.isEmpty else { return .incorrect }
+        if exercise.type == .wordMatch || exercise.type == .arrangeWords {
+            return submitted == AnswerNormalizer.normalize(exercise.correctAnswer) ? .correct : .incorrect
+        }
         let forms = AnswerNormalizer.acceptedForms(for: exercise.correctAnswer)
         if forms.contains(submitted) { return .correct }
         if exercise.type == .translateTextInput,

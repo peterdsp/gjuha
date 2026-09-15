@@ -81,7 +81,7 @@ private struct GoalPickerView: View {
                         Text(goal.displayName)
                             .font(.gjuha.labelBold)
                             .foregroundStyle(Color.gjuha.textPrimary)
-                        Text("— \(goal.minutesPerDay) min/day")
+                        Text("- \(goal.minutesPerDay) min/day")
                             .font(.gjuha.bodyRegular)
                             .foregroundStyle(Color.gjuha.textSecondary)
                         Spacer()

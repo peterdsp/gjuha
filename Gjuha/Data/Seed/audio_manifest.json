@@ -1,0 +1,6 @@
+{
+  "version": "1",
+  "generator": "Scripts/tools/generate_audio.py",
+  "notes": "Explicit manifest of pronunciation audio. An entry lists a clip and its provenance; the app only plays a clip whose file is present, and only builds graded listening exercises from entries with reviewed:true. No production audio ships yet: generating Albanian audio requires an authorized provider (Azure Neural TTS sq-AL is the recommended path, see Documentation/Content/AUDIO_PIPELINE.md) and native-speaker review before any entry is marked reviewed:true. Populate assets by running the generation pipeline; do not hand-edit reviewed flags without a completed review.",
+  "assets": []
+}

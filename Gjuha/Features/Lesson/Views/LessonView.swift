@@ -49,7 +49,8 @@ private struct LessonInProgressView: View {
                         selectedAnswer: store.selectedAnswer,
                         onAnswer: { answer in
                             store.send(.answerSubmitted(answer))
-                        }
+                        },
+                        onPlayAudio: { store.send(.playAudioTapped) }
                     )
                     .transition(.asymmetric(
                         insertion: .move(edge: .trailing).combined(with: .opacity),
@@ -259,6 +260,7 @@ private struct ExerciseView: View {
     let answerResult: AnswerResult?
     let selectedAnswer: String?
     let onAnswer: (String) -> Void
+    let onPlayAudio: () -> Void
 
     private var isDisabled: Bool {
         answerResult != nil
@@ -290,6 +292,27 @@ private struct ExerciseView: View {
                 TextInputAnswer(
                     answerResult: answerResult,
                     onSubmit: onAnswer
+                )
+            case .arrangeWords:
+                ArrangeWordsAnswer(
+                    tokens: exercise.orderedOptions,
+                    answerResult: answerResult,
+                    onSubmit: onAnswer
+                )
+            case .wordMatch:
+                WordMatchAnswer(
+                    pairs: exercise.pairs,
+                    answerResult: answerResult,
+                    onComplete: onAnswer
+                )
+            case .tapWhatYouHear:
+                ListeningAnswer(
+                    options: exercise.orderedOptions,
+                    correctAnswer: exercise.correctAnswer,
+                    selectedAnswer: selectedAnswer,
+                    answerResult: answerResult,
+                    onPlay: onPlayAudio,
+                    onSelect: onAnswer
                 )
             default:
                 MultipleChoiceAnswers(
@@ -485,6 +508,276 @@ private struct TextInputAnswer: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 100)
         }
+    }
+}
+
+// MARK: - Flow Layout (wrapping chips)
+
+/// A simple wrapping layout: lays subviews left to right, moving to a new line
+/// when the next subview would overflow. Used by the word-order and matching
+/// exercises where chip widths vary.
+private struct FlowLayout: Layout {
+    var spacing: CGFloat = 8
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout Void) -> CGSize {
+        let maxWidth = proposal.width ?? .greatestFiniteMagnitude
+        var x: CGFloat = 0, y: CGFloat = 0, lineHeight: CGFloat = 0, maxLine: CGFloat = 0
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+            if x + size.width > maxWidth, x > 0 {
+                maxLine = max(maxLine, x - spacing)
+                x = 0
+                y += lineHeight + spacing
+                lineHeight = 0
+            }
+            x += size.width + spacing
+            lineHeight = max(lineHeight, size.height)
+        }
+        maxLine = max(maxLine, x - spacing)
+        let width = proposal.width ?? max(maxLine, 0)
+        return CGSize(width: width, height: y + lineHeight)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout Void) {
+        let maxWidth = bounds.width
+        var x: CGFloat = 0, y: CGFloat = 0, lineHeight: CGFloat = 0
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+            if x + size.width > maxWidth, x > 0 {
+                x = 0
+                y += lineHeight + spacing
+                lineHeight = 0
+            }
+            subview.place(
+                at: CGPoint(x: bounds.minX + x, y: bounds.minY + y),
+                proposal: ProposedViewSize(size)
+            )
+            x += size.width + spacing
+            lineHeight = max(lineHeight, size.height)
+        }
+    }
+}
+
+private struct ChipLabel: View {
+    let text: String
+    var muted: Bool = false
+
+    var body: some View {
+        Text(text)
+            .font(.gjuha.answerOption)
+            .foregroundStyle(muted ? Color.gjuha.textTertiary : Color.gjuha.textPrimary)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .stroke(Color.white.opacity(0.22), lineWidth: 0.8)
+            )
+    }
+}
+
+// MARK: - Word Ordering
+
+private struct ArrangeWordsAnswer: View {
+    let tokens: [String]
+    let answerResult: AnswerResult?
+    let onSubmit: (String) -> Void
+
+    /// Indices into `tokens`, in the order the learner placed them.
+    @State private var placed: [Int] = []
+
+    private var remaining: [Int] { tokens.indices.filter { !placed.contains($0) } }
+    private var sentence: String { placed.map { tokens[$0] }.joined(separator: " ") }
+    private var isGraded: Bool { answerResult != nil }
+
+    var body: some View {
+        VStack(spacing: 20) {
+            // Assembled sentence
+            FlowLayout(spacing: 8) {
+                ForEach(placed, id: \.self) { index in
+                    Button { if !isGraded { placed.removeAll { $0 == index } } } label: {
+                        ChipLabel(text: tokens[index])
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Placed word \(tokens[index]), tap to remove")
+                }
+            }
+            .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
+            .padding(12)
+            .frame(maxWidth: .infinity)
+            .gjuhaLiquidGlassCard(cornerRadius: 12, tintOpacity: 0.05)
+            .padding(.horizontal, 16)
+
+            // Word bank
+            FlowLayout(spacing: 8) {
+                ForEach(remaining, id: \.self) { index in
+                    Button { if !isGraded { placed.append(index) } } label: {
+                        ChipLabel(text: tokens[index])
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Word \(tokens[index]), tap to add")
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 16)
+
+            Button {
+                onSubmit(sentence)
+            } label: {
+                Text("Check")
+                    .font(.gjuha.labelBold)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(placed.isEmpty ? Color.gjuha.textTertiary : Color.gjuha.accent)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+            .disabled(placed.isEmpty || isGraded)
+            .padding(.horizontal, 16)
+            .padding(.bottom, 100)
+        }
+    }
+}
+
+// MARK: - Matching
+
+private struct WordMatchAnswer: View {
+    let pairs: [MatchPair]
+    let answerResult: AnswerResult?
+    let onComplete: (String) -> Void
+
+    @State private var leftOrder: [Int] = []
+    @State private var rightOrder: [Int] = []
+    @State private var selectedLeft: Int?
+    @State private var matched: Set<Int> = []
+    @State private var wrongFlash: Int?
+    @State private var didSetup = false
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            column(order: leftOrder, isLeft: true)
+            column(order: rightOrder, isLeft: false)
+        }
+        .padding(.horizontal, 16)
+        .padding(.bottom, 100)
+        .onAppear(perform: setup)
+    }
+
+    private func column(order: [Int], isLeft: Bool) -> some View {
+        VStack(spacing: 10) {
+            ForEach(order, id: \.self) { pairIndex in
+                let text = isLeft ? pairs[pairIndex].albanian : pairs[pairIndex].english
+                Button { tap(pairIndex, isLeft: isLeft) } label: {
+                    Text(text)
+                        .font(.gjuha.answerOption)
+                        .foregroundStyle(foreground(pairIndex, isLeft: isLeft))
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity, minHeight: 56)
+                        .padding(.horizontal, 8)
+                        .background(background(pairIndex, isLeft: isLeft))
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .stroke(border(pairIndex, isLeft: isLeft), lineWidth: 2)
+                        )
+                }
+                .buttonStyle(.plain)
+                .disabled(matched.contains(pairIndex))
+                .accessibilityLabel(text)
+                .accessibilityValue(matched.contains(pairIndex) ? "matched" : "")
+            }
+        }
+    }
+
+    private func setup() {
+        guard !didSetup else { return }
+        leftOrder = Array(pairs.indices).shuffled()
+        rightOrder = Array(pairs.indices).shuffled()
+        didSetup = true
+    }
+
+    private func tap(_ pairIndex: Int, isLeft: Bool) {
+        guard answerResult == nil, !matched.contains(pairIndex) else { return }
+        if isLeft {
+            selectedLeft = (selectedLeft == pairIndex) ? nil : pairIndex
+            return
+        }
+        guard let left = selectedLeft else { return }
+        if left == pairIndex {
+            matched.insert(pairIndex)
+            selectedLeft = nil
+            if matched.count == pairs.count {
+                onComplete(Exercise.matchAnswer(from: pairs))
+            }
+        } else {
+            // Wrong connection: flash, keep the board, let the learner retry.
+            wrongFlash = pairIndex
+            selectedLeft = nil
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                if wrongFlash == pairIndex { wrongFlash = nil }
+            }
+        }
+    }
+
+    private func foreground(_ i: Int, isLeft: Bool) -> Color {
+        if matched.contains(i) { return Color.gjuha.success }
+        return Color.gjuha.textPrimary
+    }
+
+    private func background(_ i: Int, isLeft: Bool) -> some ShapeStyle {
+        if matched.contains(i) { return AnyShapeStyle(Color.gjuha.success.opacity(0.18)) }
+        if wrongFlash == i, !isLeft { return AnyShapeStyle(Color.gjuha.error.opacity(0.18)) }
+        return AnyShapeStyle(.ultraThinMaterial)
+    }
+
+    private func border(_ i: Int, isLeft: Bool) -> Color {
+        if matched.contains(i) { return Color.gjuha.success }
+        if wrongFlash == i, !isLeft { return Color.gjuha.error }
+        if isLeft, selectedLeft == i { return Color.gjuha.accent }
+        return Color.white.opacity(0.22)
+    }
+}
+
+// MARK: - Listening
+
+private struct ListeningAnswer: View {
+    let options: [String]
+    let correctAnswer: String
+    let selectedAnswer: String?
+    let answerResult: AnswerResult?
+    let onPlay: () -> Void
+    let onSelect: (String) -> Void
+
+    var body: some View {
+        VStack(spacing: 24) {
+            Button(action: onPlay) {
+                Image(systemName: "speaker.wave.3.fill")
+                    .font(.system(size: 34, weight: .bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 96, height: 96)
+                    .background(
+                        LinearGradient(
+                            colors: [Color.gjuha.accent, Color.gjuha.streak],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .clipShape(Circle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Play audio")
+            .accessibilityHint("Plays the word to identify")
+
+            MultipleChoiceAnswers(
+                options: options,
+                correctAnswer: correctAnswer,
+                selectedAnswer: selectedAnswer,
+                answerResult: answerResult,
+                onSelect: onSelect
+            )
+        }
+        .onAppear(perform: onPlay)
     }
 }
 

@@ -54,6 +54,29 @@ struct UserStats: Equatable {
     /// lessons. This is honest exposure ("seen"), not a mastery claim.
     let wordsSeen: Int
     let lessonsCompleted: Int
+    /// Words that have entered the spaced repetition schedule (reviewed at least
+    /// once beyond the lesson that introduced them is not required; being scheduled
+    /// means the learner has committed to retaining them). Distinct from "seen".
+    let wordsPracticed: Int
+    /// The subset of practiced words that have climbed to the documented mastery
+    /// interval in the scheduler. This is the only figure presented as mastery.
+    let wordsMastered: Int
+
+    init(
+        currentStreak: Int,
+        totalXP: Int,
+        wordsSeen: Int,
+        lessonsCompleted: Int,
+        wordsPracticed: Int = 0,
+        wordsMastered: Int = 0
+    ) {
+        self.currentStreak = currentStreak
+        self.totalXP = totalXP
+        self.wordsSeen = wordsSeen
+        self.lessonsCompleted = lessonsCompleted
+        self.wordsPracticed = wordsPracticed
+        self.wordsMastered = wordsMastered
+    }
 
     static let empty = UserStats(
         currentStreak: 0,

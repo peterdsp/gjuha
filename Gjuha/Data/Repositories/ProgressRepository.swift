@@ -30,13 +30,22 @@ extension DependencyValues {
 // MARK: - Live Implementation
 
 final class LiveProgressRepository: ProgressRepository, @unchecked Sendable {
+    private let reviewRepository: any ReviewRepository
+
+    init(reviewRepository: any ReviewRepository = LiveReviewRepository()) {
+        self.reviewRepository = reviewRepository
+    }
+
     func fetchUserStats() async -> UserStats {
         let store = ProgressStore.shared
+        let retention = await reviewRepository.summary()
         return UserStats(
             currentStreak: store.currentStreak,
             totalXP: store.totalXP,
             wordsSeen: Self.wordsSeen(in: store.completedLessonSeedIds),
-            lessonsCompleted: store.lessonsCompleted
+            lessonsCompleted: store.lessonsCompleted,
+            wordsPracticed: retention.wordsPracticed,
+            wordsMastered: retention.wordsMastered
         )
     }
 
@@ -56,7 +65,9 @@ final class LiveProgressRepository: ProgressRepository, @unchecked Sendable {
         ProgressStore.shared.markLessonCompleted(seedId: seedId, xpEarned: xpEarned)
     }
 
-    func updateStreak() async {}
+    func updateStreak() async {
+        ProgressStore.shared.markDailyActivity()
+    }
 
     func fetchCurrentStreak() async -> Int {
         ProgressStore.shared.currentStreak
@@ -87,7 +98,9 @@ final class MockProgressRepository: ProgressRepository, @unchecked Sendable {
             currentStreak: 7,
             totalXP: 340,
             wordsSeen: 45,
-            lessonsCompleted: 12
+            lessonsCompleted: 12,
+            wordsPracticed: 38,
+            wordsMastered: 16
         )
     }
 

@@ -28,6 +28,14 @@ struct HomeView: View {
                         .padding(.horizontal, 16)
                         .padding(.top, 12)
 
+                    if !store.isLoading && store.dueReviewCount > 0 {
+                        DailyReviewCard(count: store.dueReviewCount) {
+                            store.send(.startReviewTapped)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 16)
+                    }
+
                     if store.isLoading {
                         ProgressView()
                             .padding(.top, 48)
@@ -125,6 +133,51 @@ private struct HomeHeaderView: View {
         }
         .shadow(color: .black.opacity(0.12), radius: 14, y: 8)
         .onAppear { pulse = true }
+    }
+}
+
+// MARK: - Daily Review Card
+
+/// Surfaces spaced repetition reviews that are due, and starts a review session.
+/// Only shown when at least one word is due, so it never nags with an empty queue.
+private struct DailyReviewCard: View {
+    let count: Int
+    let action: () -> Void
+
+    private var wordWord: String { count == 1 ? "word" : "words" }
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 14) {
+                Image(systemName: "arrow.triangle.2.circlepath")
+                    .font(.system(size: 26, weight: .semibold))
+                    .foregroundStyle(Color.gjuha.accent)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Daily review")
+                        .font(.gjuha.headingSmall)
+                        .foregroundStyle(Color.gjuha.textPrimary)
+                    Text("\(count) \(wordWord) ready to strengthen")
+                        .font(.gjuha.caption)
+                        .foregroundStyle(Color.gjuha.textSecondary)
+                        .lineLimit(2)
+                }
+
+                Spacer(minLength: 8)
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(Color.gjuha.textTertiary)
+            }
+            .padding(16)
+            .gjuhaLiquidGlassCard(cornerRadius: 20, tintOpacity: 0.12)
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Daily review")
+        .accessibilityValue("\(count) \(wordWord) due for review")
+        .accessibilityHint("Starts a spaced repetition review session")
+        .accessibilityAddTraits(.isButton)
     }
 }
 

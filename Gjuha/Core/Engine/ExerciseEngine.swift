@@ -7,6 +7,10 @@ protocol ExerciseEngineProtocol: Sendable {
     func generateExercises(for lesson: LessonSummary) async -> [Exercise]
     /// Grades a submitted answer, distinguishing correct answers from near misses.
     func grade(_ answer: String, for exercise: Exercise) -> AnswerGrade
+    /// Builds one retrieval exercise per word id for a spaced repetition session,
+    /// each tagged with its stable word id. Word ids with no backing vocabulary are
+    /// skipped, so the session never contains an empty question.
+    func reviewExercises(forWordIds wordIds: [String]) async -> [ReviewExercise]
 }
 
 extension ExerciseEngineProtocol {
@@ -322,6 +326,32 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
         }
 
         return generatePlannedExercises(from: lessonWords, plan: lesson.exercisePlan)
+    }
+
+    /// Review type rotation. Retrieval first (the learner produces the answer),
+    /// which the evidence favors over recognition only. Listening is excluded here
+    /// because it is gated on reviewed audio that does not ship yet.
+    private static let reviewTypeRotation: [ExerciseType] = [
+        .multipleChoiceTranslate, .translateTextInput, .fillInBlank, .arrangeWords
+    ]
+
+    func reviewExercises(forWordIds wordIds: [String]) async -> [ReviewExercise] {
+        let pool = allWords
+        var result: [ReviewExercise] = []
+        var rotation = 0
+        for wordId in wordIds {
+            guard let word = allWords.first(where: { $0.id == wordId }) else { continue }
+            guard let (type, nextRotation) = nextSupportedType(
+                Self.reviewTypeRotation, startingAt: rotation, for: word
+            ) else {
+                // No rotation type fits this word; fall back to a translation prompt.
+                result.append(ReviewExercise(wordId: wordId, exercise: makeMCQAlbanianToEnglish(word: word, pool: pool)))
+                continue
+            }
+            rotation = nextRotation
+            result.append(ReviewExercise(wordId: wordId, exercise: makeExercise(of: type, word: word, pool: pool)))
+        }
+        return result
     }
 
     func grade(_ answer: String, for exercise: Exercise) -> AnswerGrade {
@@ -944,6 +974,10 @@ struct SeedWordEntry: Decodable, Sendable {
 final class MockExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
     func generateExercises(for lesson: LessonSummary) async -> [Exercise] {
         return Exercise.mockExercises
+    }
+
+    func reviewExercises(forWordIds wordIds: [String]) async -> [ReviewExercise] {
+        zip(wordIds, Exercise.mockExercises).map { ReviewExercise(wordId: $0.0, exercise: $0.1) }
     }
 
     func grade(_ answer: String, for exercise: Exercise) -> AnswerGrade {

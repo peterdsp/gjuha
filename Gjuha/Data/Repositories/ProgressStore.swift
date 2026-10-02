@@ -67,6 +67,13 @@ final class ProgressStore: @unchecked Sendable {
         defaults.integer(forKey: Keys.currentStreak)
     }
 
+    /// Records that the learner studied today, advancing the streak. Completing a
+    /// lesson calls this, and so does finishing a spaced repetition review, so a
+    /// day spent only on reviews still keeps the streak alive.
+    func markDailyActivity() {
+        updateStreak()
+    }
+
     private func updateStreak() {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())

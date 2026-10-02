@@ -34,6 +34,10 @@ private struct StatsGridView: View {
             StatCardView(label: "Total XP", value: "\(stats.totalXP)", icon: "star.fill", color: Color.gjuha.xp)
             StatCardView(label: "Words seen", value: "\(stats.wordsSeen)", icon: "book.fill", color: Color.gjuha.accent)
             StatCardView(label: "Lessons Done", value: "\(stats.lessonsCompleted)", icon: "checkmark.seal.fill", color: Color.gjuha.success)
+            // Honest retention ladder: seen (exposure) < practiced (in the review
+            // schedule) < mastered (survived to the long term interval).
+            StatCardView(label: "In review", value: "\(stats.wordsPracticed)", icon: "arrow.triangle.2.circlepath", color: Color.gjuha.accent)
+            StatCardView(label: "Mastered", value: "\(stats.wordsMastered)", icon: "trophy.fill", color: Color.gjuha.xp)
         }
     }
 }

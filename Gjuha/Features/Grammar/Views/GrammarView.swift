@@ -10,9 +10,16 @@ struct GrammarView: View {
 
             Group {
                 if let topic = store.selectedTopic {
-                    GrammarTopicDetailView(topic: topic) {
-                        store.send(.backTapped)
-                    }
+                    GrammarTopicDetailView(
+                        topic: topic,
+                        coachAvailability: store.coach.availability,
+                        coachResult: store.coach.result,
+                        isCoaching: store.coach.isGenerating,
+                        onExplain: { question in
+                            store.send(.explainTapped(topic, question: question))
+                        },
+                        onBack: { store.send(.backTapped) }
+                    )
                 } else {
                     GrammarTopicListView(
                         topics: store.topics,
@@ -135,6 +142,10 @@ private struct GrammarEmptyStateView: View {
 
 private struct GrammarTopicDetailView: View {
     let topic: GrammarTopic
+    let coachAvailability: CoachAvailability
+    let coachResult: CoachingResult?
+    let isCoaching: Bool
+    let onExplain: (String) -> Void
     let onBack: () -> Void
 
     var body: some View {
@@ -167,6 +178,13 @@ private struct GrammarTopicDetailView: View {
                     }
                     .padding(.horizontal, 16)
                 }
+
+                GrammarCoachSection(
+                    availability: coachAvailability,
+                    result: coachResult,
+                    isGenerating: isCoaching,
+                    onExplain: onExplain
+                )
             }
             .padding(.top, 16)
         }
@@ -178,6 +196,96 @@ private struct GrammarTopicDetailView: View {
                     Text("Grammar")
                 }
             }
+        }
+    }
+}
+
+/// Grammar coaching panel. Offers an English explanation of the current topic,
+/// generated on device when Apple Intelligence is available and grounded in the
+/// reviewed lesson notes, with a deterministic offline fallback otherwise. It
+/// explains only; it never grades answers.
+private struct GrammarCoachSection: View {
+    let availability: CoachAvailability
+    let result: CoachingResult?
+    let isGenerating: Bool
+    let onExplain: (String) -> Void
+
+    @State private var question: String = ""
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                Image(systemName: "sparkles")
+                    .foregroundStyle(Color.gjuha.accent)
+                Text("Explain simply (beta)")
+                    .font(.gjuha.headingMedium)
+                    .foregroundStyle(Color.gjuha.textPrimary)
+                Spacer()
+            }
+
+            Text(availabilityLabel)
+                .font(.gjuha.caption)
+                .foregroundStyle(Color.gjuha.textSecondary)
+
+            TextField("Ask about this topic (optional)", text: $question, axis: .vertical)
+                .font(.gjuha.bodyRegular)
+                .textFieldStyle(.roundedBorder)
+                .lineLimit(1...3)
+                .disabled(isGenerating)
+                .accessibilityLabel("Ask a question about this grammar topic")
+
+            Button {
+                onExplain(question)
+            } label: {
+                HStack(spacing: 8) {
+                    if isGenerating { ProgressView() }
+                    Text(isGenerating ? "Thinking" : "Explain")
+                        .font(.gjuha.labelBold)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(Color.gjuha.accent.opacity(0.14))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+            .buttonStyle(.plain)
+            .disabled(isGenerating)
+            .accessibilityLabel(isGenerating ? "Generating explanation" : "Explain this topic")
+
+            if let result {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(sourceLabel(result.source))
+                        .font(.gjuha.caption)
+                        .foregroundStyle(Color.gjuha.textTertiary)
+                    Text(result.text)
+                        .font(.gjuha.bodyRegular)
+                        .foregroundStyle(Color.gjuha.textPrimary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    Text(result.disclaimer)
+                        .font(.gjuha.caption)
+                        .foregroundStyle(Color.gjuha.textSecondary)
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .gjuhaLiquidGlassCard(cornerRadius: 12, tintOpacity: 0.05)
+                .accessibilityElement(children: .combine)
+            }
+        }
+        .padding(.horizontal, 16)
+    }
+
+    private var availabilityLabel: String {
+        switch availability {
+        case .available:
+            return "A tailored AI explanation is available on this device."
+        case .unavailable:
+            return "Showing offline explanations built from your reviewed lessons."
+        }
+    }
+
+    private func sourceLabel(_ source: CoachSource) -> String {
+        switch source {
+        case .foundationModel: return "AI generated"
+        case .deterministicFallback: return "From your reviewed lessons"
         }
     }
 }

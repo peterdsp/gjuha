@@ -15,6 +15,17 @@ struct LessonFeature {
         var selectedAnswer: String?
         var combo: Int = 0
 
+        /// Non nil when this session is a spaced repetition review over these due
+        /// word ids, rather than a course lesson. A review does not mark a lesson
+        /// complete or affect unlock state; it reschedules each word and counts as
+        /// daily activity for the streak.
+        var reviewWordIds: [String]?
+        /// Maps a generated review exercise to the stable word id it exercises, so
+        /// the outcome is recorded against the right schedule entry.
+        var reviewWordByExerciseId: [UUID: String] = [:]
+
+        var isReview: Bool { reviewWordIds != nil }
+
         enum Phase: Equatable {
             case loading
             case inProgress
@@ -36,6 +47,7 @@ struct LessonFeature {
     enum Action {
         case onAppear
         case exercisesLoaded([Exercise])
+        case reviewExercisesLoaded([ReviewExercise])
         case answerSubmitted(String)
         case answerFeedbackDismissed
         case nextExercise
@@ -47,6 +59,7 @@ struct LessonFeature {
 
     @Dependency(\.exerciseEngine) var exerciseEngine
     @Dependency(\.progressRepository) var progressRepository
+    @Dependency(\.reviewRepository) var reviewRepository
     @Dependency(\.audioPlayer) var audioPlayer
     @Dependency(\.continuousClock) var clock
 
@@ -61,6 +74,12 @@ struct LessonFeature {
                 state.combo = 0
                 state.answerResult = nil
                 state.selectedAnswer = nil
+                if let wordIds = state.reviewWordIds {
+                    return .run { send in
+                        let items = await exerciseEngine.reviewExercises(forWordIds: wordIds)
+                        await send(.reviewExercisesLoaded(items))
+                    }
+                }
                 return .run { [lesson = state.lesson] send in
                     let exercises = await exerciseEngine.generateExercises(for: lesson)
                     await send(.exercisesLoaded(exercises))
@@ -71,12 +90,21 @@ struct LessonFeature {
                 state.phase = .inProgress
                 return .none
 
+            case .reviewExercisesLoaded(let items):
+                state.exercises = items.map(\.exercise)
+                state.reviewWordByExerciseId = Dictionary(
+                    uniqueKeysWithValues: items.map { ($0.exercise.id, $0.wordId) }
+                )
+                state.phase = .inProgress
+                return .none
+
             case .answerSubmitted(let answer):
                 guard let current = state.currentExercise else { return .none }
                 guard state.answerResult == nil else { return .none }
                 state.selectedAnswer = answer
 
-                switch exerciseEngine.grade(answer, for: current) {
+                let grade = exerciseEngine.grade(answer, for: current)
+                switch grade {
                 case .correct:
                     state.combo += 1
                     // Combo bonus: +5 XP for every 3 correct in a row.
@@ -90,8 +118,9 @@ struct LessonFeature {
                 case .nearMiss:
                     // Recognised but not accepted: no XP, distinct feedback. When
                     // the miss is a dropped diacritic, prepend a hint tied to the
-                    // exact answer the learner typed.
-                    state.hearts -= 1
+                    // exact answer the learner typed. A review never ends on hearts,
+                    // so hearts only drop in a course lesson.
+                    if !state.isReview { state.hearts -= 1 }
                     state.combo = 0
                     let hint = AnswerNormalizer.diacriticHint(
                         submitted: answer,
@@ -105,7 +134,7 @@ struct LessonFeature {
                         explanation: explanation.isEmpty ? nil : explanation
                     )
                 case .incorrect:
-                    state.hearts -= 1
+                    if !state.isReview { state.hearts -= 1 }
                     state.combo = 0
                     state.answerResult = .wrong(
                         correctAnswer: current.correctAnswer,
@@ -113,16 +142,42 @@ struct LessonFeature {
                     )
                 }
 
-                // Auto-advance after delay
-                return .run { send in
-                    try await clock.sleep(for: .milliseconds(1400))
-                    await send(.answerFeedbackDismissed)
+                // In a review, reschedule the word from this outcome. Mapping is
+                // kept honest: correct -> good, near miss -> hard, wrong -> again.
+                var reviewEffect: Effect<Action> = .none
+                if state.isReview, let wordId = state.reviewWordByExerciseId[current.id] {
+                    let reviewGrade: ReviewGrade
+                    switch grade {
+                    case .correct: reviewGrade = .good
+                    case .nearMiss: reviewGrade = .hard
+                    case .incorrect: reviewGrade = .again
+                    }
+                    reviewEffect = .run { _ in
+                        await reviewRepository.recordOutcome(wordId: wordId, grade: reviewGrade)
+                    }
                 }
+
+                // Auto-advance after delay
+                return .merge(
+                    reviewEffect,
+                    .run { send in
+                        try await clock.sleep(for: .milliseconds(1400))
+                        await send(.answerFeedbackDismissed)
+                    }
+                )
 
             case .answerFeedbackDismissed:
                 let wasCorrect = state.answerResult?.isCorrect ?? false
                 state.answerResult = nil
                 state.selectedAnswer = nil
+
+                // A review always advances after showing the outcome, whatever the
+                // grade: the word was recorded and rescheduled once, so there is no
+                // retry-until-correct (which would re-record and corrupt the
+                // schedule) and no hearts failure.
+                if state.isReview {
+                    return .send(.nextExercise)
+                }
 
                 if wasCorrect {
                     return .send(.nextExercise)
@@ -141,12 +196,28 @@ struct LessonFeature {
             case .lessonCompleted:
                 let xp = state.xpEarned
                 state.phase = .completed(xp: xp)
+                // A review session reschedules its words as the learner answers, so
+                // on completion it only needs to bank the XP it earned and count as
+                // daily activity. It must not mark a course lesson complete or touch
+                // unlock state.
+                if state.isReview {
+                    return .run { [xp] _ in
+                        await progressRepository.recordReviewActivity(xpEarned: xp)
+                    }
+                }
                 return .run { [lesson = state.lesson, xp] _ in
                     await progressRepository.markLessonCompleted(
                         lesson.id,
                         seedId: lesson.seedId,
                         xpEarned: xp
                     )
+                    // Newly learned words enter the spaced repetition schedule. Words
+                    // already scheduled keep their existing progress.
+                    let wordIds = LessonVocabularyMap.wordIds(
+                        for: lesson.seedId,
+                        lessonTitle: lesson.title
+                    )
+                    await reviewRepository.scheduleNewWords(wordIds)
                 }
 
             case .lessonFailed:

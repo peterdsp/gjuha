@@ -37,6 +37,7 @@ struct AppFeature {
         case onboardingCompleted
         case tabSelected(State.RootTab)
         case bootstrapData
+        case startReviewSession([String])
     }
 
     @Reducer
@@ -48,6 +49,7 @@ struct AppFeature {
     }
 
     @Dependency(\.progressRepository) var progressRepository
+    @Dependency(\.reviewRepository) var reviewRepository
 
     var body: some ReducerOf<Self> {
         Scope(state: \.onboarding, action: \.onboarding) {
@@ -83,6 +85,27 @@ struct AppFeature {
                 // Don't open locked lessons
                 guard !lesson.isLocked else { return .none }
                 state.path.append(.lesson(LessonFeature.State(lesson: lesson)))
+                return .none
+
+            case .home(.startReviewTapped):
+                // Fetch the due words off the store, then push the review session.
+                return .run { send in
+                    let ids = await reviewRepository.dueWordIds(limit: 20)
+                    await send(.startReviewSession(ids))
+                }
+
+            case .startReviewSession(let wordIds):
+                guard !wordIds.isEmpty else { return .none }
+                let reviewLesson = LessonSummary(
+                    seedId: "review-session",
+                    title: "Daily Review",
+                    subtitle: "Spaced repetition",
+                    iconName: "arrow.triangle.2.circlepath",
+                    lessonType: .review
+                )
+                state.path.append(.lesson(
+                    LessonFeature.State(lesson: reviewLesson, reviewWordIds: wordIds)
+                ))
                 return .none
 
             case .path(.element(id: _, action: .lesson(.exitTapped))):

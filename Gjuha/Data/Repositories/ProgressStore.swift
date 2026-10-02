@@ -61,10 +61,25 @@ final class ProgressStore: @unchecked Sendable {
         defaults.integer(forKey: Keys.totalXP)
     }
 
+    /// Adds XP to the lifetime total without marking a lesson complete. Used by a
+    /// spaced repetition review, which earns XP for correct recalls but is not a
+    /// course lesson and must not change completion or unlock state.
+    func addXP(_ amount: Int) {
+        guard amount > 0 else { return }
+        defaults.set(defaults.integer(forKey: Keys.totalXP) + amount, forKey: Keys.totalXP)
+    }
+
     // MARK: - Streak
 
     var currentStreak: Int {
         defaults.integer(forKey: Keys.currentStreak)
+    }
+
+    /// Records that the learner studied today, advancing the streak. Completing a
+    /// lesson calls this, and so does finishing a spaced repetition review, so a
+    /// day spent only on reviews still keeps the streak alive.
+    func markDailyActivity() {
+        updateStreak()
     }
 
     private func updateStreak() {

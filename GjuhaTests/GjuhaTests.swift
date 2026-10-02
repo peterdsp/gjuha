@@ -643,3 +643,208 @@ struct Phase3And4Tests {
         #expect(!probe.localeSupport(forIdentifier: "sq").isSupported)
     }
 }
+
+// MARK: - Spaced repetition (retention) tests
+//
+// The scheduler is pure and takes an explicit `now` and calendar, so every test
+// here is deterministic. A fixed Gregorian calendar in Albania's timezone is used
+// to pin day boundaries, since intervals and due dates are whole days.
+struct RetentionTests {
+
+    private var calendar: Calendar {
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(identifier: "Europe/Tirane") ?? TimeZone(identifier: "UTC")!
+        return cal
+    }
+
+    private func date(_ y: Int, _ m: Int, _ d: Int, _ h: Int = 9) -> Date {
+        let cal = calendar
+        return cal.date(from: DateComponents(
+            calendar: cal, timeZone: cal.timeZone,
+            year: y, month: m, day: d, hour: h
+        ))!
+    }
+
+    private func scheduler() -> ReviewScheduler { ReviewScheduler(calendar: calendar) }
+
+    // MARK: new item
+
+    @Test
+    func newWordIsScheduledAsOneSuccessDueTheNextDay() {
+        let s = scheduler()
+        let now = date(2026, 10, 3)
+        let item = s.newItem(wordId: "w001", now: now)
+        #expect(item.reps == 1)
+        #expect(item.lapses == 0)
+        #expect(item.intervalDays == 1)
+        #expect(item.ease == ReviewScheduler.defaultEase)
+        #expect(item.lastReviewed == nil)
+        // Due at the start of the following day, not later the same day.
+        #expect(item.dueDate == calendar.startOfDay(for: date(2026, 10, 4)))
+    }
+
+    // MARK: good / easy / hard progression
+
+    @Test
+    func goodReviewsFollowTheOneThenSixThenEaseLadder() {
+        let s = scheduler()
+        let now = date(2026, 10, 3)
+        var item = s.newItem(wordId: "w001", now: now) // reps 1, interval 1
+        item = s.apply(.good, to: item, now: now)       // reps 1 -> interval 6
+        #expect(item.intervalDays == 6)
+        #expect(item.reps == 2)
+        item = s.apply(.good, to: item, now: now)       // reps >=2 -> 6 * 2.5 = 15
+        #expect(item.intervalDays == 15)
+        #expect(item.reps == 3)
+    }
+
+    @Test
+    func easyGrowsFasterThanGoodAndRaisesEase() {
+        let s = scheduler()
+        let now = date(2026, 10, 3)
+        let item = s.newItem(wordId: "w001", now: now) // reps 1
+        let easy = s.apply(.easy, to: item, now: now)
+        #expect(easy.intervalDays == 8)                 // reps 1 easy step
+        #expect(easy.ease > ReviewScheduler.defaultEase)
+    }
+
+    @Test
+    func hardShortensTheStepAndLowersEase() {
+        let s = scheduler()
+        let now = date(2026, 10, 3)
+        var item = s.newItem(wordId: "w001", now: now)
+        item = s.apply(.good, to: item, now: now)       // interval 6
+        let hard = s.apply(.hard, to: item, now: now)   // round(6 * 1.2) = 7
+        #expect(hard.intervalDays == 7)
+        #expect(hard.ease < item.ease)
+    }
+
+    // MARK: lapses
+
+    @Test
+    func lapseResetsRepsCountsAndIsDueSameDay() {
+        let s = scheduler()
+        let now = date(2026, 10, 3)
+        var item = s.newItem(wordId: "w001", now: now)
+        item = s.apply(.good, to: item, now: now)       // reps 2, interval 6
+        let lapsed = s.apply(.again, to: item, now: now)
+        #expect(lapsed.reps == 0)
+        #expect(lapsed.lapses == 1)
+        #expect(lapsed.intervalDays == 0)
+        #expect(lapsed.ease < item.ease)
+        #expect(lapsed.dueDate == calendar.startOfDay(for: now)) // see it again today
+    }
+
+    @Test
+    func easeNeverFallsBelowTheFloor() {
+        let s = scheduler()
+        let now = date(2026, 10, 3)
+        var item = s.newItem(wordId: "w001", now: now)
+        for _ in 0..<12 { item = s.apply(.again, to: item, now: now) }
+        #expect(item.ease == ReviewScheduler.minEase)
+    }
+
+    // MARK: due selection and ordering
+
+    @Test
+    func dueItemsAreTodayOrEarlierStrugglingFirstThenStable() {
+        let s = scheduler()
+        let now = date(2026, 10, 10)
+        func item(_ id: String, due: Date, lapses: Int) -> ReviewItemState {
+            ReviewItemState(wordId: id, intervalDays: 3, ease: 2.5, reps: 2,
+                            lapses: lapses, dueDate: due, lastReviewed: nil,
+                            introducedAt: due)
+        }
+        let a = item("w-a", due: date(2026, 10, 9), lapses: 0)   // due yesterday
+        let b = item("w-b", due: date(2026, 10, 9), lapses: 2)   // due yesterday, shakier
+        let c = item("w-c", due: date(2026, 10, 20), lapses: 0)  // future
+        let due = s.dueItems(from: [a, c, b], now: now)
+        #expect(due.map(\.wordId) == ["w-b", "w-a"]) // b first (more lapses), c excluded
+    }
+
+    @Test
+    func dueRespectsDayBoundaryNotTimeOfDay() {
+        let s = scheduler()
+        let dueDay = calendar.startOfDay(for: date(2026, 10, 10))
+        let item = ReviewItemState(wordId: "w001", intervalDays: 1, ease: 2.5,
+                                   reps: 1, lapses: 0, dueDate: dueDay,
+                                   lastReviewed: nil, introducedAt: dueDay)
+        // Late on the due day it is due; the evening before it is not.
+        #expect(s.isDue(item, now: date(2026, 10, 10, 23)))
+        #expect(!s.isDue(item, now: date(2026, 10, 9, 23)))
+    }
+
+    // MARK: mastery
+
+    @Test
+    func masteryUsesTheDocumentedIntervalThreshold() {
+        let s = scheduler()
+        let base = ReviewItemState(wordId: "w001", intervalDays: 0, ease: 2.5,
+                                   reps: 0, lapses: 0, dueDate: date(2026, 1, 1),
+                                   lastReviewed: nil, introducedAt: date(2026, 1, 1))
+        var belowItem = base; belowItem.intervalDays = ReviewScheduler.masteryIntervalDays - 1
+        var atItem = base; atItem.intervalDays = ReviewScheduler.masteryIntervalDays
+        #expect(!s.isMastered(belowItem))
+        #expect(s.isMastered(atItem))
+    }
+
+    // MARK: persistence
+
+    @Test
+    func storeRoundTripsAndDoesNotOverwriteExistingProgress() {
+        let defaults = UserDefaults(suiteName: "gjuha.test.\(UUID().uuidString)")!
+        let store = ReviewStore(defaults: defaults)
+        #expect(store.load().isEmpty) // defensive empty on a fresh store
+
+        let s = scheduler()
+        let now = date(2026, 10, 3)
+        var w1 = s.newItem(wordId: "w001", now: now)
+        w1 = s.apply(.good, to: w1, now: now) // interval 6, reps 2
+        store.upsert(w1)
+
+        // Inserting w001 again (as a "new" word) must not reset its progress.
+        store.insertNewItems([s.newItem(wordId: "w001", now: now),
+                              s.newItem(wordId: "w002", now: now)])
+        let loaded = store.load()
+        #expect(loaded.count == 2)
+        #expect(loaded["w001"]?.intervalDays == 6) // preserved, not reset to 1
+        #expect(loaded["w002"]?.intervalDays == 1)
+    }
+
+    // MARK: review XP banking
+
+    @Test
+    func reviewXPAddsToTheLifetimeTotalWithoutMarkingALesson() {
+        let defaults = UserDefaults(suiteName: "gjuha.test.\(UUID().uuidString)")!
+        let store = ProgressStore(defaults: defaults)
+        #expect(store.totalXP == 0)
+        store.addXP(27)
+        #expect(store.totalXP == 27)
+        store.addXP(0)   // a review with no correct answers earns nothing
+        #expect(store.totalXP == 27)
+        store.addXP(13)
+        #expect(store.totalXP == 40)
+        // Awarding review XP must not fabricate lesson completions.
+        #expect(store.lessonsCompleted == 0)
+    }
+
+    // MARK: repository integration
+
+    @Test
+    func repositorySchedulesNewWordsAndReportsHonestRetention() async {
+        let defaults = UserDefaults(suiteName: "gjuha.test.\(UUID().uuidString)")!
+        let repo = LiveReviewRepository(store: ReviewStore(defaults: defaults),
+                                        scheduler: scheduler())
+        await repo.scheduleNewWords(["w001", "w002", "w003"])
+        let summary = await repo.summary()
+        #expect(summary.wordsPracticed == 3)
+        #expect(summary.wordsMastered == 0)   // nothing is mastered on day one
+        // Freshly learned words are due the next day, so none are due right now.
+        #expect(summary.dueCount == 0)
+
+        // Recording an outcome for an unscheduled word introduces it defensively.
+        await repo.recordOutcome(wordId: "w099", grade: .good)
+        let after = await repo.summary()
+        #expect(after.wordsPracticed == 4)
+    }
+}

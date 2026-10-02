@@ -811,6 +811,23 @@ struct RetentionTests {
         #expect(loaded["w002"]?.intervalDays == 1)
     }
 
+    // MARK: review XP banking
+
+    @Test
+    func reviewXPAddsToTheLifetimeTotalWithoutMarkingALesson() {
+        let defaults = UserDefaults(suiteName: "gjuha.test.\(UUID().uuidString)")!
+        let store = ProgressStore(defaults: defaults)
+        #expect(store.totalXP == 0)
+        store.addXP(27)
+        #expect(store.totalXP == 27)
+        store.addXP(0)   // a review with no correct answers earns nothing
+        #expect(store.totalXP == 27)
+        store.addXP(13)
+        #expect(store.totalXP == 40)
+        // Awarding review XP must not fabricate lesson completions.
+        #expect(store.lessonsCompleted == 0)
+    }
+
     // MARK: repository integration
 
     @Test

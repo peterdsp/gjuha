@@ -39,7 +39,7 @@ This is not a hobby project. It is a long-term platform designed to reach **Duol
 ✦  Lesson session engine           ✦  Noun declension system
 ✦  Multiple choice exercises       ✦  Grammar reference tables
 ✦  Translation input               ✦  Fill-in-the-blank
-✦  Word matching                   ✦  Spaced repetition (planned)
+✦  Word matching                   ✦  Spaced repetition (SM-2, offline)
 ✦  Streak + XP system              ✦  Cultural immersion modules (planned)
 ✦  Offline-first - always works    ✦  Audio pronunciation (planned)
 ✦  Dark mode adaptive UI           ✦  Gheg dialect mode (planned)
@@ -268,8 +268,8 @@ All spacing follows a strict **4pt grid** (4, 8, 12, 16, 24, 32, 48).
 - [ ] Audio pronunciation
 
 ### Phase 3 - Engagement
-- [ ] Spaced repetition vocabulary review
-- [ ] Streak mechanics + daily notifications
+- [x] Spaced repetition vocabulary review (SM-2 derived, offline, deterministic; due reviews surfaced on Home, honest exposure vs practice vs mastery stats). See `Documentation/Release/`.
+- [ ] Streak mechanics + daily notifications (streak done; local notification reminders not yet, see release notes)
 - [ ] Achievements system
 - [ ] Cultural immersion modules
 

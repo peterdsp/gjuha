@@ -171,6 +171,14 @@ struct LessonFeature {
                 state.answerResult = nil
                 state.selectedAnswer = nil
 
+                // A review always advances after showing the outcome, whatever the
+                // grade: the word was recorded and rescheduled once, so there is no
+                // retry-until-correct (which would re-record and corrupt the
+                // schedule) and no hearts failure.
+                if state.isReview {
+                    return .send(.nextExercise)
+                }
+
                 if wasCorrect {
                     return .send(.nextExercise)
                 } else if state.hearts <= 0 {
@@ -189,10 +197,13 @@ struct LessonFeature {
                 let xp = state.xpEarned
                 state.phase = .completed(xp: xp)
                 // A review session reschedules its words as the learner answers, so
-                // on completion it only needs to count as daily activity. It must not
-                // mark a course lesson complete or touch unlock state.
+                // on completion it only needs to bank the XP it earned and count as
+                // daily activity. It must not mark a course lesson complete or touch
+                // unlock state.
                 if state.isReview {
-                    return .run { _ in await progressRepository.updateStreak() }
+                    return .run { [xp] _ in
+                        await progressRepository.recordReviewActivity(xpEarned: xp)
+                    }
                 }
                 return .run { [lesson = state.lesson, xp] _ in
                     await progressRepository.markLessonCompleted(

@@ -7,6 +7,10 @@ protocol ProgressRepository: Sendable {
     func fetchUserStats() async -> UserStats
     func markLessonCompleted(_ lessonId: UUID, seedId: String, xpEarned: Int) async
     func updateStreak() async
+    /// Records a finished spaced repetition review: adds the XP it earned to the
+    /// lifetime total and counts the day as activity for the streak. Does not mark a
+    /// lesson complete or change unlock state.
+    func recordReviewActivity(xpEarned: Int) async
     func fetchCurrentStreak() async -> Int
     func fetchTotalXP() async -> Int
     func fetchLearningGoal() async -> LearningGoal
@@ -69,6 +73,11 @@ final class LiveProgressRepository: ProgressRepository, @unchecked Sendable {
         ProgressStore.shared.markDailyActivity()
     }
 
+    func recordReviewActivity(xpEarned: Int) async {
+        ProgressStore.shared.addXP(xpEarned)
+        ProgressStore.shared.markDailyActivity()
+    }
+
     func fetchCurrentStreak() async -> Int {
         ProgressStore.shared.currentStreak
     }
@@ -106,6 +115,7 @@ final class MockProgressRepository: ProgressRepository, @unchecked Sendable {
 
     func markLessonCompleted(_ lessonId: UUID, seedId: String, xpEarned: Int) async {}
     func updateStreak() async {}
+    func recordReviewActivity(xpEarned: Int) async {}
     func fetchCurrentStreak() async -> Int { 7 }
     func fetchTotalXP() async -> Int { 340 }
     func fetchLearningGoal() async -> LearningGoal { .regular }

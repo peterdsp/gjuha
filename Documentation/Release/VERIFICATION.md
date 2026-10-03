@@ -113,6 +113,31 @@ Defect found and fixed during verification:
   `ProgressStore.addXP` path (`recordReviewActivity`), covered by a unit test and
   re-verified at runtime (Total XP increases by the review's XP after a review).
 
+### Appearance, Dynamic Type, iPad, keyboard
+
+Verified on the iPhone 15 simulator (and iPad for what static capture allowed).
+
+- Dark mode: Home, Words, Grammar, Profile, and a lesson interior all adapt with
+  readable contrast and no hardcoded light artifacts. All 14 design system
+  colorsets define dark variants; the liquid glass background respects Reduce
+  Motion (the drift animation is disabled when Reduce Motion is on).
+- Dynamic Type: at accessibility extra large, the six Profile stat cards (including
+  the new "In review" and "Mastered") show full labels, wrapping to two lines with
+  no truncation, clipping, or overlap; the grid stays clean and scrolls. Lesson
+  prompts and answer buttons also scale without clipping. Minor: at the largest
+  accessibility sizes the small Home info pills ("0/12 units" and similar)
+  ellipsize; acceptable, noted as a polish item.
+- Text input keyboard: with the software keyboard raised, the layout lifts so the
+  "Check" button sits about 100 points above the keyboard, fully visible and
+  tappable, and the text field is not pushed off screen. Typing then tapping Check
+  registers correctly and advances. The earlier "Check button under the keyboard"
+  observation was an automation artifact (programmatic typing without focusing the
+  field), not an app defect.
+- iPad: the app installs and runs on iPad Air 11-inch. Onboarding renders correctly
+  (verified by screenshot). The layout is a scaled up iPhone layout (full width
+  controls, extra vertical space), which is correct and not broken but not yet
+  tailored to the larger canvas. Noted as a polish item, not a defect.
+
 ## Not runtime verified / external
 
 - Audio playback: no reviewed audio ships (0 assets), so the listening exercise and
@@ -123,3 +148,10 @@ Defect found and fixed during verification:
   production flows, so not runtime exercisable. Blocked on native linguistic review.
 - Speaking experiment: disabled by default; Apple ASR for Albanian confirmed
   unsupported at runtime by a unit test probe.
+- VoiceOver spoken output: accessibility labels, values, hints, and traits are set
+  (verified in the accessibility hierarchy), but the actual spoken VoiceOver
+  experience was not driven end to end. Metadata is present and correct; a hearing
+  pass on a device is the remaining check.
+- iPad tailored layout and landscape, and the full iPad flow past onboarding, were
+  not walked (the automation could not reliably drive taps on the iPad session).
+  The iPhone flows are fully verified; the iPad renders correctly but is scaled.

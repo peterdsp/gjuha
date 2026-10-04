@@ -139,6 +139,15 @@ extension View {
     func gjuhaLiquidGlassCard(cornerRadius: CGFloat = 16, tintOpacity: Double = 0.08) -> some View {
         modifier(GjuhaLiquidGlassCardModifier(cornerRadius: cornerRadius, tintOpacity: tintOpacity))
     }
+
+    /// Constrains content to a comfortable single column reading width and centers
+    /// it, so wide screens (iPad, landscape) do not stretch the single column
+    /// learning UI edge to edge. On iPhone the cap is wider than the screen, so it is
+    /// a no op. Apply to a screen's content, never to its full bleed background.
+    func gjuhaReadableWidth(_ maxWidth: CGFloat = 620) -> some View {
+        frame(maxWidth: maxWidth)
+            .frame(maxWidth: .infinity)
+    }
 }
 
 struct AnimatedMascotView: View {

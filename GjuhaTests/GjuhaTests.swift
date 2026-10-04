@@ -848,3 +848,74 @@ struct RetentionTests {
         #expect(after.wordsPracticed == 4)
     }
 }
+
+// MARK: - Daily reminder settings tests
+
+struct ReminderTests {
+
+    @Test
+    func defaultReminderIsOffAtSevenPM() {
+        let s = ReminderSettings.default
+        #expect(s.isEnabled == false)      // opt in, never nags by default
+        #expect(s.hour == 19)
+        #expect(s.minute == 0)
+        #expect(s.timeLabel == "19:00")
+    }
+
+    @Test
+    func triggerComponentsCarryOnlyTheTimeOfDay() {
+        let s = ReminderSettings(isEnabled: true, hour: 8, minute: 5)
+        let c = s.triggerComponents
+        #expect(c.hour == 8)
+        #expect(c.minute == 5)
+        #expect(c.day == nil)   // daily: no date part, so it repeats every day
+        #expect(s.timeLabel == "08:05")
+    }
+
+    @Test
+    func settingsStoreRoundTripsAndDefaultsWhenEmpty() {
+        let defaults = UserDefaults(suiteName: "gjuha.test.\(UUID().uuidString)")!
+        let store = ReminderSettingsStore(defaults: defaults)
+        #expect(store.load() == .default)   // defensive default on a fresh store
+
+        store.save(ReminderSettings(isEnabled: true, hour: 7, minute: 30))
+        let loaded = store.load()
+        #expect(loaded.isEnabled == true)
+        #expect(loaded.hour == 7)
+        #expect(loaded.minute == 30)
+    }
+}
+
+// MARK: - Local data reset tests
+
+struct DataResetTests {
+
+    @Test
+    func resetClearsProgressButKeepsTheChosenGoal() {
+        let defaults = UserDefaults(suiteName: "gjuha.test.\(UUID().uuidString)")!
+        let store = ProgressStore(defaults: defaults)
+        store.markLessonCompleted(seedId: "u1-l1", xpEarned: 40)
+        store.setLearningGoal("serious")
+        #expect(store.totalXP == 40)
+        #expect(store.lessonsCompleted == 1)
+
+        store.resetLearningProgress()
+        #expect(store.totalXP == 0)
+        #expect(store.lessonsCompleted == 0)
+        #expect(store.currentStreak == 0)
+        #expect(store.learningGoalRawValue == "serious") // goal is kept
+    }
+
+    @Test
+    func reviewStoreResetEmptiesTheSchedule() {
+        let defaults = UserDefaults(suiteName: "gjuha.test.\(UUID().uuidString)")!
+        let store = ReviewStore(defaults: defaults)
+        store.insertNewItems([
+            ReviewItemState(wordId: "w001", intervalDays: 1, ease: 2.5, reps: 1,
+                            lapses: 0, dueDate: Date(), lastReviewed: nil, introducedAt: Date())
+        ])
+        #expect(store.load().count == 1)
+        store.reset()
+        #expect(store.load().isEmpty)
+    }
+}

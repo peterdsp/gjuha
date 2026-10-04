@@ -9,6 +9,7 @@ struct OnboardingView: View {
         ZStack {
             OnboardingBackdropView()
 
+            Group {
             switch store.step {
             case .welcome:
                 WelcomeStepView { store.send(.nextStepTapped) }
@@ -43,6 +44,8 @@ struct OnboardingView: View {
                     )
                 )
             }
+            }
+            .gjuhaReadableWidth()
         }
         .animation(
             reduceMotion

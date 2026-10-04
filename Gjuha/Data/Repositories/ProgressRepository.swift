@@ -15,6 +15,9 @@ protocol ProgressRepository: Sendable {
     func fetchTotalXP() async -> Int
     func fetchLearningGoal() async -> LearningGoal
     func saveLearningGoal(_ goal: LearningGoal) async
+    /// Wipes local learning progress and the review schedule, keeping the chosen
+    /// goal. Backs the on device "reset learning data" control.
+    func resetLearningData() async
 }
 
 // MARK: - Dependency Key
@@ -97,6 +100,11 @@ final class LiveProgressRepository: ProgressRepository, @unchecked Sendable {
     func saveLearningGoal(_ goal: LearningGoal) async {
         ProgressStore.shared.setLearningGoal(goal.rawValue)
     }
+
+    func resetLearningData() async {
+        ProgressStore.shared.resetLearningProgress()
+        ReviewStore.shared.reset()
+    }
 }
 
 // MARK: - Mock Implementation
@@ -120,4 +128,5 @@ final class MockProgressRepository: ProgressRepository, @unchecked Sendable {
     func fetchTotalXP() async -> Int { 340 }
     func fetchLearningGoal() async -> LearningGoal { .regular }
     func saveLearningGoal(_ goal: LearningGoal) async {}
+    func resetLearningData() async {}
 }

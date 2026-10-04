@@ -26,6 +26,18 @@ struct LessonView: View {
         }
         .navigationBarHidden(true)
         .onAppear { store.send(.onAppear) }
+        .alert(
+            "Quit lesson?",
+            isPresented: Binding(
+                get: { store.showExitConfirmation },
+                set: { if !$0 { store.send(.exitConfirmationDismissed) } }
+            )
+        ) {
+            Button("Keep learning", role: .cancel) { store.send(.exitConfirmationDismissed) }
+            Button("Quit", role: .destructive) { store.send(.exitTapped) }
+        } message: {
+            Text("Your progress in this lesson will not be saved. You can start it again any time.")
+        }
     }
 }
 
@@ -39,7 +51,7 @@ private struct LessonInProgressView: View {
                     progress: store.progress,
                     hearts: store.hearts,
                     combo: store.combo,
-                    onExit: { store.send(.exitTapped) }
+                    onExit: { store.send(.exitButtonTapped) }
                 )
 
                 if let exercise = store.currentExercise {
@@ -59,6 +71,7 @@ private struct LessonInProgressView: View {
                     .id(exercise.id)
                 }
             }
+            .gjuhaReadableWidth()
             .animation(.easeInOut(duration: 0.25), value: store.currentIndex)
 
             // Feedback overlay
@@ -859,6 +872,7 @@ private struct LessonCompletedView: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 48)
         }
+        .gjuhaReadableWidth()
         .onAppear {
             withAnimation(.spring(response: 0.5, dampingFraction: 0.6)) {
                 starScale = 1.0
@@ -935,6 +949,7 @@ private struct LessonFailedView: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 48)
         }
+        .gjuhaReadableWidth()
         .onAppear {
             withAnimation(.spring(response: 0.4, dampingFraction: 0.5)) {
                 heartScale = 1.0

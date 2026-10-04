@@ -50,4 +50,9 @@ final class ReviewStore: @unchecked Sendable {
         items[item.wordId] = item
         save(items)
     }
+
+    /// Clears the entire review schedule. Backs the "reset learning data" control.
+    func reset() {
+        defaults.removeObject(forKey: key)
+    }
 }

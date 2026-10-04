@@ -23,13 +23,23 @@ segments; the design serves adults who want to actually remember what they study
 
 ## Learning science
 
-Finding: spacing and retrieval practice have robust support. Kim and Webb (2022)
-meta analysis, 48 experiments and 3,411 participants, found medium to large effects
-of spaced practice on second language learning, with longer intervals giving the
-strongest delayed retention. SM-2 (Wozniak, 1987) reached about 92 percent retention
-in long term self study and is simple and deterministic. FSRS (2022) fits a per
-learner forgetting curve with machine learning and beats SM-2 for the large majority
-of users, but it needs a large personal review history and is not deterministic.
+Finding: spacing and retrieval practice have robust support. Kim and Webb (2022),
+"The effects of spaced practice on second language learning: A meta-analysis",
+Language Learning 72(1), 269 to 319, quantitatively examined 37 experimental studies
+and confirmed a positive overall effect of spacing on L2 learning, while noting the
+effect varies by learning type, learner, and practice activity, and that some
+sub analyses were inconclusive due to few studies. (Correction: an earlier draft of
+this note cited "48 experiments and 3,411 participants" and a blanket "medium to
+large" effect; those specifics were not supported by the primary source and have
+been removed.)
+
+On algorithms: SM-2 (Wozniak, 1987, SuperMemo) is simple and deterministic; SuperMemo
+reports high long term retention from its early SM-2 use, a figure from the vendor
+rather than an independent trial. FSRS (2022) fits a per learner forgetting curve
+with machine learning and, on the open spaced repetition benchmark, outperforms SM-2
+for the large majority of users; but it needs a sizeable personal review history and
+is not deterministic. These comparative figures come from SuperMemo and the FSRS
+benchmark authors and are treated here as indicative, not independently verified.
 
 Decision: implement an SM-2 derived scheduler now. It is deterministic (so it is
 unit testable with a fixed clock), offline, and well understood. Keep the scheduler
@@ -62,8 +72,16 @@ recognition only, which the exercise engine already supports.
 - https://www.langoly.com/albanian-apps
 - https://www.alllanguageresources.com/learn-albanian-app/
 - https://ling-app.com/blog/best-apps-to-learn-albanian/
-- Kim and Webb (2022), meta analysis of spaced practice in L2 learning (reported via
-  https://riset.unisma.ac.id/index.php/JREALL/article/view/25562 systematic review)
-- SM-2 and FSRS overview: https://www.mindomax.com/fsrs-vs-sm2-spaced-repetition-algorithm
+- Kim, S. K., and Webb, S. (2022). The effects of spaced practice on second language
+  learning: A meta-analysis. Language Learning, 72(1), 269 to 319.
+  https://www.cambridge.org/core/product/C833408A4C3BAD939CA39EA734423BB7 (and the
+  journal record). 37 experimental studies.
+- SM-2: SuperMemo (Wozniak). FSRS and its benchmark: the open spaced repetition
+  project. Both treated as indicative vendor or author reported figures.
+- Azure Neural TTS Albanian voices sq-AL-AnilaNeural (female) and sq-AL-IlirNeural
+  (male) are General Availability. Confirmed via Azure voice listings (for example
+  https://json2video.com/ai-voices/azure/voices/sq-al-ilirneural/ and the Azure AI
+  Speech catalog). This is the licensing path for shipped audio, still gated on
+  authorization and native review.
 - Apple Foundation Models and Speech documentation (verified in Phase 3/4, see
   `Documentation/Phase3_4/PHASE3_4_REPORT.md`).

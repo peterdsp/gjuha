@@ -75,6 +75,7 @@ struct HomeView: View {
                             .padding(.top, 20)
                     }
                 }
+                .gjuhaReadableWidth()
             }
         }
         .navigationBarHidden(true)
@@ -187,6 +188,7 @@ private struct UnitHeaderCard: View {
     let unit: LearningUnit
     let completedUnits: Int
     let totalUnits: Int
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     private var completedLessons: Int {
         unit.lessons.filter(\.isCompleted).count
@@ -246,8 +248,13 @@ private struct UnitHeaderCard: View {
                 .frame(height: 8)
             }
 
-            // Course stats
-            HStack(spacing: 8) {
+            // Course stats. At accessibility text sizes the three pills no longer
+            // fit on one line, so the row stacks vertically (full labels, no
+            // truncation) instead of ellipsizing.
+            let chipLayout: AnyLayout = dynamicTypeSize.isAccessibilitySize
+                ? AnyLayout(VStackLayout(alignment: .leading, spacing: 8))
+                : AnyLayout(HStackLayout(spacing: 8))
+            chipLayout {
                 HomeMetricChip(icon: "checkmark.seal.fill", text: "\(completedUnits)/\(totalUnits) units")
                 HomeMetricChip(icon: "book.closed.fill", text: "\(unit.lessons.count) lessons")
                 HomeMetricChip(icon: "graduationcap.fill", text: unit.cefrLevel.rawValue.uppercased())
@@ -397,7 +404,8 @@ private struct CourseNodeView: View {
                             ? Color.gjuha.textTertiary
                             : Color.gjuha.textPrimary
                     )
-                    .lineLimit(1)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
 
                 if lesson.isCompleted && lesson.bestXP > 0 {
                     HStack(spacing: 2) {

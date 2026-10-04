@@ -15,13 +15,140 @@ struct ProfileView: View {
                     GoalPickerView(selected: store.selectedGoal) { goal in
                         store.send(.goalChanged(goal))
                     }
+
+                    ReminderSettingsView(store: store)
+
+                    DataControlsView(store: store)
                 }
                 .padding(16)
+                .gjuhaReadableWidth()
             }
         }
         .navigationTitle("Profile")
         .navigationBarTitleDisplayMode(.large)
         .onAppear { store.send(.onAppear) }
+        .alert(
+            "Notifications are off",
+            isPresented: Binding(
+                get: { store.reminderPermissionDenied },
+                set: { if !$0 { store.send(.reminderPermissionAlertDismissed) } }
+            )
+        ) {
+            Button("OK", role: .cancel) { store.send(.reminderPermissionAlertDismissed) }
+        } message: {
+            Text("To get a daily reminder, allow notifications for Gjuha in the Settings app.")
+        }
+        .alert(
+            "Reset learning data?",
+            isPresented: Binding(
+                get: { store.showResetConfirmation },
+                set: { if !$0 { store.send(.resetConfirmationDismissed) } }
+            )
+        ) {
+            Button("Cancel", role: .cancel) { store.send(.resetConfirmationDismissed) }
+            Button("Reset", role: .destructive) { store.send(.resetConfirmed) }
+        } message: {
+            Text("This clears your XP, streak, completed lessons, and review schedule on this device. Your daily goal is kept. This cannot be undone.")
+        }
+    }
+}
+
+private struct DataControlsView: View {
+    let store: StoreOf<ProfileFeature>
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Your Data")
+                .font(.gjuha.headingMedium)
+                .foregroundStyle(Color.gjuha.textPrimary)
+
+            Text("Everything you learn is stored only on this device. Nothing is sent anywhere.")
+                .font(.gjuha.caption)
+                .foregroundStyle(Color.gjuha.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Button(role: .destructive, action: { store.send(.resetDataTapped) }) {
+                HStack(spacing: 8) {
+                    Image(systemName: "trash")
+                    Text("Reset learning data")
+                        .font(.gjuha.labelBold)
+                    Spacer()
+                }
+                .foregroundStyle(Color.gjuha.error)
+                .padding(14)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.gjuha.error.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Reset learning data")
+            .accessibilityHint("Clears your progress and review schedule on this device")
+        }
+        .padding(16)
+        .gjuhaLiquidGlassCard(cornerRadius: 18, tintOpacity: 0.07)
+    }
+}
+
+private struct ReminderSettingsView: View {
+    let store: StoreOf<ProfileFeature>
+
+    /// Bridges the stored hour and minute to a Date for the system time picker, and
+    /// writes the chosen hour and minute back. The date part is irrelevant; only the
+    /// time of day is used.
+    private var timeBinding: Binding<Date> {
+        Binding(
+            get: {
+                Calendar.current.date(
+                    bySettingHour: store.reminder.hour,
+                    minute: store.reminder.minute,
+                    second: 0,
+                    of: Date()
+                ) ?? Date()
+            },
+            set: { newDate in
+                let comps = Calendar.current.dateComponents([.hour, .minute], from: newDate)
+                store.send(.reminderTimeChanged(hour: comps.hour ?? 19, minute: comps.minute ?? 0))
+            }
+        )
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Daily Reminder")
+                .font(.gjuha.headingMedium)
+                .foregroundStyle(Color.gjuha.textPrimary)
+
+            Toggle(isOn: Binding(
+                get: { store.reminder.isEnabled },
+                set: { store.send(.reminderToggled($0)) }
+            )) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Remind me to practice")
+                        .font(.gjuha.labelBold)
+                        .foregroundStyle(Color.gjuha.textPrimary)
+                    Text("A gentle nudge once a day. Off by default.")
+                        .font(.gjuha.caption)
+                        .foregroundStyle(Color.gjuha.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .tint(Color.gjuha.accent)
+
+            if store.reminder.isEnabled {
+                Divider().overlay(Color.white.opacity(0.15))
+                DatePicker(
+                    "Reminder time",
+                    selection: timeBinding,
+                    displayedComponents: .hourAndMinute
+                )
+                .font(.gjuha.labelBold)
+                .foregroundStyle(Color.gjuha.textPrimary)
+                .tint(Color.gjuha.accent)
+            }
+        }
+        .padding(16)
+        .gjuhaLiquidGlassCard(cornerRadius: 18, tintOpacity: 0.07)
+        .accessibilityElement(children: .contain)
     }
 }
 

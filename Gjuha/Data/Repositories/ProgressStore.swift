@@ -115,6 +115,20 @@ final class ProgressStore: @unchecked Sendable {
         completedLessonSeedIds.count
     }
 
+    // MARK: - Reset
+
+    /// Clears the learner's progress (completed lessons, XP, streak, activity) while
+    /// keeping their chosen goal and the fact that onboarding is done. Backs the
+    /// "reset learning data" control, so a user can wipe local progress on device.
+    func resetLearningProgress() {
+        [Keys.completedLessons, Keys.xpByLesson, Keys.totalXP,
+         Keys.currentStreak, Keys.lastActivityDate].forEach {
+            defaults.removeObject(forKey: $0)
+        }
+        // Force the flush so a reset survives an immediate relaunch (see ReviewStore).
+        defaults.synchronize()
+    }
+
     // MARK: - Learning Goal
 
     /// Raw stored goal identifier, or nil if the user has not set one yet.

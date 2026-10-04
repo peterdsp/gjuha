@@ -52,6 +52,7 @@ struct VocabularyView: View {
                     }
                 }
             }
+            .gjuhaReadableWidth()
         }
         .navigationTitle("Vocabulary")
         .navigationBarTitleDisplayMode(.large)

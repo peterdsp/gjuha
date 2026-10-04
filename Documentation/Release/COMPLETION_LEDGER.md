@@ -42,22 +42,33 @@ from Duolingo, which has no Albanian course at all.
 | Experience and quality | step 4 of brief | Cohesive navigation, dark mode, Dynamic Type, keyboard behavior, accessibility metadata across iPhone screens | done (runtime verified: dark mode all screens, Dynamic Type incl. Profile stat cards, keyboard above field; VoiceOver metadata present, spoken pass pending) |
 | iPad tailored layout | step 4 of brief | iPad specific layout tuned for the larger canvas | polish (renders correctly today as a scaled iPhone layout; tailoring is a noted non-blocking item) |
 
+## Follow up items completed in the second pass
+
+| Item | Source | Acceptance criteria | Status |
+|---|---|---|---|
+| Adaptive iPad layout | step 4 of brief | Content constrained to a readable centered column on wide screens; full bleed backgrounds kept; no op on iPhone | done (impl; runtime verified on iPad) |
+| Accessibility text truncation | step 4 of brief | Home info pills stack vertically at accessibility sizes instead of truncating; lesson node captions wrap | done (impl; runtime verified) |
+| Local daily reminders | step 4 of brief | Opt in, off by default; permission requested on enable; denial explained; daily local time trigger; time picker; off cancels | done (impl + 3 unit tests; runtime verified) |
+| Interruption handling | step 3/4 of brief | Quitting a course lesson in progress confirms before discarding; reviews save per answer so they do not confirm | done (impl; runtime verified) |
+| Local data control | step 4 of brief | "Reset learning data" clears progress and schedule on device behind a confirmation; goal kept; UI reflects it live | done (impl + 2 unit tests; two runtime bugs found and fixed: a durability flush and a Home tab that did not live refresh after reset; verified on a pristine device) |
+| Upgrade behavior | step 4 of brief | Upgrading from pre retention data reads old progress, starts retention empty, does not crash | done (defensive decode unit tested; runtime confirmed no crash with old data and new keys absent; the empty retention state could not be staged on the sim due to cfprefsd caching, a sim artifact) |
+| Native review package | step 3 of brief | Concrete list of dialect pairs, cultural unit, and audio set for a native reviewer | done (`REVIEW_PACKAGE.md`) |
+| Research corrections | step 2 of brief | Fix the Kim and Webb citation and over claimed figures; confirm Azure sq-AL GA | done (`RESEARCH.md`) |
+
 ## Deliberate scope boundaries (decided this session, not silently deferred)
 
-- Local notification reminders: not implemented. The repository had no notification
-  code, so this was never a started commitment. Doing it properly needs a permission
-  request, a user facing reminder time and on/off control, scheduling with correct
-  timezone handling, and tests; a half wired version would be exactly the disabled
-  scaffolding the brief warns against. In app motivation is provided instead by the
-  streak and the due review card, which only appears when work is actually due (it
-  never nags with an empty queue). Reminders are a clean next increment.
 - FSRS scheduling: not adopted. SM-2 was chosen for determinism and zero training
   data at launch; the scheduler sits behind a value type so FSRS can replace it later
   without touching the feature layer. See `RESEARCH.md`.
 - SwiftData migration of progress: progress stays in the existing UserDefaults store
   (`ProgressStore`, `ReviewStore`). It is small, offline, and relaunch safe, and the
-  review store decodes defensively. Moving to SwiftData is not required for this
-  release and would add migration risk for no user visible gain.
+  review and reminder stores decode defensively (verified by the upgrade check).
+  Moving to SwiftData is not required for this release and would add migration risk
+  for no user visible gain.
+- VoiceOver spoken output: labels, values, hints, and traits are set and seen in the
+  accessibility hierarchy, but the spoken experience was not driven end to end in
+  this environment. This is the one accessibility check that remains, and it needs a
+  device with VoiceOver, so it is kept as an explicit external dependency.
 
 ## External dependencies (cannot be closed without access or human review)
 

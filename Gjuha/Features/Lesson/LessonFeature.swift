@@ -26,6 +26,13 @@ struct LessonFeature {
 
         var isReview: Bool { reviewWordIds != nil }
 
+        /// Whether the "quit this lesson" confirmation is showing. A course lesson
+        /// does not persist mid lesson progress, so quitting part way restarts it;
+        /// the confirmation makes that an explicit choice rather than a silent loss
+        /// from an accidental tap. A review is not confirmed: it saves each answer as
+        /// it goes, so leaving loses nothing already recorded.
+        var showExitConfirmation: Bool = false
+
         enum Phase: Equatable {
             case loading
             case inProgress
@@ -53,6 +60,8 @@ struct LessonFeature {
         case nextExercise
         case lessonCompleted
         case lessonFailed
+        case exitButtonTapped
+        case exitConfirmationDismissed
         case exitTapped
         case playAudioTapped
     }
@@ -224,7 +233,23 @@ struct LessonFeature {
                 state.phase = .failed
                 return .none
 
+            case .exitButtonTapped:
+                // Confirm only when a course lesson is in progress with something to
+                // lose. Reviews and the completion/failed screens exit immediately.
+                if !state.isReview,
+                   state.phase == .inProgress,
+                   state.currentIndex > 0 || state.xpEarned > 0 {
+                    state.showExitConfirmation = true
+                    return .none
+                }
+                return .send(.exitTapped)
+
+            case .exitConfirmationDismissed:
+                state.showExitConfirmation = false
+                return .none
+
             case .exitTapped:
+                state.showExitConfirmation = false
                 return .none
 
             case .playAudioTapped:

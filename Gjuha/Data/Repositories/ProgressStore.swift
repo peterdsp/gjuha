@@ -125,6 +125,8 @@ final class ProgressStore: @unchecked Sendable {
          Keys.currentStreak, Keys.lastActivityDate].forEach {
             defaults.removeObject(forKey: $0)
         }
+        // Force the flush so a reset survives an immediate relaunch (see ReviewStore).
+        defaults.synchronize()
     }
 
     // MARK: - Learning Goal

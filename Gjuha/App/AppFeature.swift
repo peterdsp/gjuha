@@ -119,6 +119,12 @@ struct AppFeature {
                 // Will be handled when user exits
                 return .none
 
+            case .profile(.resetCompleted):
+                // A reset wiped progress and the review schedule. Refresh Home so its
+                // cached units, unlock state, stats, and due reviews reflect the wipe
+                // instead of showing stale completed lessons until the next launch.
+                return .send(.home(.refreshAfterLessonComplete))
+
             case .tabSelected(let tab):
                 state.selectedTab = tab
                 return .none

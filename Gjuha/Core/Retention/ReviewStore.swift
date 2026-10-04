@@ -52,7 +52,11 @@ final class ReviewStore: @unchecked Sendable {
     }
 
     /// Clears the entire review schedule. Backs the "reset learning data" control.
+    /// Forces a synchronize so the deletion survives even if the app is terminated
+    /// immediately after (a destructive action must be durable, not wait for the
+    /// next automatic flush).
     func reset() {
         defaults.removeObject(forKey: key)
+        defaults.synchronize()
     }
 }

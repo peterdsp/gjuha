@@ -138,6 +138,47 @@ Verified on the iPhone 15 simulator (and iPad for what static capture allowed).
   controls, extra vertical space), which is correct and not broken but not yet
   tailored to the larger canvas. Noted as a polish item, not a defect.
 
+### Second pass: iPad, accessibility, reminders, interruption, reset, upgrade
+
+Verified on the iPhone 15 and iPad Air 11-inch (M4) simulators.
+
+- iPad adaptive layout: PASS on all five flows (onboarding, Home, lesson, Profile,
+  landscape). The single column content sits in a centered readable column (about
+  590 points on the 820 point portrait canvas, with full bleed backgrounds), and in
+  landscape it stays centered rather than stretching across the wide canvas. Nothing
+  clipped or overlapping.
+- Dynamic Type (Home info pills): PASS. At accessibility extra large the three unit
+  pills now stack vertically with full text and no ellipsis, where they previously
+  truncated on one line.
+- Daily reminder: PASS. Off by default; turning it on shows the system permission
+  prompt, and on Allow the time picker (default 19:00) appears; turning it off hides
+  the picker. No permission is requested unless the user opts in.
+- Interruption (exit confirmation): PASS. Answering an exercise then tapping the
+  lesson X shows "Quit lesson?" with Keep learning and Quit; Keep learning stays in
+  the lesson, Quit returns to Home. Reviews are not confirmed (they save per answer).
+- Reset learning data: verified on a pristine (erased) device, which was required
+  because the simulator's cfprefsd kept serving a stale cached copy of the
+  preferences domain across uninstall and reinstall (it keys by bundle id, not by
+  container), which produced misleading partial clears on the reused device. On the
+  erased device: a fresh install shows no Daily review card; completing a lesson sets
+  In review to 10; "Reset learning data" takes all six stats to 0 including In review
+  and Mastered; and after terminate and relaunch they stay 0. A durability
+  synchronize was added to the reset paths so the deletion survives an immediate
+  termination. Two runtime bugs were found and fixed along the way: the durability
+  flush, and a Home tab that did not live refresh after a reset (fixed by having a
+  completed reset refresh the Home path; see below).
+- Home refresh after reset: PASS. After a reset, switching back to the Home tab now
+  shows the wiped state live (streak and XP 0, 0 of 10 lessons, the first lesson back
+  to available, later lessons locked, no Daily review card) without an app relaunch.
+  Previously Home kept showing the completed lesson until relaunch; fixed by having a
+  completed reset refresh the Home path.
+- Upgrade behavior: the app launched with old progress present and the new keys
+  absent without crashing, and core progress (XP, streak, lessons) was preserved. The
+  intended empty retention state could not be staged reliably on the simulator (its
+  cfprefsd kept serving a cached review schedule after the on disk key was removed, a
+  simulator artifact, not app behavior). The defensive decode of absent or empty
+  retention and reminder data is covered by unit tests.
+
 ## Not runtime verified / external
 
 - Audio playback: no reviewed audio ships (0 assets), so the listening exercise and

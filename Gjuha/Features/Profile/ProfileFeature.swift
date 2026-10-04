@@ -32,6 +32,9 @@ struct ProfileFeature {
         case resetDataTapped
         case resetConfirmationDismissed
         case resetConfirmed
+        /// Emitted after a reset finishes, so the parent can refresh other tabs
+        /// (the Home path and unlock state) that cache progress separately.
+        case resetCompleted
     }
 
     @Dependency(\.progressRepository) var progressRepository
@@ -127,7 +130,12 @@ struct ProfileFeature {
                     await progressRepository.resetLearningData()
                     let stats = await progressRepository.fetchUserStats()
                     await send(.statsLoaded(stats))
+                    await send(.resetCompleted)
                 }
+
+            case .resetCompleted:
+                // Observed by the parent to refresh other tabs; nothing to do here.
+                return .none
             }
         }
     }

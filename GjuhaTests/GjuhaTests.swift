@@ -919,3 +919,183 @@ struct DataResetTests {
         #expect(store.load().isEmpty)
     }
 }
+
+// MARK: - Durable lesson resume tests
+//
+// A course lesson must survive termination and relaunch: the exercise sequence,
+// the current position, hearts, XP, and combo are snapshotted and restored, and
+// the snapshot is cleared on completion, discard, and reset so XP and review
+// scheduling are never double counted. Reviews are deliberately never snapshotted.
+struct LessonResumeTests {
+
+    private func makeSnapshot(currentIndex: Int = 2) -> LessonSessionSnapshot {
+        let lesson = LessonSummary(
+            seedId: "u1-l1", title: "Greetings", subtitle: "A1",
+            iconName: "star", lessonType: .vocabulary, exercisePlan: ["mcq", "typing"]
+        )
+        let exercises = (0..<4).map { i in
+            Exercise(
+                type: .multipleChoiceTranslate,
+                prompt: "Prompt \(i)",
+                correctAnswer: "answer\(i)",
+                distractors: ["d1\(i)", "d2\(i)", "d3\(i)"],
+                xpValue: 10
+            )
+        }
+        return LessonSessionSnapshot(
+            lesson: lesson, exercises: exercises, currentIndex: currentIndex,
+            hearts: 2, xpEarned: 25, combo: 3, savedAt: Date(timeIntervalSince1970: 1_000)
+        )
+    }
+
+    @Test
+    func snapshotRoundTripsThroughTheStore() {
+        let defaults = UserDefaults(suiteName: "gjuha.test.\(UUID().uuidString)")!
+        let store = LessonSessionStore(defaults: defaults)
+        #expect(store.load() == nil)
+
+        let snapshot = makeSnapshot()
+        store.save(snapshot)
+
+        let loaded = store.load()
+        #expect(loaded?.lesson.seedId == "u1-l1")
+        #expect(loaded?.exercises.count == 4)
+        // The exact generated sequence and its stable option order are preserved.
+        #expect(loaded?.exercises.first?.correctAnswer == "answer0")
+        #expect(loaded?.exercises.first?.orderedOptions == snapshot.exercises.first?.orderedOptions)
+        #expect(loaded?.currentIndex == 2)
+        #expect(loaded?.hearts == 2)
+        #expect(loaded?.xpEarned == 25)
+        #expect(loaded?.combo == 3)
+    }
+
+    @Test
+    func clearRemovesTheSavedSession() {
+        let defaults = UserDefaults(suiteName: "gjuha.test.\(UUID().uuidString)")!
+        let store = LessonSessionStore(defaults: defaults)
+        store.save(makeSnapshot())
+        #expect(store.load() != nil)
+        store.clear()
+        #expect(store.load() == nil)
+    }
+
+    @Test
+    func corruptOrEmptyDataDecodesToNoSession() {
+        let defaults = UserDefaults(suiteName: "gjuha.test.\(UUID().uuidString)")!
+        let store = LessonSessionStore(defaults: defaults)
+        defaults.set(Data(), forKey: "gjuha.lessonSession.v1")
+        #expect(store.load() == nil)
+        defaults.set(Data("{not json".utf8), forKey: "gjuha.lessonSession.v1")
+        #expect(store.load() == nil)
+    }
+
+    @Test
+    func restoredStateResumesAtSavedPositionAndProgress() {
+        let snapshot = makeSnapshot(currentIndex: 2)
+        let state = LessonFeature.State(restoredFrom: snapshot)
+        #expect(state.phase == .inProgress)
+        #expect(state.exercises.count == 4)
+        #expect(state.currentIndex == 2)
+        #expect(state.hearts == 2)
+        #expect(state.xpEarned == 25)
+        #expect(state.combo == 3)
+        #expect(state.isReview == false)
+        // A restored, in-progress course session still produces a snapshot, so it
+        // keeps persisting as the learner advances.
+        #expect(state.sessionSnapshot != nil)
+    }
+
+    @Test
+    func restoreClampsAnOutOfRangePosition() {
+        let snapshot = makeSnapshot(currentIndex: 99)
+        let state = LessonFeature.State(restoredFrom: snapshot)
+        #expect(state.currentIndex == 3) // last valid index for 4 exercises
+    }
+
+    @Test
+    func reviewSessionsAreNeverSnapshotted() {
+        let reviewLesson = LessonSummary(
+            seedId: "review-session", title: "Daily Review", subtitle: "",
+            iconName: "arrow.triangle.2.circlepath", lessonType: .review
+        )
+        var state = LessonFeature.State(lesson: reviewLesson, reviewWordIds: ["w001", "w002"])
+        state.exercises = Exercise.mockExercises // even once loaded
+        #expect(state.isReview == true)
+        #expect(state.sessionSnapshot == nil)
+    }
+
+    @Test
+    func aFreshCourseSessionHasNoSnapshotUntilExercisesLoad() {
+        let lesson = LessonSummary(
+            seedId: "u1-l1", title: "Greetings", subtitle: "",
+            iconName: "star", lessonType: .vocabulary
+        )
+        let state = LessonFeature.State(lesson: lesson)
+        #expect(state.sessionSnapshot == nil) // no exercises yet, nothing to restore
+    }
+}
+
+// MARK: - Cultural and dialect flow tests
+//
+// The learner-facing culture flows are real and wired, but driven only by the
+// PRODUCTION catalog, which exposes natively reviewed content. In a normal build
+// that is empty, so the hub shows an honest empty state. The flows themselves are
+// verified here with isolated `nativeReviewed` fixtures; the real sample content
+// stays `pendingNativeReview`.
+struct CultureFlowTests {
+
+    @Test
+    func productionCatalogStillHoldsTheSamplesOutUnlessFixturesAreUsed() async {
+        let catalog = LiveContentCatalog()
+        #expect(await catalog.productionCulturalUnits().isEmpty)
+        #expect(await catalog.productionDialectPacks().isEmpty)
+    }
+
+    #if DEBUG
+    @Test
+    func fixtureCatalogSurfacesReviewedContentWithoutMutatingTheSamples() async {
+        let catalog = LiveContentCatalog.cultureFixtureCatalog()
+        let units = await catalog.productionCulturalUnits()
+        let packs = await catalog.productionDialectPacks()
+        #expect(units.contains { $0.id == "culture.hospitality.v1" })
+        #expect(packs.contains { $0.id == "pack.gheg.diaspora.v1" })
+        // The real samples are untouched: still pending native review.
+        #expect(CulturalUnit.hospitalitySampleV1.reviewStatus == .pendingNativeReview)
+        #expect(DialectContentPack.ghegDiasporaSampleV1.reviewStatus == .pendingNativeReview)
+    }
+    #endif
+
+    @Test
+    func culturalUnitVocabularyResolvesThroughTheEngineAndSkipsUnknownIds() async {
+        let engine = ExerciseEngine()
+        let lines = await engine.vocabularyLines(forWordIds: ["w006", "w000-not-real"])
+        #expect(lines.contains { $0.id == "w006" && $0.albanian == "faleminderit" })
+        #expect(!lines.contains { $0.id == "w000-not-real" })
+    }
+
+    @Test
+    func cultureHubShowsEmptyStateOnlyAfterLoadingNothing() {
+        var state = CultureFeature.State()
+        #expect(state.showsEmptyState == false)        // not loaded yet
+        state.hasLoaded = true
+        #expect(state.showsEmptyState == true)         // loaded, nothing reviewed
+        state.culturalUnits = [CulturalUnit.hospitalitySampleV1]
+        #expect(state.showsEmptyState == false)        // has content
+    }
+
+    @Test
+    func practiceWordIdsDriveTheReviewSessionOverTheUnitsWords() {
+        // The unit's review prompt words are the ones a practice session schedules.
+        let unit = CulturalUnit.hospitalitySampleV1
+        let practiceState = LessonFeature.State(
+            lesson: LessonSummary(
+                seedId: "culture-practice", title: "Culture Practice", subtitle: "",
+                iconName: "globe.europe.africa.fill", lessonType: .review
+            ),
+            reviewWordIds: unit.reviewPromptWordIds
+        )
+        #expect(practiceState.isReview)                      // runs through retention
+        #expect(practiceState.reviewWordIds == unit.reviewPromptWordIds)
+        #expect(practiceState.sessionSnapshot == nil)        // practice is not snapshotted
+    }
+}

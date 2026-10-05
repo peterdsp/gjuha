@@ -12,6 +12,7 @@
 		0DF64CBC775E5C4BB870C9C6 /* AudioManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7330897C578448A63EBEF256 /* AudioManifest.swift */; };
 		1810836F400FBDCFAFE5BC32 /* a1_vocabulary.json in Resources */ = {isa = PBXBuildFile; fileRef = D289A128F464DD34E654275F /* a1_vocabulary.json */; };
 		1979B6BA632393FE82893DF2 /* DialectContentPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8F103850C8FAF7E484D6C5D /* DialectContentPack.swift */; };
+		1F39D918C364B2B034AAEFD7 /* LessonSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0810C8F28574B843CD3D0573 /* LessonSessionStore.swift */; };
 		23BBA8D05104E4E642484A23 /* VocabularyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48EC91B0F20CFC6694369833 /* VocabularyView.swift */; };
 		24C09670E5F159D80B3414C2 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B82598DB6E5FAC930554260D /* HomeView.swift */; };
 		276BE94BADE844502CFE3B24 /* OnboardingFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA826FE31BEA459913FF230 /* OnboardingFeature.swift */; };
@@ -26,6 +27,7 @@
 		5166A3F0548582CA18E74E05 /* GjuhaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17C1B7CF1DE1FE9647BED0EE /* GjuhaApp.swift */; };
 		603C8EFACAF8FD194BB5D864 /* GjuhaUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6489AAE42FBD4B7AFB15469A /* GjuhaUITests.swift */; };
 		641CBDD8BCA53BE7E98A4F33 /* AudioPlayerClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77DCEF0C489CE7D04FED301F /* AudioPlayerClient.swift */; };
+		67FF574DD0910EC15AD6BA39 /* CultureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5924074B3864089954746948 /* CultureView.swift */; };
 		682641D868819BB48C143621 /* GrammarFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B06A810E34B51182A1BDA5C /* GrammarFeature.swift */; };
 		6975187D7481E4C5DCB6C563 /* AppView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C7C8F01805342D81163BDF0 /* AppView.swift */; };
 		6A35E84C2CB16068F0CBDF77 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = E321AE751423622AD69CA351 /* ComposableArchitecture */; };
@@ -35,6 +37,7 @@
 		822ABF92B5D7B03AB3FB778F /* ContentCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB380FCFEB4B1B53B5BF74 /* ContentCatalog.swift */; };
 		82975B7B74EB98D82841F87A /* Lesson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45B6E18A23F08E097CDCC1C0 /* Lesson.swift */; };
 		86732254B4F74FD4FDD64C33 /* GjuhaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3B08FE65E3B3A31A662EEB /* GjuhaTests.swift */; };
+		86A417CB08D38F4C8B4BAF52 /* CultureFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F160E68174794FBEA39E32F /* CultureFeature.swift */; };
 		874258381653387BC8345C0F /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A385D56988E1D9499C655FA5 /* OnboardingView.swift */; };
 		901807DF97D62A6DB9642F77 /* morph_rules.json in Resources */ = {isa = PBXBuildFile; fileRef = 7B79C593CD7E9413AFCA9E55 /* morph_rules.json */; };
 		94DD67B3D7A3442310AE2FF8 /* lessons.json in Resources */ = {isa = PBXBuildFile; fileRef = 7BB42A1B4980DF9F1D81AD0E /* lessons.json */; };
@@ -82,6 +85,7 @@
 
 /* Begin PBXFileReference section */
 		03074DCCAB2314C9DEA2D700 /* VocabularyFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyFeature.swift; sourceTree = "<group>"; };
+		0810C8F28574B843CD3D0573 /* LessonSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonSessionStore.swift; sourceTree = "<group>"; };
 		146EC61D6D8D4ED1086A3A2E /* sentences_sqi_50k.csv */ = {isa = PBXFileReference; path = sentences_sqi_50k.csv; sourceTree = "<group>"; };
 		17C1B7CF1DE1FE9647BED0EE /* GjuhaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GjuhaApp.swift; sourceTree = "<group>"; };
 		18DC025170A3CAA6573F5994 /* CulturalUnit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CulturalUnit.swift; sourceTree = "<group>"; };
@@ -95,6 +99,7 @@
 		48EC91B0F20CFC6694369833 /* VocabularyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyView.swift; sourceTree = "<group>"; };
 		4DFB380FCFEB4B1B53B5BF74 /* ContentCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentCatalog.swift; sourceTree = "<group>"; };
 		52946A6304B4906FC0EC7BCA /* GjuhaTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = GjuhaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5924074B3864089954746948 /* CultureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CultureView.swift; sourceTree = "<group>"; };
 		5C3B08FE65E3B3A31A662EEB /* GjuhaTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GjuhaTests.swift; sourceTree = "<group>"; };
 		5EF51FB37400856FDE7AEE98 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		62A64CC7028F6DE857B23D4A /* units.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = units.json; sourceTree = "<group>"; };
@@ -117,6 +122,7 @@
 		964F6F114F09EEBD358573A8 /* CurriculumRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurriculumRepository.swift; sourceTree = "<group>"; };
 		980850CF70B8C2BE6BE578C1 /* audio_manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = audio_manifest.json; sourceTree = "<group>"; };
 		9A44D8A08188D9313002C3EA /* ReminderClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderClient.swift; sourceTree = "<group>"; };
+		9F160E68174794FBEA39E32F /* CultureFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CultureFeature.swift; sourceTree = "<group>"; };
 		A385D56988E1D9499C655FA5 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		A43359A951F4619F40E5BCFE /* ReviewScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewScheduler.swift; sourceTree = "<group>"; };
 		AE2769BED1B976838F08AFBA /* GrammarCoach.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarCoach.swift; sourceTree = "<group>"; };
@@ -199,6 +205,15 @@
 			path = Notifications;
 			sourceTree = "<group>";
 		};
+		238DDB2FA05280E8A9E109C9 /* Culture */ = {
+			isa = PBXGroup;
+			children = (
+				8A8C4F40DC8E2041C1303997 /* Views */,
+				9F160E68174794FBEA39E32F /* CultureFeature.swift */,
+			);
+			path = Culture;
+			sourceTree = "<group>";
+		};
 		2C3A1373DA49A511F97A14ED /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -227,6 +242,7 @@
 		3A46D0AFDE4764F86ED3C1E4 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				238DDB2FA05280E8A9E109C9 /* Culture */,
 				615D258A097FDE904316037F /* Grammar */,
 				9C18363A5CC1953736A6ACFE /* Home */,
 				A0FA5C58FF5727D3EDCE2B66 /* Lesson */,
@@ -354,6 +370,14 @@
 			path = Lessons;
 			sourceTree = "<group>";
 		};
+		8A8C4F40DC8E2041C1303997 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				5924074B3864089954746948 /* CultureView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		94A82CAF916BDDE346533661 /* SwiftData */ = {
 			isa = PBXGroup;
 			children = (
@@ -471,6 +495,7 @@
 			children = (
 				964F6F114F09EEBD358573A8 /* CurriculumRepository.swift */,
 				66B1C41B318C04C1459207B3 /* GrammarRepository.swift */,
+				0810C8F28574B843CD3D0573 /* LessonSessionStore.swift */,
 				BD7D8112A1BDFB25360A1668 /* ProgressRepository.swift */,
 				7429D8078387001A24BAF936 /* ProgressStore.swift */,
 				EF816FDA4D7AF1E8571F33DB /* ReviewRepository.swift */,
@@ -661,6 +686,8 @@
 				641CBDD8BCA53BE7E98A4F33 /* AudioPlayerClient.swift in Sources */,
 				822ABF92B5D7B03AB3FB778F /* ContentCatalog.swift in Sources */,
 				3A0F98B2FE49BBEDF33F18CD /* CulturalUnit.swift in Sources */,
+				86A417CB08D38F4C8B4BAF52 /* CultureFeature.swift in Sources */,
+				67FF574DD0910EC15AD6BA39 /* CultureView.swift in Sources */,
 				D945479473E2E370BCEF9874 /* CurriculumRepository.swift in Sources */,
 				1979B6BA632393FE82893DF2 /* DialectContentPack.swift in Sources */,
 				AA6C0C8C8F217061FF500683 /* Exercise.swift in Sources */,
@@ -678,6 +705,7 @@
 				24C09670E5F159D80B3414C2 /* HomeView.swift in Sources */,
 				82975B7B74EB98D82841F87A /* Lesson.swift in Sources */,
 				DCEDDEDC5678AE0F27511790 /* LessonFeature.swift in Sources */,
+				1F39D918C364B2B034AAEFD7 /* LessonSessionStore.swift in Sources */,
 				B262ED45E030021638E3E8EB /* LessonView.swift in Sources */,
 				276BE94BADE844502CFE3B24 /* OnboardingFeature.swift in Sources */,
 				874258381653387BC8345C0F /* OnboardingView.swift in Sources */,

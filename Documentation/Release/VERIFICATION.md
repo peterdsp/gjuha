@@ -31,6 +31,14 @@ Command:
   ease floor, due selection and ordering, day/timezone boundary, mastery
   threshold, store round trip without resetting progress, repository integration).
 - Result: TEST SUCCEEDED, 48 tests in 3 suites.
+- Second pass added reminder and reset tests (54 tests).
+- Third pass (2026-10-05): 66 tests pass in 7 suites (TEST SUCCEEDED on iPhone 15).
+  Added `LessonResumeTests` (snapshot round trip, defensive decode of empty/corrupt
+  data, clear, restore at saved position, out of range clamp, reviews never
+  snapshotted, no snapshot before exercises load) and `CultureFlowTests` (production
+  catalog still holds the samples out, the DEBUG fixture catalog surfaces reviewed
+  copies without mutating the samples, vocabulary resolution skips unknown ids, the
+  hub empty state logic, and the culture practice runs through the review path).
 
 The unit target intentionally does not link ComposableArchitecture (documented
 toolchain linkage issue), so these are pure logic tests resolved through the test
@@ -179,14 +187,71 @@ Verified on the iPhone 15 and iPad Air 11-inch (M4) simulators.
   simulator artifact, not app behavior). The defensive decode of absent or empty
   retention and reminder data is covered by unit tests.
 
+### Third pass: lesson resume, cultural/dialect wiring, upgrade re-verification
+
+Verified on the iPhone 15 simulator on 2026-10-05. Runtime evidence, distinct from
+the unit test coverage listed above. Screenshots were captured for each step.
+
+- Durable course-lesson resume (RUNTIME, PASS). Walked the first lesson ("Greetings
+  & introducing yourself") on a fresh launch: completed a matching exercise
+  (progress 14%), answered a multiple choice ("no" -> "jo", progress 29%, "2 correct
+  in a row"), and stopped on a word order exercise ("Arrange the words to say: 'Good
+  morning! Did you sleep well?'") with 3 of 3 hearts. Killed the app with
+  `simctl terminate` while on that exercise, then relaunched. After the splash the
+  app reopened DIRECTLY INTO the lesson at the identical state: same word order
+  question and tiles (Keni / fjetur / mirë / Mirëmëngjes!), progress 29%, "2 correct
+  in a row", 3 hearts. It did not return to Home. Confirmed-discard check: tapped the
+  X, the "Quit lesson?" dialog appeared, tapped "Quit", then terminated and
+  relaunched again; the app then opened to Home with no lesson in progress (streak 3,
+  XP 92), confirming a confirmed discard clears the saved session.
+
+- Cultural and dialect flows with isolated fixtures (RUNTIME, PASS). Relaunched with
+  the DEBUG-only `-GjuhaCultureFixtures` argument, which marks the sample content
+  `nativeReviewed` for verification only (the real samples stay
+  `pendingNativeReview`; a normal launch shows an "in native-speaker review" empty
+  state instead). From Home opened the "Culture & dialects" card. The hub listed the
+  cultural unit "Mikpritja: welcoming a guest" and the dialect pack "Home Albanian:
+  Gheg you may hear". The unit detail showed its intro, a resolved "Vocabulary in
+  this unit" list (faleminderit/thank you, kafe/coffee, nënë/mother, and so on), a
+  "Listen" section with Albanian plus English lines and the note that audio is added
+  only once a native speaker records it (no machine Albanian), a "Reinforces 2
+  grammar points" line, and a "Practice these words" button. Tapping practice started
+  a real exercise session (3 hearts, progress bar): "What does 'faleminderit' mean?"
+  answered "thank you" advanced to a second question (33%), confirming the cultural
+  practice runs through the normal spaced repetition machinery. The dialect pack
+  detail showed Standard vs Regional contrasts with usage notes (nënë/nanë,
+  si je?/qysh je?, të punoj/me punue) and their regional caveats. No unreviewed
+  content is reachable without the explicit fixtures argument.
+
+- Upgrade from pre-retention data (RUNTIME, PASS, now staged with proof). This closes
+  the gap the second pass could not stage on the simulator. The device was ERASED
+  (`simctl erase`) for an isolated install, the build installed fresh, then CONTROLLED
+  LEGACY data was written to the app's defaults with `simctl spawn defaults write`:
+  old progress keys present (`gjuha.totalXP` 92, `gjuha.currentStreak` 3,
+  `gjuha.completedLessonSeedIds` [l001, l002], `gjuha.learningGoal` regular,
+  `hasCompletedOnboarding` YES) and the new retention and reminder keys deliberately
+  absent (no `gjuha.reviewSchedule.v1`, no reminder settings). `cfprefsd` was killed
+  before launch so the app read the on-disk legacy values (the cfprefsd caching
+  caveat from the second pass was handled by erasing and by killing the daemon, not
+  asserted away). Observed on launch: no crash; Home showed streak 3 and XP 92
+  preserved and NO Daily Review card (retention started empty); Profile showed Day
+  Streak 3, Total XP 92, Words seen 8, Lessons Done 2, In review 0, Mastered 0; and
+  the daily reminder toggle was OFF with no permission prompt. So old progress is
+  preserved and the initial review and reminder state are correct and empty on
+  upgrade.
+
 ## Not runtime verified / external
 
 - Audio playback: no reviewed audio ships (0 assets), so the listening exercise and
   vocabulary play button stay gated and were not exercisable. Infrastructure and
   gating are covered by unit tests. Blocked on Azure authorization or native
   recordings plus native review.
-- Dialect and cultural content: held `pendingNativeReview`, not surfaced in
-  production flows, so not runtime exercisable. Blocked on native linguistic review.
+- Dialect and cultural content: the learner-facing flows (hub, unit and pack detail,
+  cultural practice, progress through the review schedule) are now fully wired and
+  were runtime verified with isolated `nativeReviewed` fixtures (see the third pass
+  above). The PRODUCTION catalog still exposes nothing, because the actual Gheg pack
+  and hospitality unit remain `pendingNativeReview`; that specific content is blocked
+  on native linguistic review before it can ship. No native approval is claimed.
 - Speaking experiment: disabled by default; Apple ASR for Albanian confirmed
   unsupported at runtime by a unit test probe.
 - VoiceOver spoken output: accessibility labels, values, hints, and traits are set

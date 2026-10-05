@@ -45,10 +45,60 @@ final class LiveContentCatalog: ContentCatalog, @unchecked Sendable {
     }
 }
 
+#if DEBUG
+extension LiveContentCatalog {
+    /// A catalog whose sample dialect pack and cultural unit are marked
+    /// `nativeReviewed` so the learner-facing flows (navigation, presentation,
+    /// exercises, progress) can be exercised end to end.
+    ///
+    /// This is ISOLATED TEST SCAFFOLDING, never production: it exists only in
+    /// DEBUG builds and is only selected when the app is launched with the
+    /// explicit `-GjuhaCultureFixtures` argument (see `ContentCatalogKey`). It
+    /// asserts nothing about native approval. The real sample content stays
+    /// `pendingNativeReview` and is still held out of any normal launch.
+    static func cultureFixtureCatalog() -> LiveContentCatalog {
+        LiveContentCatalog(
+            dialectPacks: [DialectContentPack.ghegDiasporaSampleV1.markedReviewedForFixture],
+            culturalUnits: [CulturalUnit.hospitalitySampleV1.markedReviewedForFixture]
+        )
+    }
+
+    /// True when the app was launched to exercise the culture flows with fixtures.
+    static var cultureFixturesRequested: Bool {
+        CommandLine.arguments.contains("-GjuhaCultureFixtures")
+    }
+}
+
+extension DialectContentPack {
+    /// A copy flipped to `nativeReviewed` for isolated fixture verification only.
+    var markedReviewedForFixture: DialectContentPack {
+        var copy = self
+        copy.reviewStatus = .nativeReviewed
+        return copy
+    }
+}
+
+extension CulturalUnit {
+    /// A copy flipped to `nativeReviewed` for isolated fixture verification only.
+    var markedReviewedForFixture: CulturalUnit {
+        var copy = self
+        copy.reviewStatus = .nativeReviewed
+        return copy
+    }
+}
+#endif
+
 // MARK: - Dependency
 
 private enum ContentCatalogKey: DependencyKey {
-    static let liveValue: any ContentCatalog = LiveContentCatalog()
+    static var liveValue: any ContentCatalog {
+        #if DEBUG
+        if LiveContentCatalog.cultureFixturesRequested {
+            return LiveContentCatalog.cultureFixtureCatalog()
+        }
+        #endif
+        return LiveContentCatalog()
+    }
     static let testValue: any ContentCatalog = LiveContentCatalog()
 }
 

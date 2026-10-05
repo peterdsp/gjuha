@@ -45,6 +45,42 @@ struct LessonFeature {
             return exercises[currentIndex]
         }
 
+        /// A durable snapshot of this session, or nil when there is nothing to
+        /// persist for resume. Reviews are never snapshotted (they save each
+        /// outcome as they go), and a session with no loaded exercises has no
+        /// sequence worth restoring.
+        var sessionSnapshot: LessonSessionSnapshot? {
+            guard !isReview, !exercises.isEmpty else { return nil }
+            return LessonSessionSnapshot(
+                lesson: lesson,
+                exercises: exercises,
+                currentIndex: currentIndex,
+                hearts: hearts,
+                xpEarned: xpEarned,
+                combo: combo,
+                savedAt: Date()
+            )
+        }
+
+        /// Rebuilds in-progress course-lesson state from a persisted snapshot so a
+        /// relaunched lesson resumes at the same exercise, hearts, XP, and combo,
+        /// with the identical exercise sequence. `phase` is set to `.inProgress`
+        /// and `exercises` populated, which `onAppear` detects to skip regeneration.
+        init(restoredFrom snapshot: LessonSessionSnapshot) {
+            self.lesson = snapshot.lesson
+            self.exercises = snapshot.exercises
+            self.currentIndex = min(max(snapshot.currentIndex, 0), max(snapshot.exercises.count - 1, 0))
+            self.hearts = snapshot.hearts
+            self.xpEarned = snapshot.xpEarned
+            self.combo = snapshot.combo
+            self.phase = .inProgress
+        }
+
+        init(lesson: LessonSummary, reviewWordIds: [String]? = nil) {
+            self.lesson = lesson
+            self.reviewWordIds = reviewWordIds
+        }
+
         var progress: Double {
             guard !exercises.isEmpty else { return 0 }
             return Double(currentIndex) / Double(exercises.count)
@@ -72,10 +108,28 @@ struct LessonFeature {
     @Dependency(\.audioPlayer) var audioPlayer
     @Dependency(\.continuousClock) var clock
 
+    /// Writes the resume snapshot, or does nothing when there is none (reviews,
+    /// or a session with no loaded exercises).
+    private func persist(_ snapshot: LessonSessionSnapshot?) -> Effect<Action> {
+        guard let snapshot else { return .none }
+        return .run { _ in LessonSessionStore.shared.save(snapshot) }
+    }
+
+    /// Drops the saved course-lesson session so nothing resumes next launch.
+    private func clearSession() -> Effect<Action> {
+        .run { _ in LessonSessionStore.shared.clear() }
+    }
+
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case .onAppear:
+                // A restored course session arrives already in progress with its
+                // persisted exercise sequence. Do not regenerate or reset it, or the
+                // learner would lose their place and get a different set of questions.
+                if state.phase == .inProgress, !state.exercises.isEmpty {
+                    return .none
+                }
                 state.phase = .loading
                 state.currentIndex = 0
                 state.hearts = 3
@@ -97,7 +151,9 @@ struct LessonFeature {
             case .exercisesLoaded(let exercises):
                 state.exercises = exercises
                 state.phase = .inProgress
-                return .none
+                // Capture the generated sequence immediately so a termination before
+                // the first answer still resumes to the same questions.
+                return persist(state.sessionSnapshot)
 
             case .reviewExercisesLoaded(let items):
                 state.exercises = items.map(\.exercise)
@@ -166,9 +222,11 @@ struct LessonFeature {
                     }
                 }
 
-                // Auto-advance after delay
+                // Auto-advance after delay. Persist the updated hearts, XP, and
+                // combo so a termination mid lesson resumes with them intact.
                 return .merge(
                     reviewEffect,
+                    persist(state.sessionSnapshot),
                     .run { send in
                         try await clock.sleep(for: .milliseconds(1400))
                         await send(.answerFeedbackDismissed)
@@ -200,7 +258,8 @@ struct LessonFeature {
                     return .send(.lessonCompleted)
                 }
                 state.currentIndex += 1
-                return .none
+                // Persist the advanced position for resume.
+                return persist(state.sessionSnapshot)
 
             case .lessonCompleted:
                 let xp = state.xpEarned
@@ -214,24 +273,32 @@ struct LessonFeature {
                         await progressRepository.recordReviewActivity(xpEarned: xp)
                     }
                 }
-                return .run { [lesson = state.lesson, xp] _ in
-                    await progressRepository.markLessonCompleted(
-                        lesson.id,
-                        seedId: lesson.seedId,
-                        xpEarned: xp
-                    )
-                    // Newly learned words enter the spaced repetition schedule. Words
-                    // already scheduled keep their existing progress.
-                    let wordIds = LessonVocabularyMap.wordIds(
-                        for: lesson.seedId,
-                        lessonTitle: lesson.title
-                    )
-                    await reviewRepository.scheduleNewWords(wordIds)
-                }
+                // The lesson is finished: its XP is banked here exactly once, so the
+                // resume snapshot must be cleared to avoid ever re-entering and
+                // double counting XP or rescheduling.
+                return .merge(
+                    clearSession(),
+                    .run { [lesson = state.lesson, xp] _ in
+                        await progressRepository.markLessonCompleted(
+                            lesson.id,
+                            seedId: lesson.seedId,
+                            xpEarned: xp
+                        )
+                        // Newly learned words enter the spaced repetition schedule.
+                        // Words already scheduled keep their existing progress.
+                        let wordIds = LessonVocabularyMap.wordIds(
+                            for: lesson.seedId,
+                            lessonTitle: lesson.title
+                        )
+                        await reviewRepository.scheduleNewWords(wordIds)
+                    }
+                )
 
             case .lessonFailed:
                 state.phase = .failed
-                return .none
+                // Out of hearts: the attempt is over, so discard the resume snapshot.
+                // Retrying starts a fresh attempt.
+                return clearSession()
 
             case .exitButtonTapped:
                 // Confirm only when a course lesson is in progress with something to
@@ -250,7 +317,11 @@ struct LessonFeature {
 
             case .exitTapped:
                 state.showExitConfirmation = false
-                return .none
+                // Leaving the lesson is a confirmed discard (or an exit from the
+                // completed/failed screen): drop any saved session so it does not
+                // resume on the next launch. A review has no snapshot, so this is a
+                // harmless no-op there.
+                return clearSession()
 
             case .playAudioTapped:
                 guard let exercise = state.currentExercise else { return .none }

@@ -11,6 +11,18 @@ protocol ExerciseEngineProtocol: Sendable {
     /// each tagged with its stable word id. Word ids with no backing vocabulary are
     /// skipped, so the session never contains an empty question.
     func reviewExercises(forWordIds wordIds: [String]) async -> [ReviewExercise]
+    /// Resolves stable seed word ids (for example "w028") to their Albanian and
+    /// English for presentation. Unknown ids are skipped. Used by the cultural
+    /// units flow to show a unit's vocabulary without duplicating the dataset.
+    func vocabularyLines(forWordIds wordIds: [String]) async -> [VocabularyLine]
+}
+
+/// A resolved vocabulary entry for display: the stable id plus its Albanian and
+/// English. Deliberately a thin read model, not the SwiftData `Word`.
+struct VocabularyLine: Equatable, Sendable, Identifiable, Codable {
+    let id: String
+    let albanian: String
+    let english: String
 }
 
 extension ExerciseEngineProtocol {
@@ -352,6 +364,13 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
             result.append(ReviewExercise(wordId: wordId, exercise: makeExercise(of: type, word: word, pool: pool)))
         }
         return result
+    }
+
+    func vocabularyLines(forWordIds wordIds: [String]) async -> [VocabularyLine] {
+        wordIds.compactMap { wordId in
+            guard let word = allWords.first(where: { $0.id == wordId }) else { return nil }
+            return VocabularyLine(id: word.id, albanian: word.albanian, english: word.english)
+        }
     }
 
     func grade(_ answer: String, for exercise: Exercise) -> AnswerGrade {
@@ -978,6 +997,10 @@ final class MockExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
 
     func reviewExercises(forWordIds wordIds: [String]) async -> [ReviewExercise] {
         zip(wordIds, Exercise.mockExercises).map { ReviewExercise(wordId: $0.0, exercise: $0.1) }
+    }
+
+    func vocabularyLines(forWordIds wordIds: [String]) async -> [VocabularyLine] {
+        wordIds.map { VocabularyLine(id: $0, albanian: $0, english: $0) }
     }
 
     func grade(_ answer: String, for exercise: Exercise) -> AnswerGrade {

@@ -56,7 +56,7 @@ enum LessonType: String, Codable {
 }
 
 /// Lightweight value type used in TCA State - mirrors Lesson without @Model reference
-struct LessonSummary: Identifiable, Equatable, Sendable {
+struct LessonSummary: Identifiable, Equatable, Sendable, Codable {
     let id: UUID
     let seedId: String
     let title: String

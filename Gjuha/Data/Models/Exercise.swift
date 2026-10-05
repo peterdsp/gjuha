@@ -1,6 +1,6 @@
 import Foundation
 
-struct Exercise: Identifiable, Equatable {
+struct Exercise: Identifiable, Equatable, Codable {
     let id: UUID
     let type: ExerciseType
     let prompt: String
@@ -84,7 +84,7 @@ enum ExerciseType: String, Codable, Equatable {
 }
 
 /// One Albanian ↔ English pair inside a `wordMatch` exercise.
-struct MatchPair: Identifiable, Equatable {
+struct MatchPair: Identifiable, Equatable, Codable {
     let id: UUID
     let albanian: String
     let english: String

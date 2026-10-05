@@ -17,6 +17,7 @@ struct HomeFeature {
         case unitsLoaded([LearningUnit])
         case lessonTapped(LessonSummary)
         case startReviewTapped
+        case exploreCultureTapped
         case refreshAfterLessonComplete
         case statsLoaded(streak: Int, xp: Int)
         case dueReviewsLoaded(Int)
@@ -60,6 +61,10 @@ struct HomeFeature {
 
             case .startReviewTapped:
                 // Handled by AppFeature, which pushes the review session.
+                return .none
+
+            case .exploreCultureTapped:
+                // Handled by AppFeature, which pushes the culture hub.
                 return .none
 
             case .refreshAfterLessonComplete:

@@ -104,6 +104,9 @@ final class LiveProgressRepository: ProgressRepository, @unchecked Sendable {
     func resetLearningData() async {
         ProgressStore.shared.resetLearningProgress()
         ReviewStore.shared.reset()
+        // Drop any in-progress lesson so a reset does not resume a stale session
+        // on the next launch.
+        LessonSessionStore.shared.clear()
     }
 }
 

@@ -37,7 +37,7 @@ from Duolingo, which has no Albanian course at all.
 | Honest mastery accounting | Phase 0 honesty rule | Profile distinguishes exposure (words seen), practice (in review), and mastery (words at an interval past a documented threshold) | done (runtime verified: In review and Mastered shown) |
 | Grammar coaching | Phase 3 | FoundationModels gated with deterministic offline fallback; English only; grounded; injection safe; separate from grading | done (verified in tests + build) |
 | Audio playback path | Phase 1/2 | Infrastructure, manifest, gating, player all present; 0 reviewed assets ship | blocked-external (needs Azure authorization or native recordings, then native review) |
-| Dialect and cultural content | Phase 3 | Gheg sample pack and hospitality unit modeled and gated `pendingNativeReview` | blocked-external (needs native linguistic review) |
+| Dialect and cultural content | Phase 3 | Gheg sample pack and hospitality unit modeled and gated `pendingNativeReview` | partially superseded by the third pass: content modeling is done and the gate holds. See the third-pass row "Cultural and dialect learner flows" for the learner-facing wiring; the sample content itself is still blocked-external on native linguistic review. |
 | Speaking experiment | Phase 4 | Disabled by default; ASR confidence never shown as pronunciation score; Apple ASR for Albanian confirmed unsupported | done (verified) + superseded for on-device Apple path (see report) |
 | Experience and quality | step 4 of brief | Cohesive navigation, dark mode, Dynamic Type, keyboard behavior, accessibility metadata across iPhone screens | done (runtime verified: dark mode all screens, Dynamic Type incl. Profile stat cards, keyboard above field; VoiceOver metadata present, spoken pass pending) |
 | iPad tailored layout | step 4 of brief | iPad specific layout tuned for the larger canvas | polish (renders correctly today as a scaled iPhone layout; tailoring is a noted non-blocking item) |
@@ -51,15 +51,32 @@ from Duolingo, which has no Albanian course at all.
 | Local daily reminders | step 4 of brief | Opt in, off by default; permission requested on enable; denial explained; daily local time trigger; time picker; off cancels | done (impl + 3 unit tests; runtime verified) |
 | Interruption handling | step 3/4 of brief | Quitting a course lesson in progress confirms before discarding; reviews save per answer so they do not confirm | done (impl; runtime verified) |
 | Local data control | step 4 of brief | "Reset learning data" clears progress and schedule on device behind a confirmation; goal kept; UI reflects it live | done (impl + 2 unit tests; two runtime bugs found and fixed: a durability flush and a Home tab that did not live refresh after reset; verified on a pristine device) |
-| Upgrade behavior | step 4 of brief | Upgrading from pre retention data reads old progress, starts retention empty, does not crash | done (defensive decode unit tested; runtime confirmed no crash with old data and new keys absent; the empty retention state could not be staged on the sim due to cfprefsd caching, a sim artifact) |
+| Upgrade behavior | step 4 of brief | Upgrading from pre retention data reads old progress, starts retention empty, does not crash | done (defensive decode unit tested; runtime confirmed no crash with old data and new keys absent). Historical caveat: at the second pass the empty retention state could not be staged on the sim due to cfprefsd caching. This is now closed: the third pass staged it on an erased device with the daemon dropped and observed the empty state directly. See the third-pass "Upgrade behavior re-verification" row. |
 | Native review package | step 3 of brief | Concrete list of dialect pairs, cultural unit, and audio set for a native reviewer | done (`REVIEW_PACKAGE.md`) |
 | Research corrections | step 2 of brief | Fix the Kim and Webb citation and over claimed figures; confirm Azure sq-AL GA | done (`RESEARCH.md`) |
 
+## Third pass (2026-10-05): resume, culture wiring, upgrade proof, FSRS correction
+
+Build and 66 unit tests pass in 7 suites on iOS Simulator (iPhone 15). Statuses here
+are backed by the runtime evidence in `VERIFICATION.md` ("Third pass"), kept distinct
+from the unit test coverage.
+
+| Item | Source | Acceptance criteria | Status |
+|---|---|---|---|
+| Durable course-lesson resume | brief step 1 | Exercise sequence, position, hearts, XP, and combo survive termination and relaunch; no duplicate XP, review scheduling, or completion rewards; saved session cleared on completion, confirmed discard, and learning-data reset; reviews never snapshotted | done (8 unit tests + runtime verified: killed mid lesson, relaunched straight back into the same word order question at 29% with 2 combo and 3 hearts; confirmed discard then relaunch returns to Home) |
+| Cultural and dialect learner flows | brief step 2 | Navigation, content presentation, exercises, and progress wired; verified with isolated fixtures; unreviewed production content stays gated; no native approval claimed | done (5 unit tests + runtime verified with the DEBUG `-GjuhaCultureFixtures` arg: hub, unit detail with resolved vocabulary and gated listening, practice through the review engine, dialect contrasts). Production catalog still exposes nothing; the sample content stays `pendingNativeReview` (blocked-external on native review). |
+| Upgrade behavior re-verification | brief step 3 | Isolated install with controlled legacy data; preserved progress and correct initial review/reminder state; observed, not hand-waved | done (runtime verified on an ERASED device with legacy keys staged and cfprefsd dropped: XP 92 and streak 3 preserved, Lessons Done 2, In review 0, Mastered 0, no Daily Review card, reminder OFF, no crash). Supersedes the second-pass note that could not stage the empty retention state on the sim. |
+| FSRS claim correction | brief step 4 | Separate the DSR scheduling model from parameter optimization; correct "not deterministic"; retain SM-2 if justified by simplicity; no forced migration | done (`RESEARCH.md` rewritten from primary docs: scheduling deterministic given fixed parameters and target retention, FSRS-6 = 21 parameters, default parameters ship so it runs with zero history, the optimizer is the data-dependent step; SM-2 retained for launch simplicity behind the protocol boundary) |
+
 ## Deliberate scope boundaries (decided this session, not silently deferred)
 
-- FSRS scheduling: not adopted. SM-2 was chosen for determinism and zero training
-  data at launch; the scheduler sits behind a value type so FSRS can replace it later
-  without touching the feature layer. See `RESEARCH.md`.
+- FSRS scheduling: not adopted. SM-2 was chosen for implementation simplicity (no
+  optimizer, no parameter file, no personal review history) and full determinism at
+  launch; the scheduler sits behind a value type so FSRS can replace it later without
+  touching the feature layer. The earlier "FSRS is not deterministic / needs a large
+  history to run" framing was corrected: FSRS scheduling is deterministic for a given
+  parameter set and target retention, ships with default parameters, and only its
+  per-learner parameter optimization is data dependent. See `RESEARCH.md`.
 - SwiftData migration of progress: progress stays in the existing UserDefaults store
   (`ProgressStore`, `ReviewStore`). It is small, offline, and relaunch safe, and the
   review and reminder stores decode defensively (verified by the upgrade check).

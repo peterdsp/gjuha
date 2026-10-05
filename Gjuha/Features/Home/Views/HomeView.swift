@@ -74,6 +74,13 @@ struct HomeView: View {
                             .padding(.horizontal, 16)
                             .padding(.top, 20)
                     }
+
+                    if !store.isLoading {
+                        ExploreCultureCard { store.send(.exploreCultureTapped) }
+                            .padding(.horizontal, 16)
+                            .padding(.top, 8)
+                            .padding(.bottom, 28)
+                    }
                 }
                 .gjuhaReadableWidth()
             }
@@ -178,6 +185,45 @@ private struct DailyReviewCard: View {
         .accessibilityLabel("Daily review")
         .accessibilityValue("\(count) \(wordWord) due for review")
         .accessibilityHint("Starts a spaced repetition review session")
+        .accessibilityAddTraits(.isButton)
+    }
+}
+
+// MARK: - Explore Culture Card
+
+private struct ExploreCultureCard: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 14) {
+                Image(systemName: "globe.europe.africa.fill")
+                    .font(.system(size: 26, weight: .semibold))
+                    .foregroundStyle(Color.gjuha.accent)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Culture & dialects")
+                        .font(.gjuha.headingSmall)
+                        .foregroundStyle(Color.gjuha.textPrimary)
+                    Text("Everyday situations and regional forms")
+                        .font(.gjuha.caption)
+                        .foregroundStyle(Color.gjuha.textSecondary)
+                        .lineLimit(2)
+                }
+
+                Spacer(minLength: 8)
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(Color.gjuha.textTertiary)
+            }
+            .padding(16)
+            .gjuhaLiquidGlassCard(cornerRadius: 20, tintOpacity: 0.10)
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Culture and dialects")
+        .accessibilityHint("Opens cultural units and regional forms")
         .accessibilityAddTraits(.isButton)
     }
 }

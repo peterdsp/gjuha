@@ -60,6 +60,12 @@ struct AppView: View {
                     GrammarView(store: store)
                 case .profile(let store):
                     ProfileView(store: store)
+                case .culture(let store):
+                    CultureView(store: store)
+                case .culturalUnit(let store):
+                    CulturalUnitDetailView(store: store)
+                case .dialectPack(let store):
+                    DialectPackDetailView(store: store)
                 }
             }
             .transition(.asymmetric(insertion: .opacity.combined(with: .move(edge: .trailing)), removal: .opacity))

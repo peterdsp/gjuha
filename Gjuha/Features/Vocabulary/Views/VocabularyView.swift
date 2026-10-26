@@ -146,7 +146,9 @@ private struct CEFRFilterBar: View {
                     onSelect(nil)
                 }
                 ForEach(CEFRLevel.allCases, id: \.self) { level in
-                    FilterChip(label: level.rawValue.uppercased(), isSelected: selected == level) {
+                    // CEFR codes are acronyms, identical in every language, so this one is
+                    // built from a runtime string on purpose and is not extracted.
+                    FilterChip(label: LocalizedStringKey(level.rawValue.uppercased()), isSelected: selected == level) {
                         onSelect(level)
                     }
                 }
@@ -158,7 +160,7 @@ private struct CEFRFilterBar: View {
 }
 
 private struct FilterChip: View {
-    let label: String
+    let label: LocalizedStringKey
     let isSelected: Bool
     let action: () -> Void
 

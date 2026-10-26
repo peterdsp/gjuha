@@ -1,4 +1,4 @@
-# Phase 3 & 4 — Distinctive Albanian learning and controlled experiments
+# Phase 3 & 4: Distinctive Albanian learning and controlled experiments
 
 This document records what was delivered, the evidence behind it, the linguistic
 review status, device limitations, and the release criteria. Nothing here has

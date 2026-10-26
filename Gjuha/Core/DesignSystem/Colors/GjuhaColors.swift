@@ -183,7 +183,10 @@ struct AnimatedMascotView: View {
                     )
             }
 
-            if let gifData {
+            // Reduce Motion falls through to the still mascot below. Gating only
+            // the fallback image, as this did before, left the looping animation
+            // playing for exactly the people who asked for less motion.
+            if let gifData, !reduceMotion {
                 TransparentAnimatedGIFView(data: gifData)
                     .frame(width: usesGlassOrb ? size - 14 : size, height: usesGlassOrb ? size - 14 : size)
                     .clipShape(Circle())

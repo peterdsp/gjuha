@@ -17,9 +17,24 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.1.0</string>
+	<string>1.0.0</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.gjuha.app.deeplink</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>gjuha</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -28,7 +43,7 @@
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>
-		<string></string>
+		<string>Accent</string>
 	</dict>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>

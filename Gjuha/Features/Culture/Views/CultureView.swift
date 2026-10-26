@@ -54,7 +54,7 @@ struct CultureView: View {
         .onAppear { store.send(.onAppear) }
     }
 
-    private func sectionHeader(_ title: String, systemImage: String) -> some View {
+    private func sectionHeader(_ title: LocalizedStringKey, systemImage: String) -> some View {
         HStack(spacing: 8) {
             Image(systemName: systemImage)
                 .foregroundStyle(Color.gjuha.accent)
@@ -204,7 +204,7 @@ struct CulturalUnitDetailView: View {
                     }
 
                     if !store.unit.grammarTopicSeedIds.isEmpty {
-                        Text("Reinforces \(store.unit.grammarTopicSeedIds.count) grammar point\(store.unit.grammarTopicSeedIds.count == 1 ? "" : "s") from your course.")
+                        Text("Reinforces \(store.unit.grammarTopicSeedIds.count) grammar points from your course.")
                             .font(.gjuha.caption)
                             .foregroundStyle(Color.gjuha.textSecondary)
                     }

@@ -1,0 +1,138 @@
+name: CI
+
+# Build and test Gjuha on every push and pull request.
+#
+# The project file is generated, not committed as the source of truth, so CI runs
+# xcodegen first and then fails if generation produced a diff that was never
+# committed. That keeps project.yml and Gjuha.xcodeproj from drifting apart.
+#
+# Note on runner images: Gjuha's deployment target is iOS 27, so this job needs a
+# runner image that ships the iOS 27 SDK and an iOS 27 simulator runtime. The
+# "select toolchain" step picks the newest installed Xcode and fails with an
+# explicit message if the SDK is missing, rather than failing later with an
+# unreadable compiler error.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SCHEME: Gjuha
+  PROJECT: Gjuha.xcodeproj
+  # TCA's macros are trusted through the Xcode GUI, which CI does not have.
+  EXTRA_FLAGS: -skipMacroValidation
+
+jobs:
+  build-and-test:
+    name: Build and unit test
+    runs-on: macos-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select toolchain
+        run: |
+          set -euo pipefail
+          newest="$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -1)"
+          if [ -z "$newest" ]; then
+            echo "::error::No Xcode found on this runner image."
+            exit 1
+          fi
+          sudo xcode-select -s "$newest/Contents/Developer"
+          xcodebuild -version
+          echo "Installed iOS SDKs:"
+          xcodebuild -showsdks | grep -i iphoneos || true
+          if ! xcodebuild -showsdks | grep -qiE 'iOS 2[7-9]'; then
+            echo "::error::This runner image has no iOS 27+ SDK, which Gjuha's deployment target requires. Pin a newer runner image or lower IPHONEOS_DEPLOYMENT_TARGET in project.yml."
+            exit 1
+          fi
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Generate project and check it is committed
+        run: |
+          set -euo pipefail
+          xcodegen generate
+          # The generated pbxproj is committed. If generation changes it, the
+          # committed copy is stale and the author needs to re-run xcodegen.
+          if ! git diff --quiet -- "$PROJECT/project.pbxproj"; then
+            echo "::error::Gjuha.xcodeproj/project.pbxproj is out of date. Run 'xcodegen generate' and commit the result."
+            git --no-pager diff --stat -- "$PROJECT/project.pbxproj"
+            exit 1
+          fi
+
+      - name: Pick a simulator
+        id: sim
+        run: |
+          set -euo pipefail
+          udid="$(xcrun simctl list devices available --json | python3 Scripts/ci/pick_simulator.py)"
+          echo "udid=$udid" >> "$GITHUB_OUTPUT"
+
+      - name: Build
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -destination "platform=iOS Simulator,id=${{ steps.sim.outputs.udid }}" \
+            $EXTRA_FLAGS
+
+      - name: No user-facing string ships untranslated
+        # Runs after the build, because it compares the committed String
+        # Catalogs against the keys the compiler just extracted.
+        run: python3 Scripts/check_localization.py
+
+      - name: Unit tests
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -destination "platform=iOS Simulator,id=${{ steps.sim.outputs.udid }}" \
+            -only-testing:GjuhaTests \
+            $EXTRA_FLAGS
+
+      - name: UI tests
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -destination "platform=iOS Simulator,id=${{ steps.sim.outputs.udid }}" \
+            -only-testing:GjuhaUITests \
+            $EXTRA_FLAGS
+
+  house-rules:
+    name: House rules
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: No em-dash in tracked text
+        run: |
+          set -euo pipefail
+          # AGENTS.md hard rule 1: no em-dash anywhere in prose, code, or comments.
+          # Only binaries are excluded. Albanian content is checked too, since the
+          # rule is about authored text, not about language.
+          # The escape, not the character: a literal one here would make this
+          # check fail on its own source.
+          if git grep -nI $'\u2014' -- . ':(exclude)*.png' ':(exclude)*.pdf' > /tmp/emdash.txt; then
+            echo "::error::Em-dash found. AGENTS.md hard rule 1 forbids it."
+            cat /tmp/emdash.txt
+            exit 1
+          fi
+          echo "No em-dash found."
+
+      - name: Bundled seed content decodes and its references resolve
+        run: |
+          set -euo pipefail
+          # Pure stdlib on purpose, so this job needs no dependency install.
+          python3 Scripts/validate_seed.py

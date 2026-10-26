@@ -115,6 +115,17 @@ final class ProgressStore: @unchecked Sendable {
         completedLessonSeedIds.count
     }
 
+    /// Whether the learner has already recorded study activity today.
+    ///
+    /// Read by the widget projection so the widget can say "done for today"
+    /// instead of nagging someone who has already practised. It reads the same
+    /// `lastActivityDate` the streak logic writes, so the two can never disagree.
+    var hasPracticedToday: Bool {
+        guard let last = defaults.object(forKey: Keys.lastActivityDate) as? Date else { return false }
+        let calendar = Calendar.current
+        return calendar.isDate(last, inSameDayAs: Date())
+    }
+
     // MARK: - Reset
 
     /// Clears the learner's progress (completed lessons, XP, streak, activity) while

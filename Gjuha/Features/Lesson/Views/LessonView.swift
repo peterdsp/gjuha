@@ -25,6 +25,30 @@ struct LessonView: View {
             }
         }
         .navigationBarHidden(true)
+        // Haptics for the two moments that carry weight: grading an answer, and
+        // finishing or failing the lesson. `sensoryFeedback` is the right tool
+        // rather than calling UIFeedbackGenerator directly: it honours the
+        // system haptics setting and is a no-op on hardware without a Taptic
+        // Engine, so there is nothing to gate by hand.
+        //
+        // The feedback mirrors the banner exactly, including the near miss, so a
+        // learner who feels "warning" rather than "error" knows their spelling
+        // was close before they read anything.
+        .sensoryFeedback(trigger: store.answerResult) { _, result in
+            switch result {
+            case .correct: .success
+            case .nearMiss: .warning
+            case .wrong: .error
+            case nil: nil
+            }
+        }
+        .sensoryFeedback(trigger: store.phase) { _, phase in
+            switch phase {
+            case .completed: .success
+            case .failed: .error
+            case .loading, .inProgress: nil
+            }
+        }
         .onAppear { store.send(.onAppear) }
         .alert(
             "Quit lesson?",
@@ -163,7 +187,10 @@ private struct AnswerFeedbackBanner: View {
         }
     }
 
-    private var title: String {
+    /// `LocalizedStringResource` rather than `LocalizedStringKey`, because this
+    /// is rendered as a `Text` *and* resolved into the VoiceOver announcement
+    /// below, which needs a real `String`.
+    private var title: LocalizedStringResource {
         switch result {
         case .correct: return "Correct!"
         case .nearMiss: return "Almost, check the spelling"
@@ -179,20 +206,27 @@ private struct AnswerFeedbackBanner: View {
         }
     }
 
-    private var answerLine: String? {
+    private var answerLine: LocalizedStringResource? {
         switch result {
         case .correct:
             return nil
         case let .nearMiss(correctAnswer, _), let .wrong(correctAnswer, _):
+            // The answer itself is Albanian course content; only the label
+            // around it is translated.
             return "Answer: \(correctAnswer)"
         }
     }
 
     /// Full spoken description, independent of colour and haptics.
     private var accessibilityMessage: String {
-        var parts: [String] = [title]
-        if let answerLine { parts.append(answerLine) }
-        if case let .correct(xpAwarded, _) = result { parts.append("\(xpAwarded) XP earned") }
+        // Resolved to concrete strings here: AccessibilityNotification takes a
+        // String, so the localized values have to be materialised rather than
+        // handed over as resources.
+        var parts: [String] = [String(localized: title)]
+        if let answerLine { parts.append(String(localized: answerLine)) }
+        if case let .correct(xpAwarded, _) = result {
+            parts.append(String(localized: "\(xpAwarded) XP earned"))
+        }
         if let explanation = result.explanation, !explanation.isEmpty { parts.append(explanation) }
         return parts.joined(separator: ". ")
     }
@@ -698,7 +732,7 @@ private struct WordMatchAnswer: View {
                 .buttonStyle(.plain)
                 .disabled(matched.contains(pairIndex))
                 .accessibilityLabel(text)
-                .accessibilityValue(matched.contains(pairIndex) ? "matched" : "")
+                .accessibilityValue(matched.contains(pairIndex) ? "matched" : "not matched")
             }
         }
     }

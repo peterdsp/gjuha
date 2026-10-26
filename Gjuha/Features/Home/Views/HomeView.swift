@@ -107,6 +107,7 @@ struct HomeView: View {
 private struct HomeHeaderView: View {
     let streak: Int
     let xp: Int
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var pulse = false
 
     var body: some View {
@@ -114,9 +115,14 @@ private struct HomeHeaderView: View {
             HStack(spacing: 4) {
                 Image(systemName: "flame.fill")
                     .foregroundStyle(Color.gjuha.streak)
-                    .scaleEffect(pulse ? 1.14 : 0.94)
-                    .animation(.easeInOut(duration: 0.95).repeatForever(autoreverses: true), value: pulse)
-                Text("\(streak)")
+                    .scaleEffect(reduceMotion ? 1.0 : (pulse ? 1.14 : 0.94))
+                    .animation(
+                        reduceMotion
+                        ? .linear(duration: 0.01)
+                        : .easeInOut(duration: 0.95).repeatForever(autoreverses: true),
+                        value: pulse
+                    )
+                Text(streak, format: .number)
                     .font(.gjuha.labelBold)
                     .foregroundStyle(Color.gjuha.streak)
             }
@@ -124,9 +130,14 @@ private struct HomeHeaderView: View {
             HStack(spacing: 4) {
                 Image(systemName: "star.fill")
                     .foregroundStyle(Color.gjuha.xp)
-                    .scaleEffect(pulse ? 0.94 : 1.14)
-                    .animation(.easeInOut(duration: 1.25).repeatForever(autoreverses: true), value: pulse)
-                Text("\(xp)")
+                    .scaleEffect(reduceMotion ? 1.0 : (pulse ? 0.94 : 1.14))
+                    .animation(
+                        reduceMotion
+                        ? .linear(duration: 0.01)
+                        : .easeInOut(duration: 1.25).repeatForever(autoreverses: true),
+                        value: pulse
+                    )
+                Text(xp, format: .number)
                     .font(.gjuha.labelBold)
                     .foregroundStyle(Color.gjuha.xp)
             }
@@ -140,7 +151,10 @@ private struct HomeHeaderView: View {
                 .stroke(Color.white.opacity(0.28), lineWidth: 0.8)
         }
         .shadow(color: .black.opacity(0.12), radius: 14, y: 8)
-        .onAppear { pulse = true }
+        .onAppear {
+            if reduceMotion { return }
+            pulse = true
+        }
     }
 }
 
@@ -151,8 +165,6 @@ private struct HomeHeaderView: View {
 private struct DailyReviewCard: View {
     let count: Int
     let action: () -> Void
-
-    private var wordWord: String { count == 1 ? "word" : "words" }
 
     var body: some View {
         Button(action: action) {
@@ -165,7 +177,7 @@ private struct DailyReviewCard: View {
                     Text("Daily review")
                         .font(.gjuha.headingSmall)
                         .foregroundStyle(Color.gjuha.textPrimary)
-                    Text("\(count) \(wordWord) ready to strengthen")
+                    Text("\(count) words ready to strengthen")
                         .font(.gjuha.caption)
                         .foregroundStyle(Color.gjuha.textSecondary)
                         .lineLimit(2)
@@ -183,7 +195,7 @@ private struct DailyReviewCard: View {
         .buttonStyle(.plain)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Daily review")
-        .accessibilityValue("\(count) \(wordWord) due for review")
+        .accessibilityValue("\(count) words due for review")
         .accessibilityHint("Starts a spaced repetition review session")
         .accessibilityAddTraits(.isButton)
     }
@@ -303,7 +315,9 @@ private struct UnitHeaderCard: View {
             chipLayout {
                 HomeMetricChip(icon: "checkmark.seal.fill", text: "\(completedUnits)/\(totalUnits) units")
                 HomeMetricChip(icon: "book.closed.fill", text: "\(unit.lessons.count) lessons")
-                HomeMetricChip(icon: "graduationcap.fill", text: unit.cefrLevel.rawValue.uppercased())
+                // A CEFR code needs no translation, so it is built from a runtime
+                // string deliberately rather than extracted as a catalog key.
+                HomeMetricChip(icon: "graduationcap.fill", text: LocalizedStringKey(unit.cefrLevel.rawValue.uppercased()))
             }
         }
         .padding(16)
@@ -392,6 +406,7 @@ private struct CourseNodeView: View {
     let index: Int
     let isNext: Bool
     let onTap: () -> Void
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var breathe = false
     @State private var appeared = false
 
@@ -408,8 +423,8 @@ private struct CourseNodeView: View {
                         Circle()
                             .fill(Color.gjuha.accent.opacity(0.3))
                             .frame(width: nodeSize + 16, height: nodeSize + 16)
-                            .scaleEffect(breathe ? 1.15 : 1.0)
-                            .opacity(breathe ? 0.5 : 1.0)
+                            .scaleEffect(reduceMotion ? 1.0 : (breathe ? 1.15 : 1.0))
+                            .opacity(reduceMotion ? 0.75 : (breathe ? 0.5 : 1.0))
                     }
 
                     // Main circle
@@ -457,7 +472,7 @@ private struct CourseNodeView: View {
                     HStack(spacing: 2) {
                         Image(systemName: "star.fill")
                             .font(.system(size: 9))
-                        Text("\(lesson.bestXP)")
+                        Text(lesson.bestXP, format: .number)
                             .font(.system(size: 10, weight: .semibold))
                     }
                     .foregroundStyle(Color.gjuha.xp)
@@ -472,7 +487,7 @@ private struct CourseNodeView: View {
             withAnimation(.spring(response: 0.5, dampingFraction: 0.8).delay(Double(index) * 0.06)) {
                 appeared = true
             }
-            if isNext {
+            if isNext, !reduceMotion {
                 withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
                     breathe = true
                 }
@@ -548,7 +563,7 @@ private struct NextUnitPreview: View {
 
 private struct HomeMetricChip: View {
     let icon: String
-    let text: String
+    let text: LocalizedStringKey
 
     var body: some View {
         HStack(spacing: 5) {

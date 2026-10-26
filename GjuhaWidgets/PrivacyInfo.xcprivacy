@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	  Privacy manifest for the widget extension.
+
+	  The widget reads one value: the GjuhaWidgetSnapshot projection the app
+	  writes into the shared App Group. It performs no network requests, writes
+	  nothing, and links no third party SDKs. The app's own manifest is what App
+	  Review evaluates for the bundle, but the extension declares its own use of
+	  a required reason API so the two bundles are each individually accurate.
+	-->
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
+		<dict>
+			<!-- CA92.1: reads only defaults belonging to this app and its own
+			     App Group, never another app's. -->
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>CA92.1</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

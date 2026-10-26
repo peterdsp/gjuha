@@ -1,0 +1,1926 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "%lld XP earned": {
+      "comment": "Spoken to VoiceOver after a correct answer.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%lld XP të fituara"
+          }
+        }
+      }
+    },
+    "%lld correct in a row": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%lld të sakta me radhë"
+          }
+        }
+      }
+    },
+    "%lld labeled contrasts": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld labeled contrast"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld labeled contrasts"
+                }
+              }
+            }
+          }
+        },
+        "sq": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "%lld kontrast i etiketuar"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "%lld kontraste të etiketuara"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld lessons": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld lesson"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld lessons"
+                }
+              }
+            }
+          }
+        },
+        "sq": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "%lld mësim"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "%lld mësime"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld min / day": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%lld min / ditë"
+          }
+        }
+      }
+    },
+    "%lld of 3": {
+      "comment": "Hearts remaining, accessibility value.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%lld nga 3"
+          }
+        }
+      }
+    },
+    "%lld percent": {
+      "comment": "Accessibility value for the lesson progress bar.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%lld përqind"
+          }
+        }
+      }
+    },
+    "%lld shown • %lld loaded from Albanian seed": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%lld të shfaqura • %lld të ngarkuara nga baza shqipe"
+          }
+        }
+      }
+    },
+    "%lld transparent grammar guides available": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld transparent grammar guide available"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld transparent grammar guides available"
+                }
+              }
+            }
+          }
+        },
+        "sq": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "%lld udhëzues gramatikor i disponueshëm"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "%lld udhëzues gramatikorë të disponueshëm"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld words due for review": {
+      "comment": "Accessibility value on the daily review card.",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld word due for review"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld words due for review"
+                }
+              }
+            }
+          }
+        },
+        "sq": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "%lld fjalë për përsëritje"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "%lld fjalë për përsëritje"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld words ready to strengthen": {
+      "comment": "'fjalë' is invariant in Albanian, so both forms match.",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld word ready to strengthen"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld words ready to strengthen"
+                }
+              }
+            }
+          }
+        },
+        "sq": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "%lld fjalë gati për forcim"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "%lld fjalë gati për forcim"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld%%": {
+      "comment": "Percentage, digits only.",
+      "shouldTranslate": false
+    },
+    "%lld/%lld lessons": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%lld/%lld mësime"
+          }
+        }
+      }
+    },
+    "%lld/%lld units": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%lld/%lld njësi"
+          }
+        }
+      }
+    },
+    "%lldx": {
+      "comment": "Combo multiplier, for example 3x.",
+      "shouldTranslate": false
+    },
+    "+%lld XP": {
+      "comment": "XP award. 'XP' is used untranslated in Albanian too.",
+      "shouldTranslate": false
+    },
+    "- %lld min/day": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "- %lld min/ditë"
+          }
+        }
+      }
+    },
+    "A gentle nudge once a day. Off by default.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Një kujtesë e lehtë një herë në ditë. Si parazgjedhje është e çaktivizuar."
+          }
+        }
+      }
+    },
+    "A tailored AI explanation is available on this device.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Në këtë pajisje ofrohet një shpjegim i përshtatur me AI."
+          }
+        }
+      }
+    },
+    "AI generated": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Gjeneruar nga AI"
+          }
+        }
+      }
+    },
+    "All": {
+      "comment": "CEFR filter chip meaning every level.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Të gjitha"
+          }
+        }
+      }
+    },
+    "Almost, check the spelling": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Pothuajse, kontrollo drejtshkrimin"
+          }
+        }
+      }
+    },
+    "Answer": {
+      "comment": "Label above the typed answer field.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Përgjigjja"
+          }
+        }
+      }
+    },
+    "Answer: %@": {
+      "comment": "%@ is the correct Albanian answer and stays untranslated.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Përgjigjja: %@"
+          }
+        }
+      }
+    },
+    "Ask a question about this grammar topic": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Bëj një pyetje për këtë temë gramatikore"
+          }
+        }
+      }
+    },
+    "Ask about this topic (optional)": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Pyet për këtë temë (opsionale)"
+          }
+        }
+      }
+    },
+    "Audio is added once a native speaker records it. No machine voice is used for Albanian.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Audioja shtohet pasi ta regjistrojë një folës amtar. Për shqipen nuk përdoret zë i gjeneruar."
+          }
+        }
+      }
+    },
+    "Back to lessons": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Kthehu te mësimet"
+          }
+        }
+      }
+    },
+    "Best combo: %lldx": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Kombinimi më i mirë: %lldx"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Anulo"
+          }
+        }
+      }
+    },
+    "Casual": {
+      "comment": "Daily goal level, 5 min/day.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "I lehtë"
+          }
+        }
+      }
+    },
+    "Check": {
+      "comment": "Button that submits the answer.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Kontrollo"
+          }
+        }
+      }
+    },
+    "Check Albanian Progress": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Kontrollo ecurinë e shqipes"
+          }
+        }
+      }
+    },
+    "Check Progress": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Kontrollo ecurinë"
+          }
+        }
+      }
+    },
+    "Clears your progress and review schedule on this device": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fshin ecurinë dhe planin e përsëritjes në këtë pajisje"
+          }
+        }
+      }
+    },
+    "Complete all lessons above to unlock": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Përfundoni të gjitha mësimet e mësipërme për ta zhbllokuar"
+          }
+        }
+      }
+    },
+    "Content pack is loading": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Paketa e përmbajtjes po ngarkohet"
+          }
+        }
+      }
+    },
+    "Continue": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Vazhdo"
+          }
+        }
+      }
+    },
+    "Continue Albanian Lesson": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Vazhdo mësimin e shqipes"
+          }
+        }
+      }
+    },
+    "Continue Lesson": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Vazhdo mësimin"
+          }
+        }
+      }
+    },
+    "Correct!": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Saktë!"
+          }
+        }
+      }
+    },
+    "Cultural and regional lessons are being checked by native speakers before they appear here. The course content you already have is unaffected.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mësimet kulturore dhe krahinore po kontrollohen nga folës amtarë përpara se të shfaqen këtu. Përmbajtja e kursit që ke tashmë nuk preket."
+          }
+        }
+      }
+    },
+    "Cultural units": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Njësi kulturore"
+          }
+        }
+      }
+    },
+    "Culture & curiosity": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Kulturë dhe kuriozitet"
+          }
+        }
+      }
+    },
+    "Culture & dialects": {
+      "comment": "Navigation title of the culture hub.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Kulturë dhe dialekte"
+          }
+        }
+      }
+    },
+    "Culture and dialects": {
+      "comment": "Accessibility label for the culture card.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Kulturë dhe dialekte"
+          }
+        }
+      }
+    },
+    "Daily Goal": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Qëllimi ditor"
+          }
+        }
+      }
+    },
+    "Daily Reminder": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Kujtesa ditore"
+          }
+        }
+      }
+    },
+    "Daily review": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Përsëritja e ditës"
+          }
+        }
+      }
+    },
+    "Day streak": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ditë rresht"
+          }
+        }
+      }
+    },
+    "Due now": {
+      "comment": "Siri snippet stat caption: words due right now.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Për tani"
+          }
+        }
+      }
+    },
+    "Everyday situations and regional forms": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Situata të përditshme dhe forma krahinore"
+          }
+        }
+      }
+    },
+    "Everything you learn is stored only on this device. Nothing is sent anywhere.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Çdo gjë që mëson ruhet vetëm në këtë pajisje. Asgjë nuk dërgohet gjetkë."
+          }
+        }
+      }
+    },
+    "Examples": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Shembuj"
+          }
+        }
+      }
+    },
+    "Exit lesson": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Dil nga mësimi"
+          }
+        }
+      }
+    },
+    "Explain": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Shpjego"
+          }
+        }
+      }
+    },
+    "Explain simply (beta)": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Shpjego thjesht (beta)"
+          }
+        }
+      }
+    },
+    "Explain this topic": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Shpjego këtë temë"
+          }
+        }
+      }
+    },
+    "Explore the living language: everyday cultural situations and the regional forms you may hear at home.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Zbulo gjuhën e gjallë: situata kulturore të përditshme dhe format krahinore që mund të dëgjosh në shtëpi."
+          }
+        }
+      }
+    },
+    "For a partner or family": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Për partnerin ose familjen"
+          }
+        }
+      }
+    },
+    "From your reviewed lessons": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Nga mësimet e tua të shqyrtuara"
+          }
+        }
+      }
+    },
+    "Generating explanation": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Po gjenerohet shpjegimi"
+          }
+        }
+      }
+    },
+    "Get started": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fillo"
+          }
+        }
+      }
+    },
+    "Gjuha": {
+      "comment": "The app name. Same in both languages.",
+      "shouldTranslate": false
+    },
+    "Grammar": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Gramatikë"
+          }
+        }
+      }
+    },
+    "Grammar Lab": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Laboratori i gramatikës"
+          }
+        }
+      }
+    },
+    "Grammar topics are loading": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Temat e gramatikës po ngarkohen"
+          }
+        }
+      }
+    },
+    "Hearts remaining": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Zemra të mbetura"
+          }
+        }
+      }
+    },
+    "In native-speaker review": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Në shqyrtim nga folës amtarë"
+          }
+        }
+      }
+    },
+    "In review": {
+      "comment": "Words that have entered the spaced repetition schedule.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Në përsëritje"
+          }
+        }
+      }
+    },
+    "Intense": {
+      "comment": "Daily goal level, 20 min/day.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Intensiv"
+          }
+        }
+      }
+    },
+    "Keep learning": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Vazhdo mësimin"
+          }
+        }
+      }
+    },
+    "Learn": {
+      "comment": "Tab bar: the lesson map.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mëso"
+          }
+        }
+      }
+    },
+    "Learn Albanian. Feel Albanian.": {
+      "comment": "Splash tagline.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mëso shqip. Ndjeje shqipen."
+          }
+        }
+      }
+    },
+    "Lesson Complete!": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mësimi u përfundua!"
+          }
+        }
+      }
+    },
+    "Lesson progress": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ecuria e mësimit"
+          }
+        }
+      }
+    },
+    "Lessons Done": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mësime të kryera"
+          }
+        }
+      }
+    },
+    "Living in Albania": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Jetoj në Shqipëri"
+          }
+        }
+      }
+    },
+    "Loading exercises...": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Po ngarkohen ushtrimet..."
+          }
+        }
+      }
+    },
+    "Mastered": {
+      "comment": "Words that reached the scheduler's documented mastery interval.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Të zotëruara"
+          }
+        }
+      }
+    },
+    "Mirë se vini": {
+      "comment": "Already Albanian in the English build: the welcome screen greets the learner in the language they are about to learn.",
+      "shouldTranslate": false
+    },
+    "More content coming soon. Review your lessons to keep your skills sharp.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Së shpejti vjen përmbajtje e re. Përsërit mësimet për t'i mbajtur të freskëta."
+          }
+        }
+      }
+    },
+    "Next: %@": {
+      "comment": "%@ is a lesson title, which comes from course content and is not translated here.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Më pas: %@"
+          }
+        }
+      }
+    },
+    "No results for \"%@\"": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Asnjë rezultat për “%@”"
+          }
+        }
+      }
+    },
+    "Not quite...": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Jo saktësisht..."
+          }
+        }
+      }
+    },
+    "Nothing is due for review right now. Nice work.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Tani për tani nuk ka asgjë për përsëritje. Punë e mirë."
+          }
+        }
+      }
+    },
+    "Notifications are off": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Njoftimet janë të çaktivizuara"
+          }
+        }
+      }
+    },
+    "OK": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "OK"
+          }
+        }
+      }
+    },
+    "Open Albanian Progress": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Hap ecurinë e shqipes"
+          }
+        }
+      }
+    },
+    "Open Gjuha to review %lld words": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Open Gjuha to review %lld word"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Open Gjuha to review %lld words"
+                }
+              }
+            }
+          }
+        },
+        "sq": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Hap Gjuha për të përsëritur %lld fjalë"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Hap Gjuha për të përsëritur %lld fjalë"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Open Progress": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Hap ecurinë"
+          }
+        }
+      }
+    },
+    "Opens cultural units and regional forms": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Hap njësitë kulturore dhe format krahinore"
+          }
+        }
+      }
+    },
+    "Opens your Gjuha progress, including words seen, words in review, and words mastered.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Hap ecurinë tënde në Gjuha: fjalë të shikuara, fjalë në përsëritje dhe fjalë të zotëruara."
+          }
+        }
+      }
+    },
+    "Other reason": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Arsye tjetër"
+          }
+        }
+      }
+    },
+    "Out of hearts!": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Nuk ka më zemra!"
+          }
+        }
+      }
+    },
+    "Picks up the Albanian lesson in progress, or opens the next lesson available.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Vazhdon mësimin e shqipes në proces, ose hap mësimin tjetër të disponueshëm."
+          }
+        }
+      }
+    },
+    "Placed word %@, tap to remove": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fjala e vendosur %@, trokit për ta hequr"
+          }
+        }
+      }
+    },
+    "Play audio": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Luaj audion"
+          }
+        }
+      }
+    },
+    "Play pronunciation of %@": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Luaj shqiptimin e %@"
+          }
+        }
+      }
+    },
+    "Plays the word to identify": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Luan fjalën që duhet gjetur"
+          }
+        }
+      }
+    },
+    "Practice": {
+      "comment": "App Intents category name.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Praktikë"
+          }
+        }
+      }
+    },
+    "Practice more to strengthen your memory.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Praktiko më shumë për të forcuar kujtesën."
+          }
+        }
+      }
+    },
+    "Practice these words": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Praktiko këto fjalë"
+          }
+        }
+      }
+    },
+    "Profile": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Profili"
+          }
+        }
+      }
+    },
+    "Progress": {
+      "comment": "App Intents category name.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ecuria"
+          }
+        }
+      }
+    },
+    "Quit": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Dil"
+          }
+        }
+      }
+    },
+    "Quit lesson?": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Të dilet nga mësimi?"
+          }
+        }
+      }
+    },
+    "Reconnecting with heritage": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Për t'u rilidhur me trashëgiminë"
+          }
+        }
+      }
+    },
+    "Regional forms": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Forma krahinore"
+          }
+        }
+      }
+    },
+    "Regional forms are shown so you recognize them. The course teaches Standard Albanian; neither form is wrong, and usage varies by region and family.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Format krahinore shfaqen që t'i njohësh. Kursi mëson shqipen standarde; asnjë formë nuk është e gabuar dhe përdorimi ndryshon sipas krahinës dhe familjes."
+          }
+        }
+      }
+    },
+    "Regular": {
+      "comment": "Daily goal level, 10 min/day.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "I rregullt"
+          }
+        }
+      }
+    },
+    "Reinforces %lld grammar points from your course.": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Reinforces %lld grammar point from your course."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Reinforces %lld grammar points from your course."
+                }
+              }
+            }
+          }
+        },
+        "sq": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Forcon %lld pikë gramatikore nga kursi."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Forcon %lld pika gramatikore nga kursi."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Remind me to practice": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Kujtomë të praktikoj"
+          }
+        }
+      }
+    },
+    "Reminder time": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ora e kujtesës"
+          }
+        }
+      }
+    },
+    "Reports your Gjuha streak, the words due for review, and how many words you have mastered.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Raporton ditët rresht në Gjuha, fjalët për përsëritje dhe sa fjalë ke zotëruar."
+          }
+        }
+      }
+    },
+    "Reset": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Rivendos"
+          }
+        }
+      }
+    },
+    "Reset learning data": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Rivendos të dhënat e mësimit"
+          }
+        }
+      }
+    },
+    "Reset learning data?": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Të rivendosen të dhënat e mësimit?"
+          }
+        }
+      }
+    },
+    "Reviews the Albanian words that are due today, using Gjuha's spaced repetition schedule.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Përsërit fjalët shqipe që duhen sot, sipas planit të përsëritjes së shpërndarë të Gjuha."
+          }
+        }
+      }
+    },
+    "Search words...": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Kërko fjalë..."
+          }
+        }
+      }
+    },
+    "Serious": {
+      "comment": "Daily goal level, 15 min/day.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Serioz"
+          }
+        }
+      }
+    },
+    "Set your daily goal": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Caktoni qëllimin ditor"
+          }
+        }
+      }
+    },
+    "Showing offline explanations built from your reviewed lessons.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Shfaqen shpjegime offline, ndërtuara nga mësimet e tua të shqyrtuara."
+          }
+        }
+      }
+    },
+    "Start Albanian Review": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Nis përsëritjen e shqipes"
+          }
+        }
+      }
+    },
+    "Start Review": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Nis përsëritjen"
+          }
+        }
+      }
+    },
+    "Start learning": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Nis mësimin"
+          }
+        }
+      }
+    },
+    "Starting your review of %lld words.": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Starting your review of %lld word."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Starting your review of %lld words."
+                }
+              }
+            }
+          }
+        },
+        "sq": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Po nis përsëritjen e %lld fjale."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Po nis përsëritjen e %lld fjalëve."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Starts a spaced repetition review session": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Nis një sesion përsëritjeje të shpërndarë"
+          }
+        }
+      }
+    },
+    "Starts a spaced repetition session over this unit's words": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Nis një sesion përsëritjeje të shpërndarë mbi fjalët e kësaj njësie"
+          }
+        }
+      }
+    },
+    "The Albanian pack is ready. Pull to refresh or reopen the app.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Paketa shqipe është gati. Tërhiq për të rifreskuar ose hap përsëri aplikacionin."
+          }
+        }
+      }
+    },
+    "The most modern Albanian learning experience.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Përvoja më moderne për të mësuar shqip."
+          }
+        }
+      }
+    },
+    "Thinking": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Po mendoj"
+          }
+        }
+      }
+    },
+    "This clears your XP, streak, completed lessons, and review schedule on this device. Your daily goal is kept. This cannot be undone.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Kjo fshin XP, ditët rresht, mësimet e kryera dhe planin e përsëritjes në këtë pajisje. Qëllimi ditor ruhet. Ky veprim nuk mund të zhbëhet."
+          }
+        }
+      }
+    },
+    "To get a daily reminder, allow notifications for Gjuha in the Settings app.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Për të marrë një kujtesë ditore, lejo njoftimet për Gjuha në aplikacionin Settings."
+          }
+        }
+      }
+    },
+    "Total XP": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "XP gjithsej"
+          }
+        }
+      }
+    },
+    "Travel": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Udhëtim"
+          }
+        }
+      }
+    },
+    "Try again": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Provo përsëri"
+          }
+        }
+      }
+    },
+    "Try another spelling or switch CEFR filter.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Provo një drejtshkrim tjetër ose ndrysho filtrin CEFR."
+          }
+        }
+      }
+    },
+    "Type your answer...": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Shkruaj përgjigjen..."
+          }
+        }
+      }
+    },
+    "Type your translation, then submit": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Shkruaj përkthimin, pastaj dërgoje"
+          }
+        }
+      }
+    },
+    "Vocabulary": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fjalori"
+          }
+        }
+      }
+    },
+    "Vocabulary Engine": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Motori i fjalorit"
+          }
+        }
+      }
+    },
+    "Vocabulary is loading": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fjalori po ngarkohet"
+          }
+        }
+      }
+    },
+    "Welcome to Gjuha": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mirë se vini në Gjuha"
+          }
+        }
+      }
+    },
+    "Why are you learning Albanian?": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Pse po mësoni shqip?"
+          }
+        }
+      }
+    },
+    "Word %@, tap to add": {
+      "comment": "Word order exercise. %@ is Albanian course content.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fjala %@, trokit për ta shtuar"
+          }
+        }
+      }
+    },
+    "Words": {
+      "comment": "Tab bar: the vocabulary list.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fjalë"
+          }
+        }
+      }
+    },
+    "Words seen": {
+      "comment": "Honest exposure count, not a mastery claim.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fjalë të shikuara"
+          }
+        }
+      }
+    },
+    "You are on a %lld day streak, and nothing is due for review.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Jeni në %lld ditë rresht dhe nuk ka asgjë për përsëritje."
+          }
+        }
+      }
+    },
+    "You are on a %lld day streak, with %lld words due for review.": {
+      "comment": "Two counts: days then words. Only the word count inflects.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You are on a %lld day streak, with %#@words@ due for review."
+          },
+          "substitutions": {
+            "words": {
+              "argNum": 2,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg word"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg words"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Jeni në %lld ditë rresht, me %#@words@ për përsëritje."
+          },
+          "substitutions": {
+            "words": {
+              "argNum": 2,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "needs_review",
+                      "value": "%arg fjalë"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "needs_review",
+                      "value": "%arg fjalë"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "You have not started a streak yet. %lld words are due for review.": {
+      "comment": "The verb agrees with the count, so the whole clause is the substitution.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You have not started a streak yet. %#@words@"
+          },
+          "substitutions": {
+            "words": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg word is due for review."
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg words are due for review."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Nuk ke nisur ende ditët rresht. %#@words@"
+          },
+          "substitutions": {
+            "words": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "needs_review",
+                      "value": "%arg fjalë është për përsëritje."
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "needs_review",
+                      "value": "%arg fjalë janë për përsëritje."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "You've completed everything!": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ke përfunduar çdo gjë!"
+          }
+        }
+      }
+    },
+    "Your Albanian grammar cards will appear here.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Kartat e gramatikës shqipe shfaqen këtu."
+          }
+        }
+      }
+    },
+    "Your Data": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Të dhënat e tua"
+          }
+        }
+      }
+    },
+    "Your first unit will appear here in a moment.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Njësia e parë shfaqet këtu pas një momenti."
+          }
+        }
+      }
+    },
+    "Your progress in this lesson will not be saved. You can start it again any time.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ecuria në këtë mësim nuk do të ruhet. Mund ta nisni përsëri në çdo kohë."
+          }
+        }
+      }
+    },
+    "matched": {
+      "comment": "Accessibility value on a matched pair.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "përputhur"
+          }
+        }
+      }
+    },
+    "not matched": {
+      "comment": "Accessibility value on a pair not yet matched.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "e papërputhur"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

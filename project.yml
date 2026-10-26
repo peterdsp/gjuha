@@ -2,8 +2,8 @@ name: Gjuha
 options:
   bundleIdPrefix: com.gjuha
   deploymentTarget:
-    iOS: "17.0"
-  xcodeVersion: "16"
+    iOS: "27.0"
+  xcodeVersion: "27"
   createIntermediateGroups: true
   groupSortPosition: top
   generateEmptyDirectories: true
@@ -17,7 +17,7 @@ targets:
   Gjuha:
     type: application
     platform: iOS
-    deploymentTarget: "17.0"
+    deploymentTarget: "27.0"
     sources:
       - path: Gjuha
         excludes:
@@ -29,10 +29,17 @@ targets:
       path: Gjuha/Info.plist
       properties:
         CFBundleDisplayName: Gjuha
-        CFBundleShortVersionString: "0.1.0"
+        CFBundleShortVersionString: "1.0.0"
         CFBundleVersion: "1"
+        # Launch background is the existing Accent colour set, which is the first
+        # stop of the splash gradient in AppView.LaunchExperienceView, so the
+        # static launch screen hands over to the animated splash without a colour
+        # jump. It is appearance aware, so dark mode launches dark.
         UILaunchScreen:
-          UIColorName: ""
+          UIColorName: Accent
+        # Gjuha uses no cryptography beyond what iOS itself provides, so the
+        # upload does not need an export compliance review each time.
+        ITSAppUsesNonExemptEncryption: false
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
         UISupportedInterfaceOrientations~ipad:
@@ -42,24 +49,101 @@ targets:
           - UIInterfaceOrientationLandscapeRight
         NSAppTransportSecurity:
           NSAllowsArbitraryLoads: false
+        # The gjuha:// scheme is how widget tap targets reach the app. Accessory
+        # (Lock Screen) widget families cannot host a Button(intent:), so a URL is
+        # the one tap mechanism that works in every family. Parsed by
+        # GjuhaDeepLink, which ignores anything it does not recognise.
+        CFBundleURLTypes:
+          - CFBundleURLName: com.gjuha.app.deeplink
+            CFBundleTypeRole: Editor
+            CFBundleURLSchemes:
+              - gjuha
+    entitlements:
+      # Same xcodegen behaviour as `info`: the file at this path is GENERATED
+      # from these properties. A hand written entitlements file here is
+      # overwritten with an empty dict on the next `xcodegen generate`, which
+      # silently drops the App Group and leaves the widget unable to read
+      # anything, with no build error to show for it.
+      path: Gjuha/Gjuha.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.gjuha.app
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.gjuha.app
         SWIFT_VERSION: "6.0"
-        IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+        IPHONEOS_DEPLOYMENT_TARGET: "27.0"
         TARGETED_DEVICE_FAMILY: "1,2"
         DEVELOPMENT_TEAM: ""
         CODE_SIGN_STYLE: Automatic
         ENABLE_PREVIEWS: YES
         SWIFT_STRICT_CONCURRENCY: complete
+        SWIFT_EMIT_LOC_STRINGS: YES
     dependencies:
       - package: ComposableArchitecture
         product: ComposableArchitecture
+      # Embeds the widget extension in the app bundle.
+      - target: GjuhaWidgets
+
+  # WidgetKit extension. It deliberately links as little as possible: no TCA, no
+  # WebKit, no app feature code. Its only shared sources are the App Group
+  # projection and the deep link contract, both plain value types, so the widget
+  # cannot reach into app state or drift from the app's URL shape.
+  GjuhaWidgets:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "27.0"
+    sources:
+      - path: GjuhaWidgets
+        excludes:
+          - "**/*.md"
+          - "Info.plist"
+          - "GjuhaWidgets.entitlements"
+      - path: Gjuha/Shared
+    resources:
+      # Colours are defined once, in the palette both targets include, so the
+      # widget's red is the app's red by construction.
+      - path: Gjuha/Resources/Palette.xcassets
+    info:
+      # xcodegen GENERATES the file at this path from these properties, so the
+      # extension point has to be declared here. A hand written Info.plist at the
+      # same path is overwritten on the next `xcodegen generate`, and the install
+      # then fails with "extensionDictionary must be set in placeholder
+      # attributes for an app extension placeholder".
+      path: GjuhaWidgets/Info.plist
+      properties:
+        CFBundleDisplayName: Gjuha
+        CFBundleShortVersionString: "1.0.0"
+        CFBundleVersion: "1"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      # Same xcodegen behaviour as `info`: the file at this path is GENERATED
+      # from these properties. A hand written entitlements file here is
+      # overwritten with an empty dict on the next `xcodegen generate`, which
+      # silently drops the App Group and leaves the widget unable to read
+      # anything, with no build error to show for it.
+      path: GjuhaWidgets/GjuhaWidgets.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.gjuha.app
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gjuha.app.widgets
+        PRODUCT_NAME: GjuhaWidgets
+        SWIFT_VERSION: "6.0"
+        IPHONEOS_DEPLOYMENT_TARGET: "27.0"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        DEVELOPMENT_TEAM: ""
+        CODE_SIGN_STYLE: Automatic
+        SWIFT_STRICT_CONCURRENCY: complete
+        SWIFT_EMIT_LOC_STRINGS: YES
+        SKIP_INSTALL: YES
 
   GjuhaTests:
     type: bundle.unit-test
     platform: iOS
-    deploymentTarget: "17.0"
+    deploymentTarget: "27.0"
     sources:
       - path: GjuhaTests
     settings:
@@ -79,7 +163,7 @@ targets:
   GjuhaUITests:
     type: bundle.ui-testing
     platform: iOS
-    deploymentTarget: "17.0"
+    deploymentTarget: "27.0"
     sources:
       - path: GjuhaUITests
     settings:

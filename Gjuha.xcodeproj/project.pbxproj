@@ -721,14 +721,18 @@
 				LastUpgradeCheck = 2700;
 				TargetAttributes = {
 					105C71C6630DCBF6A93DEDB3 = {
+						DevelopmentTeam = YTS4KJBX3P;
 						TestTargetID = B0B82C1E5D49C974BF2AD0C4;
 					};
+					264372101D5B45E60755F406 = {
+						DevelopmentTeam = YTS4KJBX3P;
+					};
 					B0B82C1E5D49C974BF2AD0C4 = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = YTS4KJBX3P;
 						ProvisioningStyle = Automatic;
 					};
 					F7AB732AA191185B3CB6DF39 = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = YTS4KJBX3P;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -950,6 +954,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = YTS4KJBX3P;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -978,7 +983,6 @@
 				CODE_SIGN_ENTITLEMENTS = Gjuha/Gjuha.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Gjuha/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
@@ -1000,7 +1004,6 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = GjuhaWidgets/GjuhaWidgets.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = GjuhaWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1026,7 +1029,6 @@
 				CODE_SIGN_ENTITLEMENTS = Gjuha/Gjuha.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Gjuha/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
@@ -1097,6 +1099,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = YTS4KJBX3P;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1149,7 +1152,6 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = GjuhaWidgets/GjuhaWidgets.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = GjuhaWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				LD_RUNPATH_SEARCH_PATHS = (

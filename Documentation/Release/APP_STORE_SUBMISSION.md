@@ -34,21 +34,53 @@ in use (`supportedModes`, `allowedExecutionTargets`) can be availability gated.
 Lowering the floor later is a `project.yml` change plus availability annotations,
 and it does not touch feature code.
 
-## 2. Capabilities to enable before archiving (**you**)
+## 2. Signing and capabilities
 
-1. **App Groups.** In the Apple Developer portal, enable App Groups for both
-   `com.gjuha.app` and `com.gjuha.app.widgets`, and add the group
-   `group.com.gjuha.app` to each. The entitlement files are already in the repo
-   (`Gjuha/Gjuha.entitlements`, `GjuhaWidgets/GjuhaWidgets.entitlements`).
-   If this is skipped, the app still works and the widget falls back to its
-   placeholder: no learner data is lost, because the App Group carries only a
-   derived projection (see `Gjuha/Shared/GjuhaWidgetSnapshot.swift`).
-2. **Set `DEVELOPMENT_TEAM`.** It is empty in `project.yml`, so an archive will
-   fail to sign. Put your Team ID there, or set it in Xcode's signing editor and
-   keep `project.yml` in step.
-3. No push notifications, no Sign in with Apple, no background modes, no
-   HealthKit. The daily reminder uses local notifications, which need no
-   capability.
+### Signing team: done
+
+`DEVELOPMENT_TEAM` is set to `YTS4KJBX3P` (PETROS DHESPOLLARI). It is declared
+**once, at project level** in `project.yml` rather than per target, deliberately:
+with a per-target copy, the app and its widget extension can end up on different
+teams, and an extension signed by a different team than its host app fails to
+install. All four targets resolve to it, confirmed with
+`xcodebuild -showBuildSettings`.
+
+The value was taken from this machine rather than guessed, and cross-checked three
+ways: the `TeamIdentifier` in the local provisioning profiles, the `OU` field of
+the Apple Development signing certificate
+(`/OU=YTS4KJBX3P/O=PETROS DHESPOLLARI`), and the 12 other local Xcode projects
+already using it.
+
+### App Groups: still needs the developer account (**you**)
+
+The entitlements are in the repo and correct (`Gjuha/Gjuha.entitlements`,
+`GjuhaWidgets/GjuhaWidgets.entitlements`, both generated from `project.yml`), and
+the App Group works on the simulator. What is missing is the registration of
+`group.com.gjuha.app` against the team in the Apple Developer portal, so that a
+device or distribution profile carries it.
+
+Two ways to do it, either is fine:
+
+- Let Xcode do it. Open the project, select a real device, and build. Automatic
+  signing registers the identifier and the group. The command line equivalent is
+  `xcodebuild build -project Gjuha.xcodeproj -scheme Gjuha -destination 'generic/platform=iOS' -allowProvisioningUpdates`.
+- Or do it by hand at <https://developer.apple.com/account>: create the App Group
+  `group.com.gjuha.app`, then enable the App Groups capability on both
+  `com.gjuha.app` and `com.gjuha.app.widgets` and add the group to each.
+
+This was deliberately left for you rather than run automatically, because it
+creates identifiers inside your Apple Developer account, which is not a local,
+reversible change like a build setting.
+
+If it is skipped entirely, the app still works and the widget simply falls back to
+its placeholder. No learner data is lost, because the App Group carries only a
+derived projection (see `Gjuha/Shared/GjuhaWidgetSnapshot.swift`), which is the
+whole reason it is built that way.
+
+### Nothing else to enable
+
+No push notifications, no Sign in with Apple, no background modes, no HealthKit.
+The daily reminder uses local notifications, which need no capability.
 
 ## 3. App Privacy answers
 

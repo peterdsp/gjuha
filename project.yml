@@ -8,6 +8,13 @@ options:
   groupSortPosition: top
   generateEmptyDirectories: true
 
+# Signing team for every target. Declared once at project level on purpose: with a
+# per-target copy, the app and its widget extension can drift onto different teams,
+# and an extension signed by a different team than its host app fails to install.
+settings:
+  base:
+    DEVELOPMENT_TEAM: YTS4KJBX3P
+
 packages:
   ComposableArchitecture:
     url: https://github.com/pointfreeco/swift-composable-architecture
@@ -74,7 +81,6 @@ targets:
         SWIFT_VERSION: "6.0"
         IPHONEOS_DEPLOYMENT_TARGET: "27.0"
         TARGETED_DEVICE_FAMILY: "1,2"
-        DEVELOPMENT_TEAM: ""
         CODE_SIGN_STYLE: Automatic
         ENABLE_PREVIEWS: YES
         SWIFT_STRICT_CONCURRENCY: complete
@@ -134,7 +140,6 @@ targets:
         SWIFT_VERSION: "6.0"
         IPHONEOS_DEPLOYMENT_TARGET: "27.0"
         TARGETED_DEVICE_FAMILY: "1,2"
-        DEVELOPMENT_TEAM: ""
         CODE_SIGN_STYLE: Automatic
         SWIFT_STRICT_CONCURRENCY: complete
         SWIFT_EMIT_LOC_STRINGS: YES

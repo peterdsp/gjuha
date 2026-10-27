@@ -2,7 +2,8 @@ import SwiftUI
 import ComposableArchitecture
 
 struct AppView: View {
-    let store: StoreOf<AppFeature>
+    /// `@Bindable` because the navigation stack binds to the scoped path store.
+    @Bindable var store: StoreOf<AppFeature>
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var showSplash = true
     @State private var hasStartedLaunchSequence = false
@@ -43,12 +44,20 @@ struct AppView: View {
                 }
             }
         }
+        .onOpenURL { url in
+            // Widget tap targets open gjuha:// URLs. Unrecognised URLs are
+            // ignored rather than guessed at. Siri and Shortcuts reach the same
+            // action through GjuhaIntentRouter, so both paths are identical from
+            // here on.
+            guard let link = GjuhaDeepLink(url: url) else { return }
+            store.send(.deepLinkReceived(link))
+        }
     }
 
     @ViewBuilder
     private var mainFlow: some View {
         if store.hasCompletedOnboarding {
-            NavigationStackStore(store.scope(state: \.path, action: \.path)) {
+            NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
                 RootTabView(store: store)
             } destination: { store in
                 switch store.case {
@@ -118,7 +127,10 @@ private struct FloatingPillTabBar: View {
 
     private struct TabItem: Identifiable {
         let id: AppFeature.State.RootTab
-        let title: String
+        /// `LocalizedStringKey`, not `String`: `Text(someString)` renders the
+        /// string verbatim and is never extracted into the String Catalog, which
+        /// is how these four tab titles silently stayed English-only.
+        let title: LocalizedStringKey
         let icon: String
     }
 
@@ -172,7 +184,7 @@ private struct FloatingPillTabBar: View {
     @ViewBuilder
     private func tabButton(
         tab: AppFeature.State.RootTab,
-        title: String,
+        title: LocalizedStringKey,
         icon: String
     ) -> some View {
         let isSelected = selectedTab == tab

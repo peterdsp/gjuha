@@ -57,6 +57,7 @@ struct OnboardingView: View {
 }
 
 private struct OnboardingBackdropView: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var drift = false
 
     var body: some View {
@@ -68,16 +69,29 @@ private struct OnboardingBackdropView: View {
                 .frame(width: 280, height: 280)
                 .blur(radius: 4)
                 .offset(x: drift ? -130 : 130, y: drift ? -260 : -220)
-                .animation(.easeInOut(duration: 4.6).repeatForever(autoreverses: true), value: drift)
+                .animation(
+                    reduceMotion
+                    ? .linear(duration: 0.01)
+                    : .easeInOut(duration: 4.6).repeatForever(autoreverses: true),
+                    value: drift
+                )
 
             Circle()
                 .fill(Color.gjuha.streak.opacity(0.08))
                 .frame(width: 220, height: 220)
                 .blur(radius: 8)
                 .offset(x: drift ? 150 : -120, y: drift ? 260 : 220)
-                .animation(.easeInOut(duration: 4.1).repeatForever(autoreverses: true), value: drift)
+                .animation(
+                    reduceMotion
+                    ? .linear(duration: 0.01)
+                    : .easeInOut(duration: 4.1).repeatForever(autoreverses: true),
+                    value: drift
+                )
         }
-        .onAppear { drift = true }
+        .onAppear {
+            if reduceMotion { return }
+            drift = true
+        }
     }
 }
 
@@ -414,6 +428,7 @@ private struct FloatingPhraseChip: View {
     let x: CGFloat
     let y: CGFloat
     let delay: Double
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var animate = false
 
     var body: some View {
@@ -429,9 +444,13 @@ private struct FloatingPhraseChip: View {
                     .stroke(Color.gjuha.border.opacity(0.8), lineWidth: 1)
             )
             .shadow(color: .black.opacity(0.08), radius: 6, y: 3)
-            .offset(x: x + (animate ? 6 : -6), y: y + (animate ? -8 : 8))
-            .opacity(animate ? 1.0 : 0.74)
+            .offset(
+                x: reduceMotion ? x : x + (animate ? 6 : -6),
+                y: reduceMotion ? y : y + (animate ? -8 : 8)
+            )
+            .opacity(reduceMotion ? 1.0 : (animate ? 1.0 : 0.74))
             .onAppear {
+                if reduceMotion { return }
                 withAnimation(
                     .easeInOut(duration: 2.2)
                     .repeatForever(autoreverses: true)

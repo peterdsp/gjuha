@@ -1,0 +1,235 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "%lld day streak": {
+      "comment": "'day streak' does not inflect in English here, and 'ditë' is invariant.",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld day streak"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld day streak"
+                }
+              }
+            }
+          }
+        },
+        "sq": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "%lld ditë rresht"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "%lld ditë rresht"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld words due": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld word due"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld words due"
+                }
+              }
+            }
+          }
+        },
+        "sq": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "%lld fjalë për përsëritje"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "%lld fjalë për përsëritje"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Albanian Progress": {
+      "comment": "Widget display name in the gallery.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ecuria e shqipes"
+          }
+        }
+      }
+    },
+    "Check today's review": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Kontrollo përsëritjen e ditës"
+          }
+        }
+      }
+    },
+    "Day streak": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ditë rresht"
+          }
+        }
+      }
+    },
+    "Done for today": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Gati për sot"
+          }
+        }
+      }
+    },
+    "Gjuha": {
+      "comment": "The app name. Same in both languages.",
+      "shouldTranslate": false
+    },
+    "Mastered": {
+      "comment": "Words that reached the scheduler's documented mastery interval.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Të zotëruara"
+          }
+        }
+      }
+    },
+    "Next: %@": {
+      "comment": "%@ is a lesson title, which comes from course content and is not translated here.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Më pas: %@"
+          }
+        }
+      }
+    },
+    "No streak yet": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ende pa ditë rresht"
+          }
+        }
+      }
+    },
+    "Nothing due. Keep going.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Asgjë për përsëritje. Vazhdo kështu."
+          }
+        }
+      }
+    },
+    "Open Gjuha for today's numbers.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Hap Gjuha për numrat e sotme."
+          }
+        }
+      }
+    },
+    "Open Gjuha to begin": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Hap Gjuha për të nisur"
+          }
+        }
+      }
+    },
+    "Total XP": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "XP gjithsej"
+          }
+        }
+      }
+    },
+    "Your streak and reviews will appear here.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ditët rresht dhe përsëritjet shfaqen këtu."
+          }
+        }
+      }
+    },
+    "Your streak, the words due for review, and the next lesson waiting for you.": {
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ditët rresht, fjalët për përsëritje dhe mësimi tjetër që të pret."
+          }
+        }
+      }
+    },
+    "due": {
+      "comment": "Lock Screen circular widget, under the due count.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "për tani"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

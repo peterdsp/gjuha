@@ -274,7 +274,7 @@ private struct GrammarCoachSection: View {
         .padding(.horizontal, 16)
     }
 
-    private var availabilityLabel: String {
+    private var availabilityLabel: LocalizedStringKey {
         switch availability {
         case .available:
             return "A tailored AI explanation is available on this device."
@@ -283,7 +283,7 @@ private struct GrammarCoachSection: View {
         }
     }
 
-    private func sourceLabel(_ source: CoachSource) -> String {
+    private func sourceLabel(_ source: CoachSource) -> LocalizedStringKey {
         switch source {
         case .foundationModel: return "AI generated"
         case .deterministicFallback: return "From your reviewed lessons"

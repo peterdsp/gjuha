@@ -42,7 +42,9 @@ This is not a hobby project. It is a long-term platform designed to reach **Duol
 ✦  Word matching                   ✦  Spaced repetition (SM-2, offline)
 ✦  Streak + XP system              ✦  Cultural immersion modules (planned)
 ✦  Offline-first - always works    ✦  Audio pronunciation (planned)
-✦  Dark mode adaptive UI           ✦  Gheg dialect mode (planned)
+✦  Dark mode adaptive UI           ✦  Gheg dialect mode (gated on review)
+✦  Home + Lock Screen widgets      ✦  Siri & Shortcuts (4 App Intents)
+✦  English + Albanian interface    ✦  Honest progress accounting
 ```
 
 ---
@@ -52,11 +54,13 @@ This is not a hobby project. It is a long-term platform designed to reach **Duol
 | Layer | Choice | Why |
 |-------|--------|-----|
 | **UI** | SwiftUI | Native, declarative, fast |
-| **Architecture** | TCA 1.23 | Unidirectional, testable, composable |
-| **Persistence** | SwiftData | First-class iOS 17 ORM |
+| **Architecture** | TCA 1.26 | Unidirectional, testable, composable |
+| **Persistence** | SwiftData + UserDefaults stores | Offline, relaunch safe |
 | **DI** | swift-dependencies | Mockable, testable, TCA-native |
 | **Content** | Custom engine + JSON seed | Generated exercises, not hardcoded |
-| **Distribution** | App Store | iOS 17+ |
+| **Localization** | String Catalogs (`en` source, `sq` locale) | 170 interface strings, compiler extracted |
+| **Extensions** | WidgetKit + App Intents | Widgets, Siri, Shortcuts, Spotlight |
+| **Distribution** | App Store | iOS 26+ |
 
 ---
 
@@ -147,9 +151,13 @@ bash Scripts/tools/fetch_sources.sh
 # Generate frequency list + sentence corpus
 python3 Scripts/tools/build_from_sources.py
 
-# Output:
-#   Gjuha/Data/Seed/Vocabulary/word_frequency_top6000.csv
-#   Gjuha/Data/Seed/sentences_sqi_50k.csv
+# Output (written under Scripts/content/generated/):
+#   word_frequency_top6000.csv
+#   sentences_sqi_50k.csv
+#
+# These are authoring inputs, not app resources. Nothing in the app bundle is
+# allowed to sit there unread, so earlier copies of them were moved to
+# Content/archive/ (see that folder's README).
 ```
 
 ---
@@ -284,7 +292,7 @@ All spacing follows a strict **4pt grid** (4, 8, 12, 16, 24, 32, 48).
 ## Getting Started
 
 ```bash
-# Requirements: Xcode 26+, iOS 17+ simulator
+# Requirements: Xcode 26+, iOS 26 simulator
 
 git clone https://github.com/pdhespollari/gjuha.git
 cd gjuha
@@ -311,6 +319,31 @@ bash Scripts/tools/fetch_sources.sh
 # 2. Build frequency list + sentence corpus
 python3 Scripts/tools/build_from_sources.py
 ```
+
+### Validate the seed content
+
+Every bundled seed file is decoded with `try?` at runtime, so a typo degrades
+silently rather than failing loudly. This check turns that into an error, and CI
+runs it on every push:
+
+```bash
+python3 Scripts/validate_seed.py
+```
+
+### Tests
+
+```bash
+xcodegen generate
+xcodebuild test -project Gjuha.xcodeproj -scheme Gjuha \
+  -destination 'platform=iOS Simulator,name=iPhone 17' \
+  -skipMacroValidation -only-testing:GjuhaTests
+```
+
+`-skipMacroValidation` is required from the CLI: TCA's macros are trusted through
+the Xcode GUI, which a command line build does not have.
+
+For release engineering, submission steps, and the open review gates, see
+[`Documentation/Release/APP_STORE_SUBMISSION.md`](Documentation/Release/APP_STORE_SUBMISSION.md).
 
 ---
 

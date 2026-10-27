@@ -56,3 +56,62 @@ All the surrounding implementation (the review gate, the dialect and cultural da
 models, the audio manifest, player, and gating, and the exercise wiring) is complete
 and covered by unit tests. This package is the human and licensing work that the code
 is already built to accept.
+
+## 4. Albanian interface strings (`Localizable.xcstrings`, locale `sq`)
+
+New in the 1.0 release pass. Gjuha's interface is now driven by String Catalogs
+with English as the source language and Albanian (`sq`) as a locale: 158 strings
+in the app catalog (`Gjuha/Resources/Localizable.xcstrings`) and 17 in the widget
+catalog (`GjuhaWidgets/Localizable.xcstrings`), 170 distinct strings in total.
+
+How the gate works here: every Albanian entry is written with
+`"state": "needs_review"`, which is the String Catalog's own flag for "translated
+but not checked". Xcode's catalog editor shows these with a review marker, and
+filtering to "Needs Review" lists exactly the set below. Marking an entry
+`translated` is the sign-off action.
+
+What is and is not in scope:
+
+- **In scope: interface chrome only.** Buttons, tab titles, screen titles,
+  settings labels, empty states, accessibility labels and hints, Siri and
+  Shortcuts phrasing, and widget captions.
+- **Not in scope: teaching content.** Vocabulary, example sentences, grammar
+  explanations, conjugation tables, the dialect pack, and the cultural unit all
+  come from the seed JSON in `Gjuha/Data/Seed/` and are unaffected by this
+  catalog. They keep their own review gates (sections 1 to 3 above).
+- **Not in scope: grammar coach output.** `CoachExplanation.text` and its
+  disclaimer are generated English prose and are deliberately left in English.
+  Translating the disclaimer while the explanation stays English would be worse
+  than leaving both.
+
+Reviewer actions:
+
+1. Open `Gjuha/Resources/Localizable.xcstrings` in Xcode, select Albanian, and
+   filter to "Needs Review".
+2. For each string, confirm or correct the Albanian, then mark it translated.
+   Register matters: the app addresses an adult learner. The existing strings mix
+   the second person singular and plural inconsistently in places (for example
+   "Mëso shqip" alongside "Pse po mësoni shqip?"), and picking one register
+   throughout is a judgement call for a native speaker, not a mechanical fix.
+3. Repeat for `GjuhaWidgets/Localizable.xcstrings`.
+4. Pay particular attention to these, where a wrong choice is user visible and
+   not obvious from the English:
+   - `Words seen`, `In review`, `Mastered`. These three are Gjuha's honest
+     progress claim and must stay clearly distinct from one another in Albanian.
+     "Mastered" must not read as a stronger claim than the scheduler supports.
+   - `Day streak` and the `%lld day streak` plural forms.
+   - `Casual`, `Regular`, `Serious`, `Intense`. Daily goal levels, currently
+     translated as adjectives agreeing with an implied masculine noun.
+   - The four App Shortcut phrases. These are spoken to Siri, so they must sound
+     like something a person would actually say, and each one must keep the
+     `${applicationName}` token or the phrase is dropped by the system index.
+   - `Mirë se vini` is intentionally Albanian in the English build and is marked
+     "should not translate".
+5. Plural categories: Albanian uses `one` and `other`. Several entries currently
+   carry identical `one` and `other` forms because the noun is invariant
+   (`fjalë`, `ditë`). Confirm that is right for each.
+
+Until this review is done, the honest statement is that Gjuha ships an Albanian
+interface that has not been checked by a native speaker. That is a lower risk
+than unreviewed teaching content, because none of it teaches anything, but it is
+not zero and it should be said plainly rather than implied to be complete.

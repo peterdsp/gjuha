@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	  Gjuha privacy manifest.
+
+	  Gjuha is offline first. It has no backend, performs no network requests, and
+	  links no third party SDKs, so there is nothing to declare as collected or
+	  tracked. Everything the learner produces (progress, XP, streak, review
+	  schedule, reminder time, chosen goal) stays in the app container on device
+	  and is deletable from Profile with "Reset learning data".
+
+	  Keep this file honest: if a network call, analytics SDK, or account system is
+	  ever added, this manifest and the App Store privacy answers must change in the
+	  same commit as the code.
+	-->
+
+	<!-- No tracking: no data is linked to third party data for advertising or
+	     measurement, and no ATT prompt is presented. -->
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+
+	<!-- No data of any category leaves the device, so no data types are collected. -->
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+
+	<!-- Required reason APIs actually used by the app. -->
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
+		<dict>
+			<!--
+			  UserDefaults backs ProgressStore, ReviewStore, LessonSessionStore,
+			  the reminder settings, and the onboarding flag. Reason CA92.1:
+			  "Declare this reason to access user defaults to read and write
+			  information that is only accessible to the app itself." Gjuha uses
+			  the app's own defaults (and its own App Group suite, shared only with
+			  its own widget extension), never another app's.
+			-->
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>CA92.1</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

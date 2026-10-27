@@ -58,7 +58,9 @@ enum LearningGoal: String, Equatable, CaseIterable {
     case serious = "serious"     // 15 min/day
     case intense = "intense"     // 20 min/day
 
-    var displayName: String {
+    /// `LocalizedStringResource`, so these reach the String Catalog. The
+    /// persisted value is `rawValue`, which is unaffected and must stay stable.
+    var displayName: LocalizedStringResource {
         switch self {
         case .casual: "Casual"
         case .regular: "Regular"
@@ -85,7 +87,9 @@ enum LearningReason: String, Equatable, CaseIterable {
     case culture = "culture"
     case other = "other"
 
-    var displayName: String {
+    /// See the note on `LearningGoal.displayName`. `rawValue` stays the
+    /// persisted identity.
+    var displayName: LocalizedStringResource {
         switch self {
         case .partner: "For a partner or family"
         case .diaspora: "Reconnecting with heritage"

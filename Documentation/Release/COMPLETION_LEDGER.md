@@ -236,13 +236,18 @@ two String Catalogs; app bundle assets 8.3 MB to 4.7 MB; bundled seed content
    unit before they move from `pendingNativeReview` to production.
 3. Apple on-device ASR and TTS do not support Albanian (verified at runtime). No
    synthetic listening audio is generated.
-4. The CI workflow has not been observed green on a GitHub-hosted runner. It is
-   written and committed, and it runs the same commands that pass locally, but
-   Gjuha's iOS 27 deployment target needs a runner image carrying the iOS 27 SDK
-   and an iOS 27 simulator runtime. The workflow fails fast with an explicit
-   message if the image lacks it, rather than failing later with an unreadable
-   compiler error. Confirming it needs a push to GitHub, which is the account
-   holder's call.
+4. **Hosted CI cannot compile the app, confirmed on a real run.** This is no
+   longer a prediction. On run 40578928874 the newest GitHub-hosted macOS image
+   gave Xcode 26.6 with only the iOS 26.5 SDK, so there is no iOS 27 SDK on any
+   hosted runner. With a 27.0 deployment target the app cannot be built in hosted
+   CI at all. The workflow now treats this as the environment limitation it is:
+   it emits a visible warning and skips the compile, test, and localization-guard
+   steps, while project generation, the committed-pbxproj drift check, the
+   em-dash house rule, and seed validation still run on every push. The
+   consequence is real: **until a runner image ships the iOS 27 SDK, no automated
+   build or test protects this repository.** Lowering the floor to iOS 26 would
+   make the job build and test for real, and is a one line change in
+   `project.yml` plus availability annotations on two App Intents properties.
 5. Native-speaker review of the 170 Albanian interface strings (`REVIEW_PACKAGE.md`
    section 4).
 6. The widget's *rendering* and the App Intents' *invocation* are not runtime

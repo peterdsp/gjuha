@@ -14,7 +14,7 @@ with account access; items marked **repo** are already in the tree.
 | Widget bundle identifier | `com.gjuha.app.widgets` | `project.yml` |
 | Marketing version | `1.0.0` | `project.yml`, both targets |
 | Build number | `1` | `project.yml`, both targets |
-| Minimum iOS | **27.0** | `project.yml` |
+| Minimum iOS | **26.0** | `project.yml` |
 | Device families | iPhone and iPad | `TARGETED_DEVICE_FAMILY: "1,2"` |
 
 The app and the widget must always carry the same `CFBundleShortVersionString` and
@@ -22,17 +22,27 @@ The app and the widget must always carry the same `CFBundleShortVersionString` a
 match the host app, and because both are generated from `project.yml` they can
 only drift if someone edits one of the two blocks.
 
-### The iOS 27 floor is a deliberate, costly choice
+### Minimum iOS is 26.0, lowered from 27.0
 
-Raising the deployment target to 27.0 means only devices on the newest major iOS
-can install Gjuha. That is a very small install base at launch, and it cuts
-directly against the diaspora audience described in `RESEARCH.md`, who are the
-most likely to be on older hardware. It was chosen explicitly over the wider
-reach of an iOS 17 or iOS 18 floor. Nothing in the codebase requires it: the
-widget and the App Intents work on iOS 17, and the few iOS 26+ App Intents APIs
-in use (`supportedModes`, `allowedExecutionTargets`) can be availability gated.
-Lowering the floor later is a `project.yml` change plus availability annotations,
-and it does not touch feature code.
+The floor was briefly set to 27.0 and has been lowered, for a concrete reason
+rather than a preference: **no GitHub-hosted runner ships an iOS 27 SDK.** The
+newest image provides Xcode 26.6 with the iOS 26.5 SDK, so at a 27.0 floor the
+app could not be compiled in CI at all, and the pipeline had to skip its build
+and test steps. That meant no automated check protected the repository.
+
+Lowering it cost nothing. Exactly one iOS 27 only API was in use,
+`allowedExecutionTargets` on the four App Intents, and it was redundant: the app
+ships no App Intents extension, so the system already runs them in the main app
+process, and Apple's guidance is to prefer the default rather than pin to
+`.main`. Removing it was a strict improvement. Everything else already worked at
+26: `supportedModes`, `continueInForeground`, and `systemContext` are iOS 26, and
+the widget, String Catalogs, and `sensoryFeedback` are older still.
+
+It also widens the install base, which matters for the diaspora audience in
+`RESEARCH.md` who are likeliest to be on older hardware.
+
+Verified at the floor, not just on the newest runtime: the suite was run on an
+iOS 26.5 simulator and all 87 tests pass.
 
 ## 2. Signing and capabilities
 

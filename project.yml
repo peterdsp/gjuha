@@ -2,7 +2,7 @@ name: Gjuha
 options:
   bundleIdPrefix: com.gjuha
   deploymentTarget:
-    iOS: "27.0"
+    iOS: "26.0"
   xcodeVersion: "27"
   createIntermediateGroups: true
   groupSortPosition: top
@@ -24,7 +24,7 @@ targets:
   Gjuha:
     type: application
     platform: iOS
-    deploymentTarget: "27.0"
+    deploymentTarget: "26.0"
     sources:
       - path: Gjuha
         excludes:
@@ -79,7 +79,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.gjuha.app
         SWIFT_VERSION: "6.0"
-        IPHONEOS_DEPLOYMENT_TARGET: "27.0"
+        IPHONEOS_DEPLOYMENT_TARGET: "26.0"
         TARGETED_DEVICE_FAMILY: "1,2"
         CODE_SIGN_STYLE: Automatic
         ENABLE_PREVIEWS: YES
@@ -98,7 +98,7 @@ targets:
   GjuhaWidgets:
     type: app-extension
     platform: iOS
-    deploymentTarget: "27.0"
+    deploymentTarget: "26.0"
     sources:
       - path: GjuhaWidgets
         excludes:
@@ -138,7 +138,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.gjuha.app.widgets
         PRODUCT_NAME: GjuhaWidgets
         SWIFT_VERSION: "6.0"
-        IPHONEOS_DEPLOYMENT_TARGET: "27.0"
+        IPHONEOS_DEPLOYMENT_TARGET: "26.0"
         TARGETED_DEVICE_FAMILY: "1,2"
         CODE_SIGN_STYLE: Automatic
         SWIFT_STRICT_CONCURRENCY: complete
@@ -148,7 +148,7 @@ targets:
   GjuhaTests:
     type: bundle.unit-test
     platform: iOS
-    deploymentTarget: "27.0"
+    deploymentTarget: "26.0"
     sources:
       - path: GjuhaTests
     settings:
@@ -168,7 +168,7 @@ targets:
   GjuhaUITests:
     type: bundle.ui-testing
     platform: iOS
-    deploymentTarget: "27.0"
+    deploymentTarget: "26.0"
     sources:
       - path: GjuhaUITests
     settings:

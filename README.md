@@ -60,7 +60,7 @@ This is not a hobby project. It is a long-term platform designed to reach **Duol
 | **Content** | Custom engine + JSON seed | Generated exercises, not hardcoded |
 | **Localization** | String Catalogs (`en` source, `sq` locale) | 170 interface strings, compiler extracted |
 | **Extensions** | WidgetKit + App Intents | Widgets, Siri, Shortcuts, Spotlight |
-| **Distribution** | App Store | iOS 27+ |
+| **Distribution** | App Store | iOS 26+ |
 
 ---
 
@@ -292,7 +292,7 @@ All spacing follows a strict **4pt grid** (4, 8, 12, 16, 24, 32, 48).
 ## Getting Started
 
 ```bash
-# Requirements: Xcode 27+, iOS 27 simulator
+# Requirements: Xcode 26+, iOS 26 simulator
 
 git clone https://github.com/pdhespollari/gjuha.git
 cd gjuha

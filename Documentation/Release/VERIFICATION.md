@@ -50,7 +50,10 @@ host. The reducers are thin wrappers over this logic.
 ## Fourth pass (2026-10-26): release engineering, localization, platform surfaces
 
 Environment: Xcode 27.1 (27A9275), iOS Simulator 27.1 (24A94401), device
-"iPhone Duo". Deployment target raised to iOS 27.0 for this pass.
+"iPhone Duo". Deployment target is iOS 26.0: it was briefly 27.0, and the
+consequence of that is recorded under "CI" below. The suite was additionally run
+on an iOS 26.5 simulator to confirm it passes at the floor and not only on the
+newest runtime.
 
 ### Build
 

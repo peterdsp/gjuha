@@ -14,6 +14,14 @@ import SwiftUI
 //
 // None of these fabricates progress. Nothing here can mark a lesson complete or
 // bank XP: the only way to earn either is to answer questions in the app.
+//
+// On execution target: none of these declares `allowedExecutionTargets`. The app
+// ships no App Intents extension, so the system already runs them in the main app
+// process, and Apple's guidance is to prefer the default unless the code genuinely
+// needs a specific process, because pinning to `.main` defeats extension based
+// execution and adds launch latency. It was also the only iOS 27 only API in the
+// project, and dropping it is what lets the deployment target sit at iOS 26 where
+// CI can actually build and test.
 
 // MARK: - Start review
 
@@ -31,10 +39,6 @@ struct StartReviewIntent: AppIntent {
     )
 
     static var supportedModes: IntentModes { [.background, .foreground(.dynamic)] }
-
-    /// The review session lives in the running app's TCA state, so this has to run
-    /// in the main app process rather than an extension.
-    static var allowedExecutionTargets: IntentExecutionTargets { .main }
 
     func perform() async throws -> some IntentResult & ProvidesDialog {
         let dueCount = await LiveReviewRepository().dueCount()
@@ -74,7 +78,6 @@ struct ContinueLearningIntent: AppIntent {
     )
 
     static var supportedModes: IntentModes { .foreground(.immediate) }
-    static var allowedExecutionTargets: IntentExecutionTargets { .main }
 
     func perform() async throws -> some IntentResult {
         await GjuhaIntentRouter.route(.continueLearning)
@@ -98,7 +101,6 @@ struct CheckProgressIntent: AppIntent {
     )
 
     static var supportedModes: IntentModes { .background }
-    static var allowedExecutionTargets: IntentExecutionTargets { .main }
 
     func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
         let progress = ProgressStore.shared
@@ -139,7 +141,6 @@ struct OpenProgressIntent: AppIntent {
     )
 
     static var supportedModes: IntentModes { .foreground(.immediate) }
-    static var allowedExecutionTargets: IntentExecutionTargets { .main }
 
     func perform() async throws -> some IntentResult {
         await GjuhaIntentRouter.route(.progress)

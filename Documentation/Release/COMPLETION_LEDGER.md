@@ -131,6 +131,13 @@ two String Catalogs; app bundle assets 8.3 MB to 4.7 MB; bundled seed content
 | Dead assets removed | No asset groups for targets this app does not have | done (35 icon-generator leftovers removed: Apple Watch, Messages, App Store, and legacy iOS 5 to 12 icon sets, none referenced in code; assets 8.3 MB to 4.7 MB) |
 | Colours defined once | The widget and the app cannot drift to different brand colours | done (14 colour sets moved to a shared `Palette.xcassets` included by both targets, so the widget carries 60 KB rather than the 8 MB catalog, and the values exist in exactly one place) |
 
+### Found while lowering the floor
+
+| Item | Acceptance criteria | Status |
+|---|---|---|
+| SwiftData store location pinned | Adding an App Group must not silently move where SwiftData keeps its store | done. CoreData resolves its default store directory to the **App Group** container when the app is entitled to exactly one group, so adding the group for the widget relocated this store with no code change. Harmless today, because **nothing in the app reads or writes SwiftData at all**: `Word` and `Lesson` are declared `@Model`, but all data comes from the JSON seed through the repositories and everything the learner produces lives in the UserDefaults backed stores. It would have silently relocated real data the moment any was written, so `ModelConfiguration` now takes an explicit URL in the app's own container. Also creates Application Support if missing, which stops a clean launch logging a wall of CoreData stat and sandbox errors. |
+| Noted, not fixed: a `fatalError` on an unused container | | `GjuhaSchema.container` calls `fatalError` if creation fails, which can stop the app launching over a store nothing needs. Left alone because making it survivable means deciding what the app does without SwiftData, which is a Phase 2 decision rather than a release fix. Recorded in the source. |
+
 ### Bugs found and fixed during this pass
 
 1. **The widget extension could not install at all.** xcodegen *generates* the
@@ -190,14 +197,16 @@ two String Catalogs; app bundle assets 8.3 MB to 4.7 MB; bundled seed content
 
 ## Deliberate scope boundaries (decided this session, not silently deferred)
 
-- Minimum iOS raised from 17 to **27** at the user's explicit direction. This is
-  recorded as a tradeoff, not a neutral upgrade: it limits installs to devices on
-  the newest major iOS, which cuts against the diaspora audience in `RESEARCH.md`
-  who are likeliest to be on older hardware. Nothing in the code requires it. The
-  widget and App Intents work on iOS 17, and the two iOS 26+ App Intents
-  properties in use (`supportedModes`, `allowedExecutionTargets`) can be
-  availability gated. Lowering the floor later is a `project.yml` change plus
-  availability annotations and does not touch feature code.
+- Minimum iOS is **26.0**. It was raised from 17 to 27 during this pass at the
+  user's direction, and then lowered to 26 once the cost became measurable rather
+  than theoretical: **no GitHub-hosted runner ships an iOS 27 SDK**, so at a 27
+  floor the app could not be compiled in CI and the pipeline had to skip its
+  build and test steps entirely. Lowering it cost nothing. Exactly one iOS 27
+  only API was in use, `allowedExecutionTargets` on the four App Intents, and it
+  was redundant: with no App Intents extension the system already runs them in
+  the main app process, and Apple's guidance is to prefer the default over
+  pinning `.main`. Removing it was a strict improvement. Verified at the floor,
+  not just on the newest runtime: 87 tests pass on an iOS 26.5 simulator.
 - Albanian interface strings ship as `needs_review` rather than being held back.
   Reasoning: the catalogs contain interface chrome only, never teaching content,
   so an imperfect label is a cosmetic problem rather than teaching someone wrong
@@ -236,18 +245,13 @@ two String Catalogs; app bundle assets 8.3 MB to 4.7 MB; bundled seed content
    unit before they move from `pendingNativeReview` to production.
 3. Apple on-device ASR and TTS do not support Albanian (verified at runtime). No
    synthetic listening audio is generated.
-4. **Hosted CI cannot compile the app, confirmed on a real run.** This is no
-   longer a prediction. On run 40578928874 the newest GitHub-hosted macOS image
-   gave Xcode 26.6 with only the iOS 26.5 SDK, so there is no iOS 27 SDK on any
-   hosted runner. With a 27.0 deployment target the app cannot be built in hosted
-   CI at all. The workflow now treats this as the environment limitation it is:
-   it emits a visible warning and skips the compile, test, and localization-guard
-   steps, while project generation, the committed-pbxproj drift check, the
-   em-dash house rule, and seed validation still run on every push. The
-   consequence is real: **until a runner image ships the iOS 27 SDK, no automated
-   build or test protects this repository.** Lowering the floor to iOS 26 would
-   make the job build and test for real, and is a one line change in
-   `project.yml` plus availability annotations on two App Intents properties.
+4. ~~Hosted CI cannot compile the app.~~ **Resolved.** It was real: on run
+   40578928874 the newest hosted image gave Xcode 26.6 with only the iOS 26.5
+   SDK, so at the then-current iOS 27 floor nothing could be compiled and the
+   build and test steps had to be skipped, leaving the repository with no
+   automated protection. Fixed by lowering the floor to iOS 26 and removing the
+   one redundant iOS 27 only API. CI now builds, unit tests, and UI tests on every
+   push, with no skip conditions.
 5. Native-speaker review of the 170 Albanian interface strings (`REVIEW_PACKAGE.md`
    section 4).
 6. The widget's *rendering* and the App Intents' *invocation* are not runtime

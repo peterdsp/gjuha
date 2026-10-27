@@ -51,29 +51,31 @@ the Apple Development signing certificate
 (`/OU=YTS4KJBX3P/O=PETROS DHESPOLLARI`), and the 12 other local Xcode projects
 already using it.
 
-### App Groups: still needs the developer account (**you**)
+### App Groups: done
 
-The entitlements are in the repo and correct (`Gjuha/Gjuha.entitlements`,
-`GjuhaWidgets/GjuhaWidgets.entitlements`, both generated from `project.yml`), and
-the App Group works on the simulator. What is missing is the registration of
-`group.com.gjuha.app` against the team in the Apple Developer portal, so that a
-device or distribution profile carries it.
+`group.com.gjuha.app` is registered against team `YTS4KJBX3P` and both app ids
+carry the capability. Done by letting automatic signing register it:
 
-Two ways to do it, either is fine:
+```sh
+xcodebuild build -project Gjuha.xcodeproj -scheme Gjuha \
+  -destination 'generic/platform=iOS' -allowProvisioningUpdates -skipMacroValidation
+```
 
-- Let Xcode do it. Open the project, select a real device, and build. Automatic
-  signing registers the identifier and the group. The command line equivalent is
-  `xcodebuild build -project Gjuha.xcodeproj -scheme Gjuha -destination 'generic/platform=iOS' -allowProvisioningUpdates`.
-- Or do it by hand at <https://developer.apple.com/account>: create the App Group
-  `group.com.gjuha.app`, then enable the App Groups capability on both
-  `com.gjuha.app` and `com.gjuha.app.widgets` and add the group to each.
+That build succeeded for arm64 device, creating "iOS Team Provisioning Profile:
+com.gjuha.app" and "iOS Team Provisioning Profile: com.gjuha.app.widgets" and
+signing with "Apple Development: PETROS DHESPOLLARI". Verified rather than
+assumed: both profiles were decoded with `security cms -D` and each contains
 
-This was deliberately left for you rather than run automatically, because it
-creates identifiers inside your Apple Developer account, which is not a local,
-reversible change like a build setting.
+```
+"com.apple.security.application-groups" => [ 0 => "group.com.gjuha.app" ]
+```
 
-If it is skipped entirely, the app still works and the widget simply falls back to
-its placeholder. No learner data is lost, because the App Group carries only a
+Note `-skipMacroValidation` is required here for the same reason as everywhere
+else in this project: without it the build fails on TCA macro trust, which looks
+like a signing failure but is not.
+
+If the group is ever lost, the app keeps working and the widget falls back to its
+placeholder. No learner data is at risk, because the App Group carries only a
 derived projection (see `Gjuha/Shared/GjuhaWidgetSnapshot.swift`), which is the
 whole reason it is built that way.
 
@@ -221,7 +223,8 @@ that the committed `project.pbxproj` matches `project.yml`.
 
 Then, by hand on a device:
 - [ ] Widget added to Home Screen, shows real numbers, tapping it opens the right
-      screen.
+      screen. Signing and the App Group are already in place, so this is now
+      purely a "does it look and behave right" check.
 - [ ] Lock Screen widget in all three accessory families.
 - [ ] "Hey Siri, start my review in Gjuha" with words due, and with none due.
 - [ ] The four App Shortcuts appear in the Shortcuts app.

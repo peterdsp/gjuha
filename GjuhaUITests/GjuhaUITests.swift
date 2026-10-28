@@ -173,6 +173,58 @@ final class GjuhaUITests: XCTestCase {
         }
     }
 
+    /// The daily goal is the loop the whole header is built around: the learner
+    /// picks one during onboarding, and before this release nothing in the app
+    /// ever showed progress against it. If the ring stops rendering, the goal
+    /// silently becomes invisible again, which no unit test can catch.
+    func testHomeShowsProgressTowardTheDailyGoal() throws {
+        let app = launchApp()
+        completeOnboarding(on: app)
+
+        // The ring is one accessibility element exposing its label and the real
+        // figures as its value, so this also checks it is reachable by VoiceOver
+        // rather than being a decorative shape.
+        let ring = app.otherElements["Today's goal"]
+        XCTAssertTrue(
+            ring.waitForExistence(timeout: timeout),
+            "Home should show progress toward today's goal."
+        )
+
+        // "Regular" is the goal `completeOnboarding` selects, which is 120 XP.
+        // A fresh account has earned nothing yet, so the ring must say 0 of 120
+        // rather than inventing progress.
+        XCTAssertTrue(
+            (ring.value as? String)?.contains("120") == true,
+            "The goal ring should name the chosen goal. Value was: \(String(describing: ring.value))"
+        )
+    }
+
+    /// Achievements must be visible and honestly locked on a fresh account: the
+    /// grid is the one place the app makes a claim about what the learner has
+    /// achieved, so it must not start out claiming anything.
+    func testAchievementsStartLockedAndAreReachable() throws {
+        let app = launchApp()
+        completeOnboarding(on: app)
+
+        tap(app.buttons["Profile"], "The Profile tab")
+
+        XCTAssertTrue(
+            app.staticTexts["Achievements"].waitForExistence(timeout: timeout),
+            "Profile should have an Achievements section."
+        )
+
+        let firstSteps = app.otherElements["First steps"]
+        scrollIntoView(firstSteps)
+        XCTAssertTrue(
+            firstSteps.waitForExistence(timeout: timeout),
+            "The first-lesson achievement should be in the grid."
+        )
+        XCTAssertTrue(
+            (firstSteps.value as? String)?.contains("Locked") == true,
+            "A fresh account must not start with achievements unlocked. Value was: \(String(describing: firstSteps.value))"
+        )
+    }
+
     // MARK: - Lessons
 
     /// Opening a lesson presents the exercise screen, and leaving it before

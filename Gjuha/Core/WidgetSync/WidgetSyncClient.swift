@@ -56,6 +56,8 @@ final class LiveWidgetSyncClient: WidgetSyncClient, @unchecked Sendable {
         // UserDefaults and the cached instance would report pre-lesson data.
         let units = await LiveCurriculumRepository().fetchUnits()
 
+        let goal = LearningGoal(rawValue: progressStore.learningGoalRawValue ?? "") ?? .casual
+
         let snapshot = GjuhaWidgetSnapshot(
             currentStreak: progressStore.currentStreak,
             totalXP: progressStore.totalXP,
@@ -63,6 +65,8 @@ final class LiveWidgetSyncClient: WidgetSyncClient, @unchecked Sendable {
             wordsMastered: retention.wordsMastered,
             nextLessonTitle: Self.nextLessonTitle(in: units),
             practicedToday: progressStore.hasPracticedToday,
+            xpToday: progressStore.xpEarnedToday,
+            dailyGoalXP: goal.dailyXPGoal,
             generatedAt: Date()
         )
 

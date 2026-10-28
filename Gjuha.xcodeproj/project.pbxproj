@@ -21,6 +21,7 @@
 		276BE94BADE844502CFE3B24 /* OnboardingFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA826FE31BEA459913FF230 /* OnboardingFeature.swift */; };
 		29F117C82C3D3BD9FCAEA570 /* AppFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA576DEE9996DF103ABE9944 /* AppFeature.swift */; };
 		2C27F969E2B34805BC9D00CC /* ReminderClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A44D8A08188D9313002C3EA /* ReminderClient.swift */; };
+		312883F33C4252A8F3EB6937 /* GjuhaButtonStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D7C6A35FE547540A195CB4 /* GjuhaButtonStyles.swift */; };
 		322BDF0B2C2A059E7C69E964 /* ReviewRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF816FDA4D7AF1E8571F33DB /* ReviewRepository.swift */; };
 		34DEB6E01DEB4CA994025A26 /* audio_manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 980850CF70B8C2BE6BE578C1 /* audio_manifest.json */; };
 		37A162D82B053A86CD9AD978 /* GrammarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E9D9F25830DD968FEFD5FF /* GrammarView.swift */; };
@@ -55,6 +56,7 @@
 		A03B24CAF8C346B55A6773FB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5EF51FB37400856FDE7AEE98 /* Assets.xcassets */; };
 		A318CA82DFF882AB933046F3 /* GrammarCoach.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE2769BED1B976838F08AFBA /* GrammarCoach.swift */; };
 		A44BA5C370463A6C0563B392 /* GjuhaWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEDF2D7E2F8D2D8BF492B780 /* GjuhaWidgetBundle.swift */; };
+		A99E3E623C64095A00804498 /* DesignAndRetentionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7428A57049F1C3B349F3EB3B /* DesignAndRetentionTests.swift */; };
 		AA6C0C8C8F217061FF500683 /* Exercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7354819AA729E93BCCA667F /* Exercise.swift */; };
 		AD4A43BFAC0640E64E917115 /* VocabularyFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03074DCCAB2314C9DEA2D700 /* VocabularyFeature.swift */; };
 		AE9BB6EA0172DC91816BEE9D /* ExerciseEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB8742C6E4D0AA587AF0E660 /* ExerciseEngine.swift */; };
@@ -72,13 +74,16 @@
 		E38C5BA69A2DCB64DEA3E511 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 8D4EE8952E179E89C9828FD0 /* Localizable.xcstrings */; };
 		E4C4D017948EBBAC5E00172E /* ProgressRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD7D8112A1BDFB25360A1668 /* ProgressRepository.swift */; };
 		E5577ECBFB3003D2864AA700 /* GrammarTopic.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8C4E3FD1632C0420EA79851 /* GrammarTopic.swift */; };
+		E6494E29329087F6695E05C2 /* AchievementStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 495837299D4C6950C79E6C67 /* AchievementStore.swift */; };
 		E7AF93DD6E329F12D1C7BFB0 /* ReviewScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43359A951F4619F40E5BCFE /* ReviewScheduler.swift */; };
 		E9CE243F8D44C1A7DC55D16E /* ProgressSnippetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A3056CF8785C3FA6B504251 /* ProgressSnippetView.swift */; };
 		E9EAC9AD55AA2CA509FF8074 /* units.json in Resources */ = {isa = PBXBuildFile; fileRef = 62A64CC7028F6DE857B23D4A /* units.json */; };
 		EAE56959DD79F02FED3E10CC /* WidgetSyncClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29CEE69D8DE5D4FC20321000 /* WidgetSyncClient.swift */; };
 		EF223C2F68CAF41FFCC97C59 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 45A5DB596C7EA89D593F2CA2 /* PrivacyInfo.xcprivacy */; };
 		EFB50411D617E2BD1740398E /* VocabularyRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CFDDA191EC2592A6DBCDBC4 /* VocabularyRepository.swift */; };
+		F0B9F5F7C4A84E27D9727330 /* GjuhaSpacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7122C5054E4717A6E3D54FC /* GjuhaSpacing.swift */; };
 		FA02E52C347F24C4D2A222D2 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D64619B60B89E4FB14A9F8A7 /* ProfileView.swift */; };
+		FF61CA0CD80B8496B1BBCADC /* Achievement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F232D8DBE85771E8084935D /* Achievement.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -124,6 +129,7 @@
 		0523ACE968CD1BB1D50690B1 /* Palette.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Palette.xcassets; sourceTree = "<group>"; };
 		0810C8F28574B843CD3D0573 /* LessonSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonSessionStore.swift; sourceTree = "<group>"; };
 		084CFC18FEB7EE36FE6FF779 /* GjuhaAppIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GjuhaAppIntents.swift; sourceTree = "<group>"; };
+		0F232D8DBE85771E8084935D /* Achievement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Achievement.swift; sourceTree = "<group>"; };
 		1042034FDC5B169CBAE85FAA /* GjuhaWidgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = GjuhaWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		17C1B7CF1DE1FE9647BED0EE /* GjuhaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GjuhaApp.swift; sourceTree = "<group>"; };
 		18DC025170A3CAA6573F5994 /* CulturalUnit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CulturalUnit.swift; sourceTree = "<group>"; };
@@ -131,6 +137,7 @@
 		19DCBEA4497F8BF1A676D78C /* ProfileFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileFeature.swift; sourceTree = "<group>"; };
 		1A3056CF8785C3FA6B504251 /* ProgressSnippetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressSnippetView.swift; sourceTree = "<group>"; };
 		1A3F6E6485810D5DA179CC73 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		27D7C6A35FE547540A195CB4 /* GjuhaButtonStyles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GjuhaButtonStyles.swift; sourceTree = "<group>"; };
 		29CEE69D8DE5D4FC20321000 /* WidgetSyncClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSyncClient.swift; sourceTree = "<group>"; };
 		2CFDDA191EC2592A6DBCDBC4 /* VocabularyRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyRepository.swift; sourceTree = "<group>"; };
 		2EFEF556D9B098C6A7E93831 /* GjuhaDeepLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GjuhaDeepLink.swift; sourceTree = "<group>"; };
@@ -143,6 +150,7 @@
 		45BF6CF0429AE46959CDA8BF /* GjuhaIntentRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GjuhaIntentRouter.swift; sourceTree = "<group>"; };
 		4882CEB377472BE9B6432F61 /* AudioLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLibrary.swift; sourceTree = "<group>"; };
 		48EC91B0F20CFC6694369833 /* VocabularyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyView.swift; sourceTree = "<group>"; };
+		495837299D4C6950C79E6C67 /* AchievementStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementStore.swift; sourceTree = "<group>"; };
 		4DFB380FCFEB4B1B53B5BF74 /* ContentCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentCatalog.swift; sourceTree = "<group>"; };
 		4EE9B40CC6DAA0A06A173C0A /* ReleaseSurfaceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReleaseSurfaceTests.swift; sourceTree = "<group>"; };
 		52946A6304B4906FC0EC7BCA /* GjuhaTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = GjuhaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -158,6 +166,7 @@
 		6FFC860C5CF9F3C4BB286031 /* GjuhaColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GjuhaColors.swift; sourceTree = "<group>"; };
 		707DD6AEF4DD96731894AC2F /* WidgetPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetPalette.swift; sourceTree = "<group>"; };
 		7330897C578448A63EBEF256 /* AudioManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioManifest.swift; sourceTree = "<group>"; };
+		7428A57049F1C3B349F3EB3B /* DesignAndRetentionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignAndRetentionTests.swift; sourceTree = "<group>"; };
 		7429D8078387001A24BAF936 /* ProgressStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressStore.swift; sourceTree = "<group>"; };
 		77DCEF0C489CE7D04FED301F /* AudioPlayerClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayerClient.swift; sourceTree = "<group>"; };
 		7AF761B0EBE9456459F5E43C /* LessonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonView.swift; sourceTree = "<group>"; };
@@ -190,6 +199,7 @@
 		D64619B60B89E4FB14A9F8A7 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		D8C4E3FD1632C0420EA79851 /* GrammarTopic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarTopic.swift; sourceTree = "<group>"; };
 		DA576DEE9996DF103ABE9944 /* AppFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFeature.swift; sourceTree = "<group>"; };
+		E7122C5054E4717A6E3D54FC /* GjuhaSpacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GjuhaSpacing.swift; sourceTree = "<group>"; };
 		EEDF2D7E2F8D2D8BF492B780 /* GjuhaWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GjuhaWidgetBundle.swift; sourceTree = "<group>"; };
 		EF816FDA4D7AF1E8571F33DB /* ReviewRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewRepository.swift; sourceTree = "<group>"; };
 		F6597BB7B8728D68DC39F74C /* GjuhaFonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GjuhaFonts.swift; sourceTree = "<group>"; };
@@ -331,12 +341,29 @@
 			path = Grammar;
 			sourceTree = "<group>";
 		};
+		4657CD55DB62A47087CC6116 /* Achievements */ = {
+			isa = PBXGroup;
+			children = (
+				0F232D8DBE85771E8084935D /* Achievement.swift */,
+				495837299D4C6950C79E6C67 /* AchievementStore.swift */,
+			);
+			path = Achievements;
+			sourceTree = "<group>";
+		};
 		4673FE665D609FB3CA71A166 /* Typography */ = {
 			isa = PBXGroup;
 			children = (
 				F6597BB7B8728D68DC39F74C /* GjuhaFonts.swift */,
 			);
 			path = Typography;
+			sourceTree = "<group>";
+		};
+		52EC266B10565684D1609062 /* Spacing */ = {
+			isa = PBXGroup;
+			children = (
+				E7122C5054E4717A6E3D54FC /* GjuhaSpacing.swift */,
+			);
+			path = Spacing;
 			sourceTree = "<group>";
 		};
 		544C7A322D505531AEB60367 /* Retention */ = {
@@ -408,7 +435,9 @@
 		7CCB8DEF2FA8FEE3A169C961 /* DesignSystem */ = {
 			isa = PBXGroup;
 			children = (
+				FFCB513C031796832A0C7442 /* Buttons */,
 				9E54FACF020EA21CF8FD1B89 /* Colors */,
+				52EC266B10565684D1609062 /* Spacing */,
 				4673FE665D609FB3CA71A166 /* Typography */,
 			);
 			path = DesignSystem;
@@ -506,6 +535,7 @@
 		AF7615DE7C1478170BA7C564 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				4657CD55DB62A47087CC6116 /* Achievements */,
 				5BFCB1755C73535E86CDF5CE /* Audio */,
 				FBAE55B5B2F153E67452E60C /* Coaching */,
 				1914B6346BD34B8D29EBBF51 /* Content */,
@@ -522,6 +552,7 @@
 		B4B70DEBFA640680E6901215 /* GjuhaTests */ = {
 			isa = PBXGroup;
 			children = (
+				7428A57049F1C3B349F3EB3B /* DesignAndRetentionTests.swift */,
 				5C3B08FE65E3B3A31A662EEB /* GjuhaTests.swift */,
 				4EE9B40CC6DAA0A06A173C0A /* ReleaseSurfaceTests.swift */,
 			);
@@ -630,6 +661,14 @@
 				B82598DB6E5FAC930554260D /* HomeView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		FFCB513C031796832A0C7442 /* Buttons */ = {
+			isa = PBXGroup;
+			children = (
+				27D7C6A35FE547540A195CB4 /* GjuhaButtonStyles.swift */,
+			);
+			path = Buttons;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -817,6 +856,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF61CA0CD80B8496B1BBCADC /* Achievement.swift in Sources */,
+				E6494E29329087F6695E05C2 /* AchievementStore.swift in Sources */,
 				29F117C82C3D3BD9FCAEA570 /* AppFeature.swift in Sources */,
 				6975187D7481E4C5DCB6C563 /* AppView.swift in Sources */,
 				B39B799F6633D2A84A83E146 /* AudioLibrary.swift in Sources */,
@@ -832,11 +873,13 @@
 				AE9BB6EA0172DC91816BEE9D /* ExerciseEngine.swift in Sources */,
 				5166A3F0548582CA18E74E05 /* GjuhaApp.swift in Sources */,
 				BCED22910A0CBE74BFCC999D /* GjuhaAppIntents.swift in Sources */,
+				312883F33C4252A8F3EB6937 /* GjuhaButtonStyles.swift in Sources */,
 				6AC98AB592C4E63836F37F01 /* GjuhaColors.swift in Sources */,
 				2193B1A9F486FC59AAB8F51F /* GjuhaDeepLink.swift in Sources */,
 				707ED465F0018AAE8D21DBC3 /* GjuhaFonts.swift in Sources */,
 				48BBAD79DA06FBB63D020B5C /* GjuhaIntentRouter.swift in Sources */,
 				D6AF2EC3C005898B9E17BD41 /* GjuhaSchema.swift in Sources */,
+				F0B9F5F7C4A84E27D9727330 /* GjuhaSpacing.swift in Sources */,
 				D4A97907ED28B4DB4235350A /* GjuhaWidgetSnapshot.swift in Sources */,
 				A318CA82DFF882AB933046F3 /* GrammarCoach.swift in Sources */,
 				682641D868819BB48C143621 /* GrammarFeature.swift in Sources */,
@@ -874,6 +917,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A99E3E623C64095A00804498 /* DesignAndRetentionTests.swift in Sources */,
 				86732254B4F74FD4FDD64C33 /* GjuhaTests.swift in Sources */,
 				3C82340D44DF101E6846C736 /* ReleaseSurfaceTests.swift in Sources */,
 			);

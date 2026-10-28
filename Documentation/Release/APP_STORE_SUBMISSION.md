@@ -42,7 +42,8 @@ It also widens the install base, which matters for the diaspora audience in
 `RESEARCH.md` who are likeliest to be on older hardware.
 
 Verified at the floor, not just on the newest runtime: the suite was run on an
-iOS 26.5 simulator and all 87 tests pass.
+iOS 26.5 simulator and all tests pass. The suite is now 131 unit tests in 16
+suites plus 8 UI tests.
 
 ## 2. Signing and capabilities
 
@@ -202,12 +203,22 @@ iPad-tailored layout and is listed as a universal app.
 
 Suggested six, in this order, because they tell the differentiator story rather
 than just showing screens:
-1. Home with the lesson map and a visible streak.
+1. Home with the lesson map, a visible streak and the daily goal ring partly
+   filled. Shoot this with the goal *not* yet met: a part-filled ring reads as
+   something to finish, a tick reads as nothing to do.
 2. The Daily review card with words due.
 3. A review question mid-answer.
-4. Profile, showing words seen / in review / mastered side by side.
+4. Profile, showing words seen / in review / mastered side by side, with the
+   achievement grid below.
 5. A grammar guide with its conjugation table.
 6. The Home Screen widget beside the app.
+
+Shoot each one in light appearance as well as dark. Light was where the hardcoded
+white overlays used to disappear, and a screenshot set is the cheapest place to
+notice that kind of regression returning.
+
+Do not screenshot the lesson completion screen with a fabricated accuracy: it is
+derived from real answers, so it has to be earned on the device being captured.
 
 Do not screenshot the culture or dialect screens: their content is still gated on
 native review and in a normal build they show an "in review" empty state.
@@ -235,6 +246,19 @@ Then, by hand on a device:
 - [ ] Widget added to Home Screen, shows real numbers, tapping it opens the right
       screen. Signing and the App Group are already in place, so this is now
       purely a "does it look and behave right" check.
+- [ ] The widget's daily goal ring. Specifically: install over a build from
+      before this change, so the widget is reading a projection written without
+      the goal fields. It must keep showing the streak and due count and simply
+      omit the ring, then pick the ring up once the app is next opened. This path
+      is unit tested (`aPreUpgradeWidgetSnapshotStillDecodes`) but the
+      install-over behaviour is not.
+- [ ] Increase Contrast on (Settings > Accessibility > Display & Text Size). The
+      palette ships increased-contrast variants for the first time, so this is
+      the first release where that setting does anything. Check a lesson, Home
+      and Profile in both light and dark.
+- [ ] Tab state. Open Words, search for something, switch to Grammar and back.
+      The query and scroll position must survive, which is the behaviour the
+      native tab bar replaced the custom one to get.
 - [ ] Lock Screen widget in all three accessory families.
 - [ ] "Hey Siri, start my review in Gjuha" with words due, and with none due.
 - [ ] The four App Shortcuts appear in the Shortcuts app.
@@ -248,17 +272,30 @@ Then, by hand on a device:
 
 These are real and are not closed by this pass.
 
-1. **Albanian UI strings need a native pass.** All 170 on-screen strings are now
-   in String Catalogs with an Albanian locale, but every Albanian entry is marked
-   `needs_review` in the catalog. They are UI chrome only (buttons, labels,
-   settings), not teaching content, so the risk is low, but they have not been
-   checked by a native speaker. See `REVIEW_PACKAGE.md` section 4.
+1. **Albanian UI strings need a native pass.** All 226 on-screen strings (205 in
+   the app, 21 in the widget) are in String Catalogs with an Albanian locale, but
+   every Albanian entry is marked `needs_review` in the catalog. They are UI
+   chrome only (buttons, labels, settings, achievement titles), not teaching
+   content, so the risk is low, but they have not been checked by a native
+   speaker. See `REVIEW_PACKAGE.md` section 4.
+
+   The 51 strings added in the design and retention pass are in the same state as
+   the rest. The achievement titles are the ones most worth a careful look,
+   because several are idiomatic in English ("Halfway to fluent", "Three in a
+   row") and a literal translation will read oddly.
 2. **Pronunciation audio.** Still zero reviewed assets. Needs billing
    authorization for Azure Neural TTS `sq-AL`, or native recordings, then native
    review of every clip. Listening exercises degrade cleanly today.
 3. **Gheg dialect pack and the hospitality cultural unit.** Still
    `pendingNativeReview`, still held out of production by `ContentCatalog`.
-4. **Grammar coach output stays English.** `CoachExplanation.text` and its
+4. **Daily goal rate is a judgement, not a measurement.** `LearningGoal.xpPerMinute`
+   is 12, derived from what the engine awards per exercise and roughly how long a
+   lesson takes, which makes the casual goal about one lesson a day. It has not
+   been checked against how long real learners actually take. If it turns out to
+   be wrong the fix is one constant, and because every goal is derived from it the
+   four options cannot drift apart.
+
+5. **Grammar coach output stays English.** `CoachExplanation.text` and its
    disclaimer are generated English prose and are deliberately not localized:
    translating the disclaimer while the explanation stays English would be worse
    than leaving both. If the coach is ever localized, do both together.

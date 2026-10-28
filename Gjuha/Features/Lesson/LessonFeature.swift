@@ -14,6 +14,22 @@ struct LessonFeature {
         var answerResult: AnswerResult?
         var selectedAnswer: String?
         var combo: Int = 0
+        /// Answers graded this attempt, and how many were correct. A near miss
+        /// counts as answered but not correct, matching how it is graded and how
+        /// it is fed to the review scheduler.
+        var answeredCount: Int = 0
+        var correctCount: Int = 0
+        /// Best combo reached this attempt. `combo` itself is reset by every
+        /// wrong answer, so the completion screen was reading whatever the combo
+        /// happened to be at the final question and calling it "best".
+        var bestCombo: Int = 0
+        /// Milestones this session earned, shown once on the completion screen.
+        var newAchievements: [Achievement] = []
+        /// Whether this session is what carried the learner past their daily
+        /// goal, so the completion screen can say so exactly once.
+        var metDailyGoalThisSession: Bool = false
+        /// Stats after this session, for the completion screen's goal line.
+        var statsAfterSession: UserStats?
 
         /// Non nil when this session is a spaced repetition review over these due
         /// word ids, rather than a course lesson. A review does not mark a lesson
@@ -58,6 +74,8 @@ struct LessonFeature {
                 hearts: hearts,
                 xpEarned: xpEarned,
                 combo: combo,
+                answeredCount: answeredCount,
+                correctCount: correctCount,
                 savedAt: Date()
             )
         }
@@ -73,6 +91,9 @@ struct LessonFeature {
             self.hearts = snapshot.hearts
             self.xpEarned = snapshot.xpEarned
             self.combo = snapshot.combo
+            self.answeredCount = snapshot.answeredCount
+            self.correctCount = snapshot.correctCount
+            self.bestCombo = snapshot.combo
             self.phase = .inProgress
         }
 
@@ -85,6 +106,18 @@ struct LessonFeature {
             guard !exercises.isEmpty else { return 0 }
             return Double(currentIndex) / Double(exercises.count)
         }
+
+        /// Share of graded answers that were correct, or nil when nothing has
+        /// been graded yet.
+        ///
+        /// Nil rather than zero on purpose: a session resumed from a snapshot
+        /// written by the previous app version has no counters, and "0%
+        /// accuracy" would be a false statement about a lesson the learner may
+        /// have aced. The completion screen omits the figure instead.
+        var accuracy: Double? {
+            guard answeredCount > 0 else { return nil }
+            return Double(correctCount) / Double(answeredCount)
+        }
     }
 
     enum Action {
@@ -95,6 +128,7 @@ struct LessonFeature {
         case answerFeedbackDismissed
         case nextExercise
         case lessonCompleted
+        case sessionOutcomeLoaded(achievements: [Achievement], stats: UserStats, goalMetNow: Bool)
         case lessonFailed
         case exitButtonTapped
         case exitConfirmationDismissed
@@ -106,6 +140,8 @@ struct LessonFeature {
     @Dependency(\.progressRepository) var progressRepository
     @Dependency(\.reviewRepository) var reviewRepository
     @Dependency(\.audioPlayer) var audioPlayer
+    @Dependency(\.achievements) var achievements
+    @Dependency(\.widgetSync) var widgetSync
     @Dependency(\.continuousClock) var clock
 
     /// Writes the resume snapshot, or does nothing when there is none (reviews,
@@ -118,6 +154,23 @@ struct LessonFeature {
     /// Drops the saved course-lesson session so nothing resumes next launch.
     private func clearSession() -> Effect<Action> {
         .run { _ in LessonSessionStore.shared.clear() }
+    }
+
+    /// Reads the stats a finished session produced, records any milestone it
+    /// earned, and reports whether this session is the one that met the daily
+    /// goal.
+    ///
+    /// Shared by the course-lesson and review paths because both bank XP and
+    /// both count as daily activity, so either can unlock a milestone and either
+    /// can be the session that crosses the goal line.
+    private static func outcome(
+        progressRepository: any ProgressRepository,
+        achievements: any AchievementsClient,
+        goalMetBefore: Bool
+    ) async -> (achievements: [Achievement], stats: UserStats, goalMetNow: Bool) {
+        let stats = await progressRepository.fetchUserStats()
+        let unlocked = await achievements.recordUnlocks(for: stats)
+        return (unlocked, stats, !goalMetBefore && stats.hasMetDailyGoal)
     }
 
     var body: some ReducerOf<Self> {
@@ -135,6 +188,12 @@ struct LessonFeature {
                 state.hearts = 3
                 state.xpEarned = 0
                 state.combo = 0
+                state.answeredCount = 0
+                state.correctCount = 0
+                state.bestCombo = 0
+                state.newAchievements = []
+                state.metDailyGoalThisSession = false
+                state.statsAfterSession = nil
                 state.answerResult = nil
                 state.selectedAnswer = nil
                 if let wordIds = state.reviewWordIds {
@@ -169,9 +228,12 @@ struct LessonFeature {
                 state.selectedAnswer = answer
 
                 let grade = exerciseEngine.grade(answer, for: current)
+                state.answeredCount += 1
                 switch grade {
                 case .correct:
+                    state.correctCount += 1
                     state.combo += 1
+                    state.bestCombo = max(state.bestCombo, state.combo)
                     // Combo bonus: +5 XP for every 3 correct in a row.
                     let comboBonus = state.combo % 3 == 0 ? 5 : 0
                     let awarded = current.xpValue + comboBonus
@@ -269,8 +331,20 @@ struct LessonFeature {
                 // daily activity. It must not mark a course lesson complete or touch
                 // unlock state.
                 if state.isReview {
-                    return .run { [xp] _ in
+                    return .run { [xp] send in
+                        let goalBefore = await progressRepository.fetchUserStats().hasMetDailyGoal
                         await progressRepository.recordReviewActivity(xpEarned: xp)
+                        let outcome = await Self.outcome(
+                            progressRepository: progressRepository,
+                            achievements: achievements,
+                            goalMetBefore: goalBefore
+                        )
+                        await send(.sessionOutcomeLoaded(
+                            achievements: outcome.achievements,
+                            stats: outcome.stats,
+                            goalMetNow: outcome.goalMetNow
+                        ))
+                        await widgetSync.refresh()
                     }
                 }
                 // The lesson is finished: its XP is banked here exactly once, so the
@@ -278,7 +352,12 @@ struct LessonFeature {
                 // double counting XP or rescheduling.
                 return .merge(
                     clearSession(),
-                    .run { [lesson = state.lesson, xp] _ in
+                    .run { [lesson = state.lesson, xp] send in
+                        // Read the goal state *before* banking this session's XP,
+                        // so "you met your goal" is said by the session that
+                        // actually crossed the line and not by every one after it.
+                        let goalBefore = await progressRepository.fetchUserStats().hasMetDailyGoal
+
                         await progressRepository.markLessonCompleted(
                             lesson.id,
                             seedId: lesson.seedId,
@@ -291,8 +370,37 @@ struct LessonFeature {
                             lessonTitle: lesson.title
                         )
                         await reviewRepository.scheduleNewWords(wordIds)
+
+                        let outcome = await Self.outcome(
+                            progressRepository: progressRepository,
+                            achievements: achievements,
+                            goalMetBefore: goalBefore
+                        )
+                        await send(.sessionOutcomeLoaded(
+                            achievements: outcome.achievements,
+                            stats: outcome.stats,
+                            goalMetNow: outcome.goalMetNow
+                        ))
+                        await widgetSync.refresh()
                     }
                 )
+
+            case let .sessionOutcomeLoaded(newAchievements, stats, goalMetNow):
+                state.newAchievements = newAchievements
+                state.statsAfterSession = stats
+                state.metDailyGoalThisSession = goalMetNow
+
+                // Marked here rather than from the completion screen's
+                // `onAppear`. `phase` flips to `.completed` synchronously while
+                // this outcome arrives from an effect, so the screen is already
+                // up and its `onAppear` has already fired with an empty list:
+                // view-driven marking would always have marked nothing.
+                //
+                // By this point the screen is presented and this list is what it
+                // is about to render, so recording it as shown is accurate.
+                let ids = newAchievements.map(\.id)
+                guard !ids.isEmpty else { return .none }
+                return .run { _ in await achievements.markCelebrated(ids) }
 
             case .lessonFailed:
                 state.phase = .failed

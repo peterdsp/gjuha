@@ -32,6 +32,23 @@ struct AppFeature {
         /// yet. Holding it here and resolving it on `unitsLoaded` is what makes a
         /// cold launch from a widget behave the same as a tap inside the app.
         var pendingDeepLink: GjuhaDeepLink?
+
+        /// Whether the first screen has everything it needs to be useful.
+        ///
+        /// This is what dismisses the launch splash. Before, the splash was held
+        /// for a fixed 1.45s regardless of whether the app was ready, which is
+        /// the "branded launch delay" Apple's launch guidance calls out: it
+        /// makes a fast launch slow and tells the learner nothing. Now the
+        /// splash covers real work and gets out of the way as soon as that work
+        /// is done.
+        ///
+        /// Onboarding needs no curriculum, so an unonboarded launch is ready
+        /// immediately. An onboarded launch is ready once `bootstrapData` has
+        /// run and the curriculum is in state.
+        var isReadyForFirstScreen: Bool {
+            guard hasCompletedOnboarding else { return true }
+            return hasBootstrappedData && !home.units.isEmpty
+        }
     }
 
     enum Action {

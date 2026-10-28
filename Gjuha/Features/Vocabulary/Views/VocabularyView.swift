@@ -175,7 +175,7 @@ private struct FilterChip: View {
                 .clipShape(RoundedRectangle(cornerRadius: 20))
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)
-                        .stroke(isSelected ? Color.clear : Color.white.opacity(0.22), lineWidth: 0.8)
+                        .stroke(isSelected ? Color.clear : Color.gjuha.hairline, lineWidth: 0.8)
                 )
         }
     }

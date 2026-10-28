@@ -6,10 +6,18 @@ struct HomeFeature {
     @ObservableState
     struct State: Equatable {
         var units: [LearningUnit] = []
-        var currentStreak: Int = 0
-        var totalXP: Int = 0
         var dueReviewCount: Int = 0
         var isLoading: Bool = false
+        /// The whole stats record rather than a streak and an XP total.
+        ///
+        /// Home now shows progress toward today's goal, which needs `xpToday`
+        /// and `dailyGoalXP` as well, and passing four loose integers around was
+        /// how the header and Profile ended up able to disagree about the same
+        /// numbers.
+        var stats: UserStats = .empty
+
+        var currentStreak: Int { stats.currentStreak }
+        var totalXP: Int { stats.totalXP }
     }
 
     enum Action {
@@ -19,7 +27,7 @@ struct HomeFeature {
         case startReviewTapped
         case exploreCultureTapped
         case refreshAfterLessonComplete
-        case statsLoaded(streak: Int, xp: Int)
+        case statsLoaded(UserStats)
         case dueReviewsLoaded(Int)
     }
 
@@ -36,9 +44,7 @@ struct HomeFeature {
                 return .run { send in
                     let units = await curriculumRepository.fetchUnits()
                     await send(.unitsLoaded(units))
-                    let streak = await progressRepository.fetchCurrentStreak()
-                    let xp = await progressRepository.fetchTotalXP()
-                    await send(.statsLoaded(streak: streak, xp: xp))
+                    await send(.statsLoaded(await progressRepository.fetchUserStats()))
                     await send(.dueReviewsLoaded(reviewRepository.dueCount()))
                 }
 
@@ -47,9 +53,8 @@ struct HomeFeature {
                 state.isLoading = false
                 return .none
 
-            case .statsLoaded(let streak, let xp):
-                state.currentStreak = streak
-                state.totalXP = xp
+            case .statsLoaded(let stats):
+                state.stats = stats
                 return .none
 
             case .dueReviewsLoaded(let count):
@@ -75,8 +80,7 @@ struct HomeFeature {
                     let freshRepo = LiveCurriculumRepository()
                     let units = await freshRepo.fetchUnits()
                     await send(.unitsLoaded(units))
-                    let store = ProgressStore.shared
-                    await send(.statsLoaded(streak: store.currentStreak, xp: store.totalXP))
+                    await send(.statsLoaded(await progressRepository.fetchUserStats()))
                     await send(.dueReviewsLoaded(reviewRepository.dueCount()))
                 }
             }

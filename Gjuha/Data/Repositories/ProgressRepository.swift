@@ -11,8 +11,6 @@ protocol ProgressRepository: Sendable {
     /// lifetime total and counts the day as activity for the streak. Does not mark a
     /// lesson complete or change unlock state.
     func recordReviewActivity(xpEarned: Int) async
-    func fetchCurrentStreak() async -> Int
-    func fetchTotalXP() async -> Int
     func fetchLearningGoal() async -> LearningGoal
     func saveLearningGoal(_ goal: LearningGoal) async
     /// Wipes local learning progress and the review schedule, keeping the chosen
@@ -46,13 +44,16 @@ final class LiveProgressRepository: ProgressRepository, @unchecked Sendable {
     func fetchUserStats() async -> UserStats {
         let store = ProgressStore.shared
         let retention = await reviewRepository.summary()
+        let goal = await fetchLearningGoal()
         return UserStats(
             currentStreak: store.currentStreak,
             totalXP: store.totalXP,
             wordsSeen: Self.wordsSeen(in: store.completedLessonSeedIds),
             lessonsCompleted: store.lessonsCompleted,
             wordsPracticed: retention.wordsPracticed,
-            wordsMastered: retention.wordsMastered
+            wordsMastered: retention.wordsMastered,
+            xpToday: store.xpEarnedToday,
+            dailyGoalXP: goal.dailyXPGoal
         )
     }
 
@@ -81,14 +82,6 @@ final class LiveProgressRepository: ProgressRepository, @unchecked Sendable {
         ProgressStore.shared.markDailyActivity()
     }
 
-    func fetchCurrentStreak() async -> Int {
-        ProgressStore.shared.currentStreak
-    }
-
-    func fetchTotalXP() async -> Int {
-        ProgressStore.shared.totalXP
-    }
-
     func fetchLearningGoal() async -> LearningGoal {
         guard let raw = ProgressStore.shared.learningGoalRawValue,
               let goal = LearningGoal(rawValue: raw) else {
@@ -104,6 +97,10 @@ final class LiveProgressRepository: ProgressRepository, @unchecked Sendable {
     func resetLearningData() async {
         ProgressStore.shared.resetLearningProgress()
         ReviewStore.shared.reset()
+        // The badges were derived from the stats that just went away; keeping
+        // them would present milestones the learner's visible progress no
+        // longer supports.
+        AchievementStore.shared.reset()
         // Drop any in-progress lesson so a reset does not resume a stale session
         // on the next launch.
         LessonSessionStore.shared.clear()
@@ -120,15 +117,15 @@ final class MockProgressRepository: ProgressRepository, @unchecked Sendable {
             wordsSeen: 45,
             lessonsCompleted: 12,
             wordsPracticed: 38,
-            wordsMastered: 16
+            wordsMastered: 16,
+            xpToday: 70,
+            dailyGoalXP: LearningGoal.regular.dailyXPGoal
         )
     }
 
     func markLessonCompleted(_ lessonId: UUID, seedId: String, xpEarned: Int) async {}
     func updateStreak() async {}
     func recordReviewActivity(xpEarned: Int) async {}
-    func fetchCurrentStreak() async -> Int { 7 }
-    func fetchTotalXP() async -> Int { 340 }
     func fetchLearningGoal() async -> LearningGoal { .regular }
     func saveLearningGoal(_ goal: LearningGoal) async {}
     func resetLearningData() async {}

@@ -252,7 +252,7 @@ two String Catalogs; app bundle assets 8.3 MB to 4.7 MB; bundled seed content
    automated protection. Fixed by lowering the floor to iOS 26 and removing the
    one redundant iOS 27 only API. CI now builds, unit tests, and UI tests on every
    push, with no skip conditions.
-5. Native-speaker review of the 170 Albanian interface strings (`REVIEW_PACKAGE.md`
+5. Native-speaker review of the 226 Albanian interface strings (`REVIEW_PACKAGE.md`
    section 4).
 6. The widget's *rendering* and the App Intents' *invocation* are not runtime
    verified. The data path underneath both is: the shared container is created,
@@ -264,6 +264,138 @@ two String Catalogs; app bundle assets 8.3 MB to 4.7 MB; bundled seed content
    built app with no dropped phrases, which is evidence that extraction worked,
    not that Siri answers. The device checklist is in `APP_STORE_SUBMISSION.md`
    section 8.
+
+## Fourth pass: design system and retention loop
+
+Opened 2026-10-29. The brief was to bring the app to release-grade polish. The
+work divided cleanly into defects found by measuring, and one loop that was built
+but never closed.
+
+### Colour, measured rather than asserted
+
+The palette had light and dark variants and nothing else, and several tokens were
+being used in a role they could not carry. Measuring every pair the app actually
+renders produced this:
+
+| What | Measured | Effect |
+|---|---|---|
+| Gold (`XP`) as text on `Surface` | **1.76:1** | The XP number on Home, the Total XP and Mastered stat tiles, and the widget's star were all effectively unreadable in light appearance. |
+| White on the amber near-miss banner | **1.76:1** | The line telling a learner what they spelled wrong was the hardest line in the app to read. |
+| White on the `Success` banner | **2.70:1** | Below even the 3:1 graphical floor. |
+| White on the `Streak` gradient stop | **2.61:1** | Under the bold label of every primary button. |
+| `TextTertiary` on `Background` | **2.70:1** light, **2.99:1** dark | Real captions, in both appearances. |
+| `Error` as fill under white | **4.06:1** | Under a 12pt caption. |
+
+Fixed by splitting fill from on-surface text (`accent` vs `accentStrong`, and so
+on), deepening the four fills that carry white until white clears 4.5:1, and
+keeping `Warning` and `XP` bright with a dark `onWarning` foreground instead,
+because deepening gold far enough for white turns it brown.
+
+| Item | Acceptance criteria | Status |
+|---|---|---|
+| Fill / on-surface token split | Every brand and state colour has a documented role; a `*Strong` member exists for text and icons; `onAccent` / `onWarning` name what goes on a fill | done |
+| Increased-contrast variants | Every token ships four appearances; the Increase Contrast setting has an effect | done (23 pairs x 4 appearances asserted) |
+| Contrast enforced at both ends | `gen_colors.py` exits non-zero below 4.5:1; `GjuhaContrastTests` measures the same pairs on resolved runtime colours | done (script and runtime agree to 3 decimal places) |
+| Overlay tints tokenised | No `Color.white.opacity(...)` left on an adaptive surface; card edges, tracks, chips and option borders visible in light appearance | done (40 call sites across 6 views) |
+| 4pt grid codified | `GjuhaSpacing` named steps, radii, 44pt hit target; asserted on the grid | done |
+| Button styles | Primary / secondary / card; press feedback; gradient stop opaque so it keeps its measured ratio | done (replaced 4 hand-built copies) |
+
+The script and the test are deliberately redundant. The script alone proves
+nothing, because the asset catalog can be edited in Xcode without running it. The
+measured agreement between the two is the only reason either claim is worth
+anything. Verified by mutation: raising the test floor to 25:1 produces failures
+quoting the real runtime numbers.
+
+### Native tab bar
+
+The custom floating capsule bar was replaced with `TabView` + `Tab`. Three
+defects, not a matter of taste:
+
+1. **Tab state was destroyed on every switch.** The bar drove a `switch` inside a
+   `ZStack` carrying `.id(selectedTab)`, so leaving Words discarded its search
+   text, CEFR filter and scroll position. Apple's tab-bar guidance is explicit
+   that a section keeps state independently of selection.
+2. **The selected label failed contrast.** The capsule was a hardcoded black
+   gradient in both appearances with the selected item tinted accent, which is
+   about 3.3:1 behind an 11pt semibold label.
+3. **It reimplemented system behaviour**: Liquid Glass, the scroll-edge effect,
+   iPad sidebar adaptation for a universal app, tab-bar minimise, and VoiceOver
+   position reporting.
+
+| Item | Acceptance criteria | Status |
+|---|---|---|
+| Native tab bar | Per-tab state survives a round trip; iPad adapts to a sidebar; existing UI tests still find each tab by label | done (6 pre-existing UI tests pass unchanged) |
+
+### Launch
+
+The splash was held for a fixed 1.45s whether or not the app was ready, which is
+the branded launch delay Apple's launch guidance calls out. It now tracks
+`AppFeature.State.isReadyForFirstScreen`, with a short floor so a warm launch does
+not strobe and a 2.5s cap so a content failure cannot trap the learner behind it.
+
+| Item | Acceptance criteria | Status |
+|---|---|---|
+| Readiness-driven splash | Dismisses when the curriculum is in state, not on a timer; capped; Reduce Motion path shortened further | done |
+
+### The daily goal loop
+
+The learner picked a daily goal during onboarding, it was persisted, it was
+editable in Profile, and **nothing in the app ever showed progress against it**.
+There was no way to know whether today counted.
+
+| Item | Acceptance criteria | Status |
+|---|---|---|
+| Daily XP accounting | Day-stamped, so the rollover is a read-time comparison and needs no timer, no background task and no assumption that the app was open at midnight; follows the device across time zones like the streak does | done (7 unit tests incl. rollover and reset) |
+| Goal derived from the chosen minutes | One rate constant, so the four options cannot drift apart; reachable by reviewing alone, so a learner is never pushed past unretained material to fill a ring | done |
+| Surfaced on Home, in Profile, in the widget | Ring in the header, full bar in Profile, ring on the small widget and a capacity gauge on the circular accessory when nothing is due | done (1 UI test) |
+| Goal-met is announced once | The session that crosses the line says so; later sessions that day do not | done (goal state read before XP is banked) |
+
+### Achievements
+
+| Item | Acceptance criteria | Status |
+|---|---|---|
+| Achievement catalogue | 12 milestones over streak, lessons, XP, breadth and mastery; pure evaluation over `UserStats`, no clock and no randomness | done (13 unit tests) |
+| Mastery milestones are honest | Read `wordsMastered` from the scheduler, so "100 kept" means survived to the documented long-term interval, never "seen once" | done (asserted: 4,000 words seen with none mastered unlocks no mastery badge) |
+| Durable unlock ledger | An unlock is a historical fact and is never recomputed downward, so a broken streak does not take the badge back | done (9 unit tests) |
+| Celebrated exactly once | Tracked separately from the ledger, so a celebration survives the app being killed between earning and seeing it | done |
+| Surfaced | Grid in Profile with a "next up" row showing real distance; new badges on the completion screen | done (1 UI test: fresh account starts locked) |
+
+### Session summary
+
+The completion screen showed XP and a "best combo" that was really `combo` at the
+final question, so a learner who slipped on the last answer was told their best
+combo was 0. It now reports accuracy, question count, the true best combo and the
+streak, and the screen scrolls with the action pinned, because at accessibility
+text sizes the two `Spacer()`s pushed Continue off the bottom with no way to reach
+it.
+
+| Item | Acceptance criteria | Status |
+|---|---|---|
+| Accuracy tracking | Correct and answered counted per attempt; near miss counts as answered, not correct, matching how it is graded and scheduled | done |
+| Best combo | Tracked as a maximum rather than read at the end | done |
+| Pre-upgrade sessions still resume | Both stored payloads that gained fields decode a previous-version payload with defaults rather than throwing | done (4 unit tests) |
+| Reachable at every text size | Scroll view with the action in a bottom safe-area inset | done |
+
+### Stored-payload compatibility
+
+Two persisted structs gained fields after 1.0 was already installable, and
+synthesised `Codable` throws on a payload missing a non-optional key. Both failure
+modes are silent: a learner mid-lesson loses their place, and a placed widget
+falls back to its placeholder. Both now decode with defaults, and the tests build
+their fixtures by encoding a real value and deleting the new keys, rather than
+hand-writing a payload that would drift from the schema and then test nothing but
+itself.
+
+### Not done in this pass
+
+- Albanian for the 51 new strings is entered and marked `needs_review`, like every
+  other Albanian entry. Still the same open gate.
+- `xpPerMinute = 12` is a judgement from what the engine awards, not a measurement
+  against real learners. Recorded in `APP_STORE_SUBMISSION.md` section 9.
+- The widget's install-over-an-older-build path is unit tested but not device
+  verified. Added to the device checklist.
+- Increase Contrast now has an effect for the first time, which means it has never
+  been looked at on hardware. Added to the device checklist.
 
 ## Verification log
 

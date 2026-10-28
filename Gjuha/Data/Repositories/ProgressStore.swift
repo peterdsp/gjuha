@@ -20,6 +20,8 @@ final class ProgressStore: @unchecked Sendable {
         static let currentStreak = "gjuha.currentStreak"
         static let lastActivityDate = "gjuha.lastActivityDate"
         static let learningGoal = "gjuha.learningGoal"
+        static let xpToday = "gjuha.xpToday"
+        static let xpTodayDate = "gjuha.xpTodayDate"
     }
 
     // MARK: - Completed Lessons
@@ -48,6 +50,9 @@ final class ProgressStore: @unchecked Sendable {
         let total = defaults.integer(forKey: Keys.totalXP) + xpEarned
         defaults.set(total, forKey: Keys.totalXP)
 
+        // And today's, which is what the daily goal is measured against.
+        addXPToToday(xpEarned)
+
         // Update streak
         updateStreak()
     }
@@ -67,6 +72,34 @@ final class ProgressStore: @unchecked Sendable {
     func addXP(_ amount: Int) {
         guard amount > 0 else { return }
         defaults.set(defaults.integer(forKey: Keys.totalXP) + amount, forKey: Keys.totalXP)
+        addXPToToday(amount)
+    }
+
+    // MARK: - Today's XP
+
+    /// XP earned since local midnight, which is what the daily goal measures.
+    ///
+    /// Stored as a value plus the day it belongs to, rather than as a value that
+    /// something has to remember to reset. A stored day that is not today reads
+    /// as zero, so the rollover needs no timer, no background task, and no
+    /// correctness assumption about the app having been open at midnight. It
+    /// also follows the device across time zones for the same reason the streak
+    /// does: both ask the current calendar what "today" is at read time.
+    var xpEarnedToday: Int {
+        guard let day = defaults.object(forKey: Keys.xpTodayDate) as? Date,
+              Calendar.current.isDate(day, inSameDayAs: Date()) else {
+            return 0
+        }
+        return defaults.integer(forKey: Keys.xpToday)
+    }
+
+    private func addXPToToday(_ amount: Int) {
+        guard amount > 0 else { return }
+        let today = Calendar.current.startOfDay(for: Date())
+        // `xpEarnedToday` already returns 0 for a stale day, so adding to it is
+        // what performs the rollover.
+        defaults.set(xpEarnedToday + amount, forKey: Keys.xpToday)
+        defaults.set(today, forKey: Keys.xpTodayDate)
     }
 
     // MARK: - Streak
@@ -133,7 +166,8 @@ final class ProgressStore: @unchecked Sendable {
     /// "reset learning data" control, so a user can wipe local progress on device.
     func resetLearningProgress() {
         [Keys.completedLessons, Keys.xpByLesson, Keys.totalXP,
-         Keys.currentStreak, Keys.lastActivityDate].forEach {
+         Keys.currentStreak, Keys.lastActivityDate,
+         Keys.xpToday, Keys.xpTodayDate].forEach {
             defaults.removeObject(forKey: $0)
         }
         // Force the flush so a reset survives an immediate relaunch (see ReviewStore).

@@ -33,8 +33,7 @@ struct AppView: View {
                 store.send(.bootstrapData)
             }
 
-            let launchDelay: UInt64 = reduceMotion ? 300_000_000 : 1_450_000_000
-            try? await Task.sleep(nanoseconds: launchDelay)
+            await waitForFirstScreen()
 
             if reduceMotion {
                 showSplash = false
@@ -51,6 +50,32 @@ struct AppView: View {
             // here on.
             guard let link = GjuhaDeepLink(url: url) else { return }
             store.send(.deepLinkReceived(link))
+        }
+    }
+
+    /// Holds the splash until the first screen is actually usable.
+    ///
+    /// Three bounds, in order of who they protect:
+    ///
+    /// - `floor` stops a warm launch, where the curriculum is already cached and
+    ///   readiness is true on the first poll, from flashing the splash for one
+    ///   frame. Reduce Motion gets a much shorter floor, because the thing the
+    ///   floor is protecting is an animation that Reduce Motion does not play.
+    /// - the poll loop is what makes a fast launch fast: as soon as
+    ///   `isReadyForFirstScreen` flips, the splash leaves.
+    /// - `cap` means a content failure cannot trap the learner behind the
+    ///   splash. If the curriculum never loads, the app proceeds and Home shows
+    ///   its own empty state, which is information; a permanent splash is not.
+    private func waitForFirstScreen() async {
+        let clock = ContinuousClock()
+        let start = clock.now
+        let floor: Duration = reduceMotion ? .milliseconds(120) : .milliseconds(420)
+        let cap: Duration = .seconds(2.5)
+
+        while clock.now - start < cap {
+            if store.isReadyForFirstScreen, clock.now - start >= floor { return }
+            try? await clock.sleep(for: .milliseconds(40))
+            if Task.isCancelled { return }
         }
     }
 
@@ -85,6 +110,28 @@ struct AppView: View {
     }
 }
 
+/// The four top-level destinations.
+///
+/// This replaced a hand-built floating capsule bar, for three reasons that were
+/// all defects rather than matters of taste:
+///
+/// - **Switching tabs destroyed each tab's state.** The old bar drove a `switch`
+///   inside a `ZStack` carrying `.id(store.selectedTab)`, so leaving a tab tore
+///   its view down: the vocabulary search text and CEFR filter, and every scroll
+///   position, were reset on the way back. Apple's tab-bar guidance is explicit
+///   that a section keeps its own state independently of which tab is selected.
+///   A real `TabView` holds each tab's content alive, so returning to Words
+///   finds the same query and the same scroll offset.
+/// - **The selected label failed contrast.** The capsule was a hardcoded black
+///   gradient in both appearances, with the selected item tinted `accent`.
+///   Accent-on-black measured 3.3:1 behind an 11pt semibold label, under the
+///   4.5:1 floor, and Apple's colour guidance prefers a tinted *background* for
+///   a selected control over coloured label text.
+/// - **It reimplemented behaviour the system already has.** A native tab bar
+///   brings Liquid Glass, the scroll-edge effect, the iPad sidebar adaptation
+///   this universal app is listed for, the tab-bar minimise behaviour, and
+///   VoiceOver's "tab 2 of 4" position reporting, none of which the custom bar
+///   provided.
 private struct RootTabView: View {
     let store: StoreOf<AppFeature>
 
@@ -96,142 +143,43 @@ private struct RootTabView: View {
     }
 
     var body: some View {
-        ZStack {
-            switch store.selectedTab {
-            case .home:
+        TabView(selection: selectedTab) {
+            Tab("Learn", systemImage: "bolt.fill", value: AppFeature.State.RootTab.home) {
                 HomeView(store: store.scope(state: \.home, action: \.home))
-            case .vocabulary:
+            }
+
+            Tab("Words", systemImage: "text.book.closed.fill", value: AppFeature.State.RootTab.vocabulary) {
                 VocabularyView(store: store.scope(state: \.vocabulary, action: \.vocabulary))
-            case .grammar:
+            }
+
+            Tab("Grammar", systemImage: "book.pages.fill", value: AppFeature.State.RootTab.grammar) {
                 GrammarView(store: store.scope(state: \.grammar, action: \.grammar))
-            case .profile:
+            }
+
+            Tab("Profile", systemImage: "person.crop.circle.fill", value: AppFeature.State.RootTab.profile) {
                 ProfileView(store: store.scope(state: \.profile, action: \.profile))
             }
         }
-        .id(store.selectedTab)
-        .transition(.opacity)
-        .toolbarBackground(.visible, for: .navigationBar)
-        .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            FloatingPillTabBar(selectedTab: selectedTab)
-                .padding(.horizontal, 20)
-                .padding(.bottom, 8)
-        }
-        .animation(.spring(response: 0.4, dampingFraction: 0.86), value: store.selectedTab)
+        // iPad is a listed device family for this app, and a four-destination
+        // learning course reads better in a sidebar on a 13" screen than as a
+        // centred bar with three quarters of the width empty. On iPhone this is
+        // a no-op and the bar stays at the bottom.
+        .tabViewStyle(.sidebarAdaptable)
+        // Gives the lesson map the full screen while the learner scrolls it, and
+        // brings the bar back the moment they scroll up.
+        .tabBarMinimizeBehavior(.onScrollDown)
+        .tint(Color.gjuha.accentStrong)
     }
 }
 
-private struct FloatingPillTabBar: View {
-    @Binding var selectedTab: AppFeature.State.RootTab
-    @Namespace private var activeTabAnimation
-
-    private struct TabItem: Identifiable {
-        let id: AppFeature.State.RootTab
-        /// `LocalizedStringKey`, not `String`: `Text(someString)` renders the
-        /// string verbatim and is never extracted into the String Catalog, which
-        /// is how these four tab titles silently stayed English-only.
-        let title: LocalizedStringKey
-        let icon: String
-    }
-
-    private let items: [TabItem] = [
-        .init(id: .home, title: "Learn", icon: "bolt.fill"),
-        .init(id: .vocabulary, title: "Words", icon: "text.book.closed.fill"),
-        .init(id: .grammar, title: "Grammar", icon: "book.pages.fill"),
-        .init(id: .profile, title: "Profile", icon: "person.crop.circle.fill")
-    ]
-
-    var body: some View {
-        HStack(spacing: 2) {
-            ForEach(items) { item in
-                tabButton(tab: item.id, title: item.title, icon: item.icon)
-            }
-        }
-        .frame(maxWidth: 560)
-        .padding(.horizontal, 6)
-        .padding(.vertical, 6)
-        .background(
-            ZStack {
-                Capsule(style: .continuous)
-                    .fill(.ultraThinMaterial)
-
-                Capsule(style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color.black.opacity(0.58),
-                                Color.black.opacity(0.46)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-            }
-        )
-        .overlay(
-            Capsule(style: .continuous)
-                .stroke(Color.white.opacity(0.28), lineWidth: 1.0)
-        )
-        .overlay(
-            Capsule(style: .continuous)
-                .stroke(Color.white.opacity(0.08), lineWidth: 3)
-                .blur(radius: 1.2)
-                .clipShape(Capsule(style: .continuous))
-        )
-        .shadow(color: .black.opacity(0.36), radius: 24, y: 12)
-    }
-
-    @ViewBuilder
-    private func tabButton(
-        tab: AppFeature.State.RootTab,
-        title: LocalizedStringKey,
-        icon: String
-    ) -> some View {
-        let isSelected = selectedTab == tab
-
-        Button {
-            withAnimation(.spring(response: 0.36, dampingFraction: 0.82)) {
-                selectedTab = tab
-            }
-        } label: {
-            VStack(spacing: 2) {
-                Image(systemName: icon)
-                    .font(.system(size: 17, weight: .semibold))
-                    .symbolRenderingMode(.hierarchical)
-
-                Text(title)
-                    .font(.system(size: 11, weight: .semibold, design: .rounded))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.85)
-            }
-            .foregroundStyle(isSelected ? Color.gjuha.accent : Color.white.opacity(0.88))
-            .padding(.horizontal, 10)
-            .padding(.vertical, 8)
-            .frame(maxWidth: .infinity)
-            .scaleEffect(isSelected ? 1.0 : 0.98)
-            .background {
-                if isSelected {
-                    Capsule(style: .continuous)
-                        .fill(Color.black.opacity(0.34))
-                        .overlay(
-                            Capsule(style: .continuous)
-                                .fill(Color.white.opacity(0.08))
-                        )
-                        .overlay(
-                            Capsule(style: .continuous)
-                                .stroke(Color.white.opacity(0.22), lineWidth: 0.8)
-                        )
-                        .matchedGeometryEffect(id: "active-pill-tab", in: activeTabAnimation)
-                }
-            }
-            .contentShape(Capsule(style: .continuous))
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(title)
-        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
-    }
-}
-
+/// The branded splash, shown over the first screen while it loads.
+///
+/// White is used literally throughout this view rather than through a token, and
+/// that is correct here: everything below sits on an opaque accent-to-streak
+/// gradient this view draws itself, not on an adaptive surface. The appearance
+/// cannot change what is behind these shapes, so there is nothing for a token to
+/// adapt to. Elsewhere in the app a literal white overlay was a bug, because the
+/// surface underneath it is `#FFFFFF` in light appearance.
 private struct LaunchExperienceView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var gradientMotion = false

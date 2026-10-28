@@ -204,11 +204,11 @@ private struct ReasonStepView: View {
                             }
                         }
                         .padding(16)
-                        .background(selected == reason ? Color.gjuha.accentSubtle.opacity(0.92) : Color.white.opacity(0.12))
+                        .background(selected == reason ? Color.gjuha.accentSubtle.opacity(0.92) : Color.gjuha.controlFill)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
-                                .stroke(selected == reason ? Color.gjuha.accent : Color.white.opacity(0.22), lineWidth: 1.2)
+                                .stroke(selected == reason ? Color.gjuha.accentStrong : Color.gjuha.hairline, lineWidth: 1.2)
                         )
                         .shadow(
                             color: selected == reason ? Color.gjuha.accent.opacity(0.22) : .clear,
@@ -295,11 +295,11 @@ private struct GoalStepView: View {
                             }
                         }
                         .padding(16)
-                        .background(selected == goal ? Color.gjuha.accentSubtle.opacity(0.92) : Color.white.opacity(0.12))
+                        .background(selected == goal ? Color.gjuha.accentSubtle.opacity(0.92) : Color.gjuha.controlFill)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
-                                .stroke(selected == goal ? Color.gjuha.accent : Color.white.opacity(0.22), lineWidth: 1.2)
+                                .stroke(selected == goal ? Color.gjuha.accentStrong : Color.gjuha.hairline, lineWidth: 1.2)
                         )
                         .shadow(
                             color: selected == goal ? Color.gjuha.accent.opacity(0.22) : .clear,
@@ -417,7 +417,7 @@ private struct OrbitSparkleView: View {
         Image(systemName: "sparkle")
             .font(.system(size: size, weight: .heavy))
             .foregroundStyle(Color.gjuha.warning)
-            .shadow(color: .white.opacity(0.38), radius: 4)
+            .shadow(color: Color.gjuha.glassTint.opacity(0.6), radius: 4)
             .opacity(opacity)
             .scaleEffect(scale)
     }
@@ -437,7 +437,7 @@ private struct FloatingPhraseChip: View {
             .foregroundStyle(Color.gjuha.textPrimary)
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
-            .background(.white.opacity(0.9))
+            .background(Color.gjuha.surface.opacity(0.92))
             .clipShape(Capsule())
             .overlay(
                 Capsule()

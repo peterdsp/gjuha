@@ -112,6 +112,39 @@
         }
       }
     },
+    "%lld min/day · %lld XP": {
+      "comment": "Goal option detail: minutes per day and the XP it equals.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%lld min/ditë · %lld XP"
+          }
+        }
+      }
+    },
+    "%lld of %lld": {
+      "comment": "Spoken progress toward an achievement, e.g. 6 of 7.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%lld nga %lld"
+          }
+        }
+      }
+    },
+    "%lld of %lld XP": {
+      "comment": "Spoken form of today's XP out of the daily goal.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%lld nga %lld XP"
+          }
+        }
+      }
+    },
     "%lld of 3": {
       "comment": "Hearts remaining, accessibility value.",
       "localizations": {
@@ -270,6 +303,28 @@
       "comment": "Percentage, digits only.",
       "shouldTranslate": false
     },
+    "%lld/%lld": {
+      "comment": "Unlocked achievements out of the total, e.g. 3/12.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%lld/%lld"
+          }
+        }
+      }
+    },
+    "%lld/%lld XP": {
+      "comment": "Today's XP out of the daily goal, e.g. 70/120 XP.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%lld/%lld XP"
+          }
+        }
+      }
+    },
     "%lld/%lld lessons": {
       "localizations": {
         "sq": {
@@ -308,12 +363,45 @@
         }
       }
     },
+    "A full week": {
+      "comment": "Achievement title: seven consecutive study days.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Një javë e plotë"
+          }
+        }
+      }
+    },
     "A gentle nudge once a day. Off by default.": {
       "localizations": {
         "sq": {
           "stringUnit": {
             "state": "needs_review",
             "value": "Një kujtesë e lehtë një herë në ditë. Si parazgjedhje është e çaktivizuar."
+          }
+        }
+      }
+    },
+    "A hundred words": {
+      "comment": "Achievement title: 100 distinct words met.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Njëqind fjalë"
+          }
+        }
+      }
+    },
+    "A month of Albanian": {
+      "comment": "Achievement title: thirty consecutive study days.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Një muaj shqip"
           }
         }
       }
@@ -334,6 +422,28 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Gjeneruar nga AI"
+          }
+        }
+      }
+    },
+    "Accuracy": {
+      "comment": "Label of the accuracy tile on the completion screen.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Saktësia"
+          }
+        }
+      }
+    },
+    "Achievements": {
+      "comment": "Section heading on the Profile screen.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Arritjet"
           }
         }
       }
@@ -431,12 +541,45 @@
         }
       }
     },
+    "Best streak": {
+      "comment": "Label of the best-combo tile on the completion screen.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Seria më e mirë"
+          }
+        }
+      }
+    },
     "Cancel": {
       "localizations": {
         "sq": {
           "stringUnit": {
             "state": "needs_review",
             "value": "Anulo"
+          }
+        }
+      }
+    },
+    "Carry 100 words to the long-term review interval.": {
+      "comment": "Achievement requirement.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Çojini 100 fjalë në intervalin afatgjatë të përsëritjes."
+          }
+        }
+      }
+    },
+    "Carry 25 words to the long-term review interval.": {
+      "comment": "Achievement requirement. 'Carry' means retained in the spaced repetition schedule.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Çojini 25 fjalë në intervalin afatgjatë të përsëritjes."
           }
         }
       }
@@ -625,6 +768,17 @@
         }
       }
     },
+    "Daily goal met": {
+      "comment": "Title of the banner on the lesson completion screen.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Qëllimi ditor u arrit"
+          }
+        }
+      }
+    },
     "Daily review": {
       "localizations": {
         "sq": {
@@ -652,6 +806,28 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Për tani"
+          }
+        }
+      }
+    },
+    "Earn 2,500 XP in total.": {
+      "comment": "Achievement requirement.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fitoni 2.500 XP gjithsej."
+          }
+        }
+      }
+    },
+    "Earn 500 XP in total.": {
+      "comment": "Achievement requirement.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fitoni 500 XP gjithsej."
           }
         }
       }
@@ -736,6 +912,72 @@
         }
       }
     },
+    "Finish a lesson or a review to get there.": {
+      "comment": "Shown under the goal bar while the goal is still open.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Përfundoni një mësim ose një përsëritje për t'ia arritur."
+          }
+        }
+      }
+    },
+    "Finish fifty lessons.": {
+      "comment": "Achievement requirement.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Përfundoni pesëdhjetë mësime."
+          }
+        }
+      }
+    },
+    "Finish ten lessons.": {
+      "comment": "Achievement requirement.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Përfundoni dhjetë mësime."
+          }
+        }
+      }
+    },
+    "Finish your first lesson.": {
+      "comment": "Achievement requirement.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Përfundoni mësimin e parë."
+          }
+        }
+      }
+    },
+    "First steps": {
+      "comment": "Achievement title: first lesson finished.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Hapat e parë"
+          }
+        }
+      }
+    },
+    "Five hundred XP": {
+      "comment": "Achievement title: 500 XP earned.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Pesëqind XP"
+          }
+        }
+      }
+    },
     "For a partner or family": {
       "localizations": {
         "sq": {
@@ -780,6 +1022,28 @@
       "comment": "The app name. Same in both languages.",
       "shouldTranslate": false
     },
+    "Goal met. %lld of %lld XP": {
+      "comment": "Spoken when the daily goal is reached.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Qëllimi u arrit. %lld nga %lld XP"
+          }
+        }
+      }
+    },
+    "Goal met. Anything more today is a bonus.": {
+      "comment": "Shown under the goal bar once the goal is reached.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Qëllimi u arrit. Çdo gjë më tepër sot është shtesë."
+          }
+        }
+      }
+    },
     "Grammar": {
       "localizations": {
         "sq": {
@@ -806,6 +1070,17 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Temat e gramatikës po ngarkohen"
+          }
+        }
+      }
+    },
+    "Halfway to fluent": {
+      "comment": "Achievement title: fifty lessons finished.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Në gjysmë të rrugës"
           }
         }
       }
@@ -934,6 +1209,17 @@
         }
       }
     },
+    "Locked. %@ %lld of %lld": {
+      "comment": "VoiceOver value for a locked badge: requirement, then progress.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "E bllokuar. %@ %lld nga %lld"
+          }
+        }
+      }
+    },
     "Mastered": {
       "comment": "Words that reached the scheduler's documented mastery interval.",
       "localizations": {
@@ -941,6 +1227,17 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Të zotëruara"
+          }
+        }
+      }
+    },
+    "Meet 100 different Albanian words.": {
+      "comment": "Achievement requirement.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Njihuni me 100 fjalë të ndryshme shqipe."
           }
         }
       }
@@ -955,6 +1252,39 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Së shpejti vjen përmbajtje e re. Përsërit mësimet për t'i mbajtur të freskëta."
+          }
+        }
+      }
+    },
+    "New achievement": {
+      "comment": "Heading when one achievement was just unlocked.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Arritje e re"
+          }
+        }
+      }
+    },
+    "New achievements": {
+      "comment": "Heading when several achievements were just unlocked.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Arritje të reja"
+          }
+        }
+      }
+    },
+    "Next achievement: %@": {
+      "comment": "VoiceOver label for the closest unreached achievement.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Arritja e radhës: %@"
           }
         }
       }
@@ -1016,6 +1346,28 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "OK"
+          }
+        }
+      }
+    },
+    "One hundred days": {
+      "comment": "Achievement title: one hundred consecutive study days.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Njëqind ditë"
+          }
+        }
+      }
+    },
+    "One hundred kept": {
+      "comment": "Achievement title: 100 words carried to the long-term review interval.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Njëqind të mbajtura"
           }
         }
       }
@@ -1222,6 +1574,17 @@
         }
       }
     },
+    "Questions": {
+      "comment": "Label of the question-count tile after a lesson.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Pyetje"
+          }
+        }
+      }
+    },
     "Quit": {
       "localizations": {
         "sq": {
@@ -1383,6 +1746,17 @@
         }
       }
     },
+    "Review complete!": {
+      "comment": "Title of the completion screen after a review session.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Përsëritja u përfundua!"
+          }
+        }
+      }
+    },
     "Reviews the Albanian words that are due today, using Gjuha's spaced repetition schedule.": {
       "localizations": {
         "sq": {
@@ -1410,6 +1784,17 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Serioz"
+          }
+        }
+      }
+    },
+    "Serious effort": {
+      "comment": "Achievement title: 2,500 XP earned.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Përpjekje serioze"
           }
         }
       }
@@ -1524,6 +1909,61 @@
         }
       }
     },
+    "Study one hundred days in a row.": {
+      "comment": "Achievement requirement.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Studioni njëqind ditë rresht."
+          }
+        }
+      }
+    },
+    "Study seven days in a row.": {
+      "comment": "Achievement requirement.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Studioni shtatë ditë rresht."
+          }
+        }
+      }
+    },
+    "Study thirty days in a row.": {
+      "comment": "Achievement requirement.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Studioni tridhjetë ditë rresht."
+          }
+        }
+      }
+    },
+    "Study three days in a row.": {
+      "comment": "Achievement requirement.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Studioni tri ditë rresht."
+          }
+        }
+      }
+    },
+    "Ten lessons in": {
+      "comment": "Achievement title: ten lessons finished.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Dhjetë mësime"
+          }
+        }
+      }
+    },
     "The Albanian pack is ready. Pull to refresh or reopen the app.": {
       "localizations": {
         "sq": {
@@ -1564,12 +2004,45 @@
         }
       }
     },
+    "Three in a row": {
+      "comment": "Achievement title: three consecutive study days.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Tri ditë rresht"
+          }
+        }
+      }
+    },
     "To get a daily reminder, allow notifications for Gjuha in the Settings app.": {
       "localizations": {
         "sq": {
           "stringUnit": {
             "state": "needs_review",
             "value": "Për të marrë një kujtesë ditore, lejo njoftimet për Gjuha në aplikacionin Settings."
+          }
+        }
+      }
+    },
+    "Today": {
+      "comment": "Heading of the daily-goal card, meaning today's progress.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Sot"
+          }
+        }
+      }
+    },
+    "Today's goal": {
+      "comment": "VoiceOver label for the daily-goal ring.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Qëllimi i sotëm"
           }
         }
       }
@@ -1614,6 +2087,17 @@
         }
       }
     },
+    "Twenty-five kept": {
+      "comment": "Achievement title: 25 words carried to the long-term review interval.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Njëzet e pesë të mbajtura"
+          }
+        }
+      }
+    },
     "Type your answer...": {
       "localizations": {
         "sq": {
@@ -1630,6 +2114,17 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Shkruaj përkthimin, pastaj dërgoje"
+          }
+        }
+      }
+    },
+    "Unlocked": {
+      "comment": "VoiceOver value for an earned achievement badge.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "E zhbllokuar"
           }
         }
       }
@@ -1702,6 +2197,17 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Fjalë"
+          }
+        }
+      }
+    },
+    "Words reviewed": {
+      "comment": "Label of the word-count tile after a review session.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fjalë të përsëritura"
           }
         }
       }
@@ -1895,6 +2401,17 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Ecuria në këtë mësim nuk do të ruhet. Mund ta nisni përsëri në çdo kohë."
+          }
+        }
+      }
+    },
+    "Your streak is safe for today.": {
+      "comment": "Subtitle of the daily-goal-met banner.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ditët rresht janë të sigurta për sot."
           }
         }
       }

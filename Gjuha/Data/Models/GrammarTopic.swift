@@ -61,6 +61,11 @@ struct UserStats: Equatable {
     /// The subset of practiced words that have climbed to the documented mastery
     /// interval in the scheduler. This is the only figure presented as mastery.
     let wordsMastered: Int
+    /// XP earned since local midnight. Resets by calendar day, not by timer.
+    let xpToday: Int
+    /// XP that meets the learner's chosen daily goal. See
+    /// `LearningGoal.dailyXPGoal`.
+    let dailyGoalXP: Int
 
     init(
         currentStreak: Int,
@@ -68,7 +73,9 @@ struct UserStats: Equatable {
         wordsSeen: Int,
         lessonsCompleted: Int,
         wordsPracticed: Int = 0,
-        wordsMastered: Int = 0
+        wordsMastered: Int = 0,
+        xpToday: Int = 0,
+        dailyGoalXP: Int = LearningGoal.casual.dailyXPGoal
     ) {
         self.currentStreak = currentStreak
         self.totalXP = totalXP
@@ -76,7 +83,21 @@ struct UserStats: Equatable {
         self.lessonsCompleted = lessonsCompleted
         self.wordsPracticed = wordsPracticed
         self.wordsMastered = wordsMastered
+        self.xpToday = xpToday
+        self.dailyGoalXP = dailyGoalXP
     }
+
+    /// Today's progress toward the daily goal, clamped to 0...1.
+    ///
+    /// Clamped because the ring that draws it cannot overfill, while the XP
+    /// number next to it is not clamped: a learner who doubles their goal should
+    /// see that they did.
+    var dailyGoalProgress: Double {
+        guard dailyGoalXP > 0 else { return 0 }
+        return min(1.0, Double(xpToday) / Double(dailyGoalXP))
+    }
+
+    var hasMetDailyGoal: Bool { dailyGoalXP > 0 && xpToday >= dailyGoalXP }
 
     static let empty = UserStats(
         currentStreak: 0,

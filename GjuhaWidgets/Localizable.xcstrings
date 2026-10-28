@@ -42,6 +42,17 @@
         }
       }
     },
+    "%lld of %lld XP": {
+      "comment": "Spoken form of today's XP out of the daily goal.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%lld nga %lld XP"
+          }
+        }
+      }
+    },
     "%lld words due": {
       "localizations": {
         "en": {
@@ -189,12 +200,34 @@
         }
       }
     },
+    "Today's goal": {
+      "comment": "VoiceOver label for the widget's daily-goal ring.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Qëllimi i sotëm"
+          }
+        }
+      }
+    },
     "Total XP": {
       "localizations": {
         "sq": {
           "stringUnit": {
             "state": "needs_review",
             "value": "XP gjithsej"
+          }
+        }
+      }
+    },
+    "XP today": {
+      "comment": "Caption under today's XP, when no goal has been written yet.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "XP sot"
           }
         }
       }
@@ -226,6 +259,17 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "për tani"
+          }
+        }
+      }
+    },
+    "of %lld XP today": {
+      "comment": "Caption under today's XP, naming the goal, e.g. 'of 120 XP today'.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "nga %lld XP sot"
           }
         }
       }

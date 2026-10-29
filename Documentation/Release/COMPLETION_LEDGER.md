@@ -472,6 +472,47 @@ screenshots differ by a mean absolute pixel delta of 17.6 to 25.8 in the mascot
 region against 2.4 to 4.7 in a background-only region, so the movement is the
 mascot and not the ambient drift.
 
+### Seventh sub-pass: acting on a code review of the branch
+
+A review of the five commits found eight issues, one of which was a regression
+the design pass introduced and the screenshot pass then failed to notice.
+
+**Three tab titles stopped rendering.** Replacing the custom tab bar with a real
+`TabView` was correct, but it changed a premise the screens relied on. The old
+`switch` carrying `.id(selectedTab)` meant exactly one screen existed at a time,
+so each could set its own navigation preferences. A `TabView` keeps all four
+alive, so Home's `navigationBarHidden(true)` and the `navigationTitle` on
+Vocabulary, Grammar and Profile all applied to the same bar at once. Home won,
+and the other three titles silently disappeared. Worse, the App Store
+screenshots were captured and reviewed in that state without the missing titles
+being spotted.
+
+The textbook fix is a `NavigationStack` inside each `Tab`, and it is the wrong
+one here: `AppFeature` drives navigation from a single `StackState<Path.State>`
+that deep links, the lesson flow and the resume path all append to, so four
+stacks sharing one path would show the same pushed screen in every tab.
+Splitting it into four paths is a real refactor of tested navigation behaviour.
+Instead the container now owns the chrome, and `gjuhaScreenTitle` titles a
+screen when it is pushed while standing aside when it is a tab root. Every tab
+root already draws its own header card, so the bar is hidden consistently rather
+than being fought over.
+
+| Item | Acceptance criteria | Status |
+|---|---|---|
+| One navigation policy for the tab roots | No two tabs set competing preferences; a pushed screen still titles itself | done (recaptured and checked visually) |
+| `.prominent` actually is prominent | It resolved identically to `.standard`, so eight leading cards asked for emphasis and got none | done (elevation now differs; asserted) |
+| Unknown achievement ids are not counted | A removed milestone read as "13/12" and hid the "next up" row for good; the row still stays in storage | done (2 tests) |
+| Best combo survives a resume | It was not persisted, so a 6x run that was later broken reported 0 after a relaunch | done (2 tests, with a fallback for old payloads) |
+| The frame stream is bounded | `AsyncStream` defaulted to unbounded, so a main-actor stall could buffer about 20 MB of decoded frames per mascot | done (`.bufferingNewest(1)`) |
+| The goal banner stops over-claiming | "Your streak is safe for today" is not what the code does: any finished lesson or review credits the streak, goal or no goal | done |
+| The capture script cannot delete the repo | `rm -rf "$OUT"` with `OUT` overridable from the environment | done (validated before the delete) |
+| The ring assertion stops racing | It read the value immediately, catching the default casual goal of 60 before the chosen 120 arrived | done (waits on a predicate) |
+
+Two of these are worth naming as a pattern rather than a list: the dead
+`.prominent` case and the unpersisted `bestCombo` were both introduced by this
+branch's own work, and both are the same mistake the branch was written to fix,
+which is claiming something the code does not do.
+
 ### Not done in this pass
 
 - Albanian for the 51 new strings is entered and marked `needs_review`, like every

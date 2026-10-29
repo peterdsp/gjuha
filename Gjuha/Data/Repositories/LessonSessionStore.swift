@@ -27,6 +27,10 @@ struct LessonSessionSnapshot: Codable, Equatable {
     /// accuracy figure on the completion screen.
     var answeredCount: Int
     var correctCount: Int
+    /// Best combo reached this attempt. Stored separately from `combo`, which
+    /// every wrong answer resets: without it a learner who reached 6x, slipped,
+    /// then resumed after a termination would be told their best streak was 0.
+    var bestCombo: Int
     /// When the snapshot was written, for diagnostics.
     var savedAt: Date
 
@@ -39,6 +43,7 @@ struct LessonSessionSnapshot: Codable, Equatable {
         combo: Int,
         answeredCount: Int = 0,
         correctCount: Int = 0,
+        bestCombo: Int = 0,
         savedAt: Date
     ) {
         self.lesson = lesson
@@ -49,6 +54,7 @@ struct LessonSessionSnapshot: Codable, Equatable {
         self.combo = combo
         self.answeredCount = answeredCount
         self.correctCount = correctCount
+        self.bestCombo = bestCombo
         self.savedAt = savedAt
     }
 
@@ -71,6 +77,11 @@ struct LessonSessionSnapshot: Codable, Equatable {
         combo = try container.decode(Int.self, forKey: .combo)
         answeredCount = try container.decodeIfPresent(Int.self, forKey: .answeredCount) ?? 0
         correctCount = try container.decodeIfPresent(Int.self, forKey: .correctCount) ?? 0
+        // Absent in payloads from before this field existed. Falling back to
+        // `combo` is the closest true statement available: it is the best run
+        // still in progress at the moment the snapshot was written.
+        bestCombo = try container.decodeIfPresent(Int.self, forKey: .bestCombo)
+            ?? container.decode(Int.self, forKey: .combo)
         savedAt = try container.decode(Date.self, forKey: .savedAt)
     }
 }

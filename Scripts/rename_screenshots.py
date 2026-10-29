@@ -32,13 +32,27 @@ def main() -> int:
         return 1
 
     renamed = 0
+    used: set[str] = set()
     for group in json.loads(manifest.read_text()):
         for attachment in group.get("attachments", []):
             source = out / attachment.get("exportedFileName", "")
             name = SUFFIX.sub("", attachment.get("suggestedHumanReadableName", ""))
-            if source.exists() and name:
-                shutil.move(str(source), str(out / f"{name}.png"))
-                renamed += 1
+            if not (source.exists() and name):
+                continue
+
+            # The suffix is only stripped when it matches, so a name that
+            # already ends in .png would otherwise become "name.png.png".
+            stem = name[:-4] if name.lower().endswith(".png") else name
+
+            # Two attachments can carry the same human name, and moving the
+            # second over the first loses it silently.
+            candidate, n = stem, 2
+            while candidate in used:
+                candidate, n = f"{stem}-{n}", n + 1
+            used.add(candidate)
+
+            shutil.move(str(source), str(out / f"{candidate}.png"))
+            renamed += 1
 
     manifest.unlink()
     print(f"renamed {renamed} screenshot(s)")

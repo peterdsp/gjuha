@@ -50,6 +50,9 @@ struct GjuhaSurfaceResolution: Equatable, Sendable {
     let fill: Fill
     let hasShadow: Bool
     let strokeWidth: CGFloat
+    /// How far the surface lifts off the page. Zero when `hasShadow` is false.
+    let shadowRadius: CGFloat
+    let shadowOpacity: Double
 
     /// Whether this resolution puts any translucency on screen. Used by the
     /// test that checks Reduce Transparency leaves none.
@@ -82,24 +85,43 @@ enum GjuhaSurfaceStyle {
     ) -> GjuhaSurfaceResolution {
         let strokeWidth: CGFloat = increaseContrast ? 1.5 : 0.8
 
+        // Elevation is what separates `.standard` from `.prominent`. Without
+        // it the two resolved identically and `.prominent` was a dead enum
+        // case: the eight cards that lead a screen (the daily review prompt,
+        // the culture card, the cultural-unit and dialect rows) asked for
+        // emphasis and got none, having previously had it through a heavier
+        // `tintOpacity`.
+        let radius: CGFloat = prominence == .prominent ? 20 : 12
+        let opacity: Double = prominence == .prominent ? 0.18 : 0.12
+
         if reduceTransparency {
             return GjuhaSurfaceResolution(
                 fill: prominence == .nested ? .opaqueSurfaceSecondary : .opaqueSurface,
                 // A shadow over an opaque fill still reads as depth and costs
                 // nothing in legibility, so only the nested level drops it.
                 hasShadow: prominence != .nested,
-                strokeWidth: strokeWidth
+                strokeWidth: strokeWidth,
+                shadowRadius: prominence == .nested ? 0 : radius,
+                shadowOpacity: prominence == .nested ? 0 : opacity
             )
         }
 
         switch prominence {
         case .nested:
-            return GjuhaSurfaceResolution(fill: .chipFill, hasShadow: false, strokeWidth: strokeWidth)
+            return GjuhaSurfaceResolution(
+                fill: .chipFill,
+                hasShadow: false,
+                strokeWidth: strokeWidth,
+                shadowRadius: 0,
+                shadowOpacity: 0
+            )
         case .standard, .prominent:
             return GjuhaSurfaceResolution(
                 fill: .regularMaterial,
                 hasShadow: true,
-                strokeWidth: strokeWidth
+                strokeWidth: strokeWidth,
+                shadowRadius: radius,
+                shadowOpacity: opacity
             )
         }
     }
@@ -172,9 +194,9 @@ private struct GjuhaSurfaceModifier: ViewModifier {
                 shape.stroke(Color.gjuha.hairline, lineWidth: resolved.strokeWidth)
             }
             .shadow(
-                color: .black.opacity(resolved.hasShadow ? 0.12 : 0),
-                radius: resolved.hasShadow ? 12 : 0,
-                y: resolved.hasShadow ? 6 : 0
+                color: .black.opacity(resolved.shadowOpacity),
+                radius: resolved.shadowRadius,
+                y: resolved.hasShadow ? resolved.shadowRadius / 2 : 0
             )
     }
 }
@@ -189,8 +211,8 @@ extension View {
     /// "can result in unnecessary complexity and a confusing visual hierarchy",
     /// with standard materials being the content layer's tool instead.
     ///
-    /// Every one of these 30-odd surfaces is content — a card, a stat tile, a
-    /// row — so none of them was ever a candidate for glass. Calling the modifier
+    /// Every one of these 30-odd surfaces is content: a card, a stat tile, a
+    /// row. None of them was ever a candidate for glass. Calling the modifier
     /// `gjuhaLiquidGlassCard` told every future reader the opposite, and the app's
     /// real functional layer (the tab bar and the navigation bar) now gets the
     /// material from the system, where it is correct and free.

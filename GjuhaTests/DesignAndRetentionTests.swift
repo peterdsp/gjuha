@@ -678,20 +678,48 @@ struct AchievementStoreTests {
         #expect(store.uncelebrated.isEmpty)
     }
 
-    /// An id in storage that the catalogue no longer defines must be ignored on
-    /// read, not crash and not resurface as a badge with no definition.
+    /// An id in storage that the catalogue no longer defines must be left out
+    /// of what the app counts, but kept in storage so a downgrade does not lose
+    /// it.
+    ///
+    /// Counting it was a real defect: Profile renders the unlocked count over
+    /// `AchievementCatalog.all.count`, so one stale id reads as "13/12", and
+    /// the `unlocked < all` guard then hides the "next up" row for good.
     @Test
-    func anUnknownStoredIDIsIgnoredRatherThanShown() {
+    func anUnknownStoredIDIsNotCountedButIsNotDestroyed() {
         let suiteName = "gjuha.test.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
-        let ledger = ["achievement.removed.in.a.later.version": Date()]
+        let stale = "achievement.removed.in.a.later.version"
+        let ledger = [stale: Date(), "lessons.1": Date()]
         defaults.set(try! JSONEncoder().encode(ledger), forKey: "gjuha.achievements.unlockedAt.v1")
 
         let store = AchievementStore(defaults: defaults)
-        #expect(store.uncelebrated.isEmpty)
-        #expect(store.unlockedIDs == ["achievement.removed.in.a.later.version"])
+
+        #expect(store.unlockedIDs == ["lessons.1"], "a stale id must not be counted")
+        #expect(store.unlockedAt.count <= AchievementCatalog.all.count)
+        #expect(store.uncelebrated.map(\.id) == ["lessons.1"])
+        #expect(
+            store.storedIDsIncludingUnknown.contains(stale),
+            "the row must stay in storage so a downgrade does not lose it"
+        )
+    }
+
+    /// The count Profile divides by the catalogue size can never exceed it.
+    @Test
+    func theUnlockedCountNeverExceedsTheCatalogue() {
+        let suiteName = "gjuha.test.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        var ledger = [String: Date]()
+        for id in AchievementCatalog.all.map(\.id) { ledger[id] = Date() }
+        for n in 0..<5 { ledger["removed.milestone.\(n)"] = Date() }
+        defaults.set(try! JSONEncoder().encode(ledger), forKey: "gjuha.achievements.unlockedAt.v1")
+
+        let store = AchievementStore(defaults: defaults)
+        #expect(store.unlockedAt.count == AchievementCatalog.all.count)
     }
 }
 
@@ -727,6 +755,46 @@ struct StoredPayloadCompatibilityTests {
         #expect(restored.combo == snapshot.combo)
         #expect(restored.answeredCount == 0, "absent counters default rather than throw")
         #expect(restored.correctCount == 0)
+    }
+
+    /// The best combo survives a termination. It was not persisted, so a
+    /// learner who reached 6x, slipped to 0, then resumed and finished was told
+    /// their best streak was 0: the same under-reporting the counters were
+    /// added to fix.
+    @Test
+    func theBestComboSurvivesAResume() throws {
+        let original = LessonSessionSnapshot(
+            lesson: Self.sampleSession.lesson,
+            exercises: [],
+            currentIndex: 7,
+            hearts: 2,
+            xpEarned: 80,
+            combo: 0,
+            answeredCount: 8,
+            correctCount: 6,
+            bestCombo: 6,
+            savedAt: Date(timeIntervalSince1970: 1_700_000_000)
+        )
+
+        let data = try JSONEncoder().encode(original)
+        let restored = try JSONDecoder().decode(LessonSessionSnapshot.self, from: data)
+
+        #expect(restored.combo == 0, "the live combo really was broken")
+        #expect(restored.bestCombo == 6, "but the attempt really did reach 6")
+    }
+
+    /// A payload from before the field existed falls back to `combo`, which is
+    /// the best run still going when it was written.
+    @Test
+    func aPreUpgradeSnapshotInfersTheBestComboFromTheLiveOne() throws {
+        var object = try Self.jsonObject(from: Self.sampleSession)
+        object.removeValue(forKey: "bestCombo")
+        object["combo"] = 3
+
+        let data = try JSONSerialization.data(withJSONObject: object)
+        let restored = try JSONDecoder().decode(LessonSessionSnapshot.self, from: data)
+
+        #expect(restored.bestCombo == 3)
     }
 
     @Test
@@ -878,6 +946,33 @@ struct GjuhaSurfaceTests {
     func textBearingSurfacesUseTheThickerMaterial() {
         #expect(resolve(.standard).fill == .regularMaterial)
         #expect(resolve(.prominent).fill == .regularMaterial)
+    }
+
+    /// `.prominent` has to actually be more prominent. It previously resolved
+    /// identically to `.standard`, which made it a dead enum case: the eight
+    /// cards that lead a screen asked for emphasis and silently got none.
+    @Test
+    func prominentLiftsFurtherOffThePageThanStandard() {
+        for transparency in [false, true] {
+            let standard = resolve(.standard, reduceTransparency: transparency)
+            let prominent = resolve(.prominent, reduceTransparency: transparency)
+            #expect(
+                prominent.shadowRadius > standard.shadowRadius,
+                "prominent did not lift further (reduceTransparency: \(transparency))"
+            )
+            #expect(prominent.shadowOpacity > standard.shadowOpacity)
+        }
+    }
+
+    /// And a nested surface lifts not at all, at every setting.
+    @Test
+    func aNestedSurfaceNeverCastsAShadow() {
+        for transparency in [false, true] {
+            let nested = resolve(.nested, reduceTransparency: transparency)
+            #expect(!nested.hasShadow)
+            #expect(nested.shadowRadius == 0)
+            #expect(nested.shadowOpacity == 0)
+        }
     }
 
     /// A surface drawn inside another surface carries no material and no shadow.

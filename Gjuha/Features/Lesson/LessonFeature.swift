@@ -76,6 +76,7 @@ struct LessonFeature {
                 combo: combo,
                 answeredCount: answeredCount,
                 correctCount: correctCount,
+                bestCombo: bestCombo,
                 savedAt: Date()
             )
         }
@@ -93,7 +94,7 @@ struct LessonFeature {
             self.combo = snapshot.combo
             self.answeredCount = snapshot.answeredCount
             self.correctCount = snapshot.correctCount
-            self.bestCombo = snapshot.combo
+            self.bestCombo = snapshot.bestCombo
             self.phase = .inProgress
         }
 

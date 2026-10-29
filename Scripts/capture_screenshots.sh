@@ -61,6 +61,16 @@ TEST_RUNNER_GJUHA_CAPTURE=1 xcodebuild test \
   -resultBundlePath "$RESULT" \
   >/dev/null
 
+# $OUT is overridable from the environment and is about to be recursively
+# deleted, so refuse anything that is not a plain relative subdirectory.
+# `OUT=. bash Scripts/capture_screenshots.sh` would otherwise delete the repo.
+case "$OUT" in
+  ""|"."|".."|/*|*..*)
+    echo "refusing to delete OUT=\"$OUT\": set it to a relative subdirectory" >&2
+    exit 1
+    ;;
+esac
+
 rm -rf "$OUT"
 mkdir -p "$OUT"
 xcrun xcresulttool export attachments --path "$RESULT" --output-path "$OUT" >/dev/null

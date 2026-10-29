@@ -51,8 +51,7 @@ struct ProfileView: View {
                 .gjuhaReadableWidth(isRegularWidth ? 1_040 : 620)
             }
         }
-        .navigationTitle("Profile")
-        .navigationBarTitleDisplayMode(.large)
+        .gjuhaScreenTitle("Profile")
         .onAppear { store.send(.onAppear) }
         .alert(
             "Notifications are off",

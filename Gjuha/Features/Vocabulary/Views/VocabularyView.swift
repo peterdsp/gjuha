@@ -54,8 +54,7 @@ struct VocabularyView: View {
             }
             .gjuhaReadableWidth()
         }
-        .navigationTitle("Vocabulary")
-        .navigationBarTitleDisplayMode(.large)
+        .gjuhaScreenTitle("Vocabulary")
         .onAppear { store.send(.onAppear) }
     }
 }

@@ -68,6 +68,7 @@
 		C04CF8D12CC57791C9129A39 /* ReviewStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398FDF5FA3BC6A5CC668503B /* ReviewStore.swift */; };
 		C773242143A2ECE04E9105A7 /* ProgressStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7429D8078387001A24BAF936 /* ProgressStore.swift */; };
 		CA74F5B2BBE1BBED168EAC52 /* a1_grammar.json in Resources */ = {isa = PBXBuildFile; fileRef = C93F1D6598730E6CC29C6702 /* a1_grammar.json */; };
+		D35A65FB71F40E2E17BA5343 /* GjuhaScreenChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CC6F51EEA273A553858110C /* GjuhaScreenChrome.swift */; };
 		D4A97907ED28B4DB4235350A /* GjuhaWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCE5A1CA9363982BA62D074 /* GjuhaWidgetSnapshot.swift */; };
 		D52B56F910F7C240C366B542 /* GjuhaSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AB23A8F180FBA5E4554422B /* GjuhaSurface.swift */; };
 		D6AF2EC3C005898B9E17BD41 /* GjuhaSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92AEB3EDF54D9925DC1E8F9 /* GjuhaSchema.swift */; };
@@ -140,6 +141,7 @@
 		19DCBEA4497F8BF1A676D78C /* ProfileFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileFeature.swift; sourceTree = "<group>"; };
 		1A3056CF8785C3FA6B504251 /* ProgressSnippetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressSnippetView.swift; sourceTree = "<group>"; };
 		1A3F6E6485810D5DA179CC73 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		1CC6F51EEA273A553858110C /* GjuhaScreenChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GjuhaScreenChrome.swift; sourceTree = "<group>"; };
 		27D7C6A35FE547540A195CB4 /* GjuhaButtonStyles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GjuhaButtonStyles.swift; sourceTree = "<group>"; };
 		29CEE69D8DE5D4FC20321000 /* WidgetSyncClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSyncClient.swift; sourceTree = "<group>"; };
 		2AB23A8F180FBA5E4554422B /* GjuhaSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GjuhaSurface.swift; sourceTree = "<group>"; };
@@ -461,6 +463,7 @@
 				FFCB513C031796832A0C7442 /* Buttons */,
 				9E54FACF020EA21CF8FD1B89 /* Colors */,
 				5167FE73F8C864CA5440D830 /* Mascot */,
+				D5F994B5815BB4BF48B29BF4 /* Navigation */,
 				52EC266B10565684D1609062 /* Spacing */,
 				686B860752FDBA05E01A7843 /* Surfaces */,
 				4673FE665D609FB3CA71A166 /* Typography */,
@@ -636,6 +639,14 @@
 				9493F0D52F2686DDDF0459B9 /* SpeakingExperiment.swift */,
 			);
 			path = Speech;
+			sourceTree = "<group>";
+		};
+		D5F994B5815BB4BF48B29BF4 /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				1CC6F51EEA273A553858110C /* GjuhaScreenChrome.swift */,
+			);
+			path = Navigation;
 			sourceTree = "<group>";
 		};
 		ECE612B66B8D6DA73FDCF377 /* Repositories */ = {
@@ -905,6 +916,7 @@
 				707ED465F0018AAE8D21DBC3 /* GjuhaFonts.swift in Sources */,
 				48BBAD79DA06FBB63D020B5C /* GjuhaIntentRouter.swift in Sources */,
 				D6AF2EC3C005898B9E17BD41 /* GjuhaSchema.swift in Sources */,
+				D35A65FB71F40E2E17BA5343 /* GjuhaScreenChrome.swift in Sources */,
 				F0B9F5F7C4A84E27D9727330 /* GjuhaSpacing.swift in Sources */,
 				D52B56F910F7C240C366B542 /* GjuhaSurface.swift in Sources */,
 				D4A97907ED28B4DB4235350A /* GjuhaWidgetSnapshot.swift in Sources */,

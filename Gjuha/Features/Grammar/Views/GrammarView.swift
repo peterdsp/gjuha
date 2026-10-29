@@ -31,8 +31,7 @@ struct GrammarView: View {
             }
             .gjuhaReadableWidth()
         }
-        .navigationTitle("Grammar")
-        .navigationBarTitleDisplayMode(.large)
+        .gjuhaScreenTitle("Grammar")
         .onAppear { store.send(.onAppear) }
     }
 }

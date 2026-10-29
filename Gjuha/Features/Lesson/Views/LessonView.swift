@@ -1070,7 +1070,13 @@ private struct DailyGoalMetBanner: View {
                 Text("Daily goal met")
                     .font(.gjuha.labelBold)
                     .foregroundStyle(Color.gjuha.onAccent)
-                Text("Your streak is safe for today.")
+                // Was "Your streak is safe for today", which is not what the
+                // code does: `markDailyActivity` credits the streak for any
+                // finished lesson or review, whether or not the goal was met.
+                // The old copy both implied the goal protects the streak and
+                // withheld the reassurance from someone who studied but fell
+                // short, which is the overstatement this app exists to avoid.
+                Text("You have hit your target for today.")
                     .font(.gjuha.caption)
                     .foregroundStyle(Color.gjuha.onAccent.opacity(0.92))
             }

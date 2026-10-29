@@ -13,8 +13,9 @@ import XCTest
 ///
 /// Run it on a 6.9 inch device (iPhone 17 Pro Max or 16 Pro Max), which produces
 /// the 1320 x 2868 px images App Store Connect requires for that display size.
-/// Images land as attachments in the `.xcresult` bundle; `Scripts/export_screenshots.sh`
-/// pulls them out as PNGs.
+/// Easier still, `Scripts/capture_screenshots.sh` does all of the above and the
+/// export in one command. Images land as attachments in the `.xcresult` bundle;
+/// `Scripts/rename_screenshots.py` puts their readable names back.
 ///
 /// Everything captured is real app state reached by driving the real UI. Nothing
 /// is seeded, and in particular the lesson completion screen is not captured,

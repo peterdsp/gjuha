@@ -35,7 +35,23 @@ final class AchievementStore: @unchecked Sendable {
               let decoded = try? JSONDecoder().decode([String: Date].self, from: data) else {
             return [:]
         }
-        return decoded
+        // Actually filter, which the documentation above has always claimed.
+        // Returning the raw ledger let a removed or renamed milestone keep
+        // counting: Profile renders `unlockedCount` over
+        // `AchievementCatalog.all.count`, so a learner would read "13/12", and
+        // the `unlockedCount < all.count` guard would hide the "next up" row
+        // permanently. The row stays in storage, so a downgrade does not lose it.
+        return decoded.filter { AchievementCatalog.achievement(id: $0.key) != nil }
+    }
+
+    /// Every id in storage, including ones this version's catalogue no longer
+    /// defines. Only for tests that assert nothing is destroyed on read.
+    var storedIDsIncludingUnknown: Set<String> {
+        guard let data = defaults.data(forKey: unlockedKey), !data.isEmpty,
+              let decoded = try? JSONDecoder().decode([String: Date].self, from: data) else {
+            return []
+        }
+        return Set(decoded.keys)
     }
 
     var unlockedIDs: Set<String> { Set(unlockedAt.keys) }

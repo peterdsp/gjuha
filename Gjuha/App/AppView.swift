@@ -169,6 +169,15 @@ private struct RootTabView: View {
         // brings the bar back the moment they scroll up.
         .tabBarMinimizeBehavior(.onScrollDown)
         .tint(Color.gjuha.accentStrong)
+        // Every tab root draws its own header card, so none of them needs a
+        // navigation title, and the container is the only place that can say so
+        // once rather than four times. See `gjuhaIsTabRoot`: with a real
+        // `TabView` all four tabs stay alive, so a per-screen
+        // `navigationBarHidden` or `navigationTitle` fights the other three for
+        // one bar. Home won that fight and the other three titles stopped
+        // rendering, which is why the chrome is decided here.
+        .environment(\.gjuhaIsTabRoot, true)
+        .toolbar(.hidden, for: .navigationBar)
     }
 }
 

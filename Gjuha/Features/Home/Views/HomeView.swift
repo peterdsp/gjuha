@@ -71,7 +71,9 @@ struct HomeView: View {
                 .gjuhaReadableWidth(usesTwoColumns ? 1_040 : 620)
             }
         }
-        .navigationBarHidden(true)
+        // No title: Home draws its own header card. The bar itself is
+        // hidden by the container, which is the only thing that can do it
+        // without fighting the other three tabs for one navigation bar.
         .onAppear {
             if !animateEntrance {
                 animateEntrance = true

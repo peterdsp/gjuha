@@ -48,7 +48,15 @@ enum MascotLoop {
     /// animation's stop flag on the next tick, so a mascot that scrolls off
     /// screen stops decoding rather than animating invisibly.
     static func frames(from data: Data) -> AsyncStream<Frame> {
-        AsyncStream { continuation in
+        // `.bufferingNewest(1)`, not the default unbounded policy. Image I/O
+        // yields on its own queue at the GIF's frame rate while the consumer is
+        // a main-actor `for await`, so any main-actor stall (a lesson
+        // transition, a long scroll, cold-start work) would queue decoded
+        // frames with nothing to bound them. A 420x420 frame is roughly 700 KB,
+        // so a one second stall at 30fps buffers about 20 MB per mascot on
+        // screen. An animation only ever wants the newest frame anyway: a stale
+        // one is not worth showing late.
+        AsyncStream(Frame.self, bufferingPolicy: .bufferingNewest(1)) { continuation in
             CGAnimateImageDataWithBlock(data as CFData, nil) { _, image, stop in
                 // `YieldResult` is not Equatable, so match the terminated case
                 // rather than comparing. Terminated means the consuming task was

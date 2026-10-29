@@ -243,8 +243,19 @@ final class GjuhaUITests: XCTestCase {
         // "Regular" is the goal `completeOnboarding` selects, which is 120 XP.
         // A fresh account has earned nothing yet, so the ring must say 0 of 120
         // rather than inventing progress.
-        XCTAssertTrue(
-            (ring.value as? String)?.contains("120") == true,
+        //
+        // Waited for rather than read once: Home renders the ring immediately
+        // from `UserStats.empty`, whose `dailyGoalXP` defaults to the casual
+        // goal of 60, and the chosen 120 only arrives with the asynchronous
+        // `statsLoaded`. Reading the value straight after `waitForExistence`
+        // legitimately catches the 60 on a slow simulator.
+        let namesTheGoal = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "value CONTAINS %@", "120"),
+            object: ring
+        )
+        XCTAssertEqual(
+            XCTWaiter.wait(for: [namesTheGoal], timeout: timeout),
+            .completed,
             "The goal ring should name the chosen goal. Value was: \(String(describing: ring.value))"
         )
     }

@@ -18,80 +18,158 @@ struct HomeView: View {
         }.count
     }
 
+    /// At a regular width the context cards move into a leading rail and the
+    /// lesson map keeps its own column.
+    ///
+    /// The map is a single vertical flow and reads correctly centred, so it is
+    /// not split. What was wrong at a regular width is everything *around* it:
+    /// the unit card, the review prompt and the culture card were stacked above
+    /// and below the map, which on an iPad meant scrolling past a screen of
+    /// context to reach the lessons and scrolling the whole map again to find the
+    /// culture card. Apple's iPhone Duo guidance is to "show an additional level
+    /// of hierarchy on the larger inner display if it makes sense for your
+    /// content", and two columns is an even split, which is what the fold wants.
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    private var isRegularWidth: Bool { horizontalSizeClass == .regular }
+
+    /// Two columns need the width *and* a map to put in the second one. The
+    /// loading, no-content and all-finished states have nothing to pair with the
+    /// rail, so they stay a single column at every width.
+    private var usesTwoColumns: Bool {
+        isRegularWidth && !store.isLoading && currentUnit != nil
+    }
+
     var body: some View {
         ZStack {
-            GjuhaLiquidGlassBackground()
+            GjuhaAmbientBackground()
 
             ScrollView {
-                VStack(spacing: 0) {
-                    HomeHeaderView(streak: store.currentStreak, xp: store.totalXP)
-                        .padding(.horizontal, 16)
-                        .padding(.top, 12)
+                Group {
+                    if usesTwoColumns {
+                        HStack(alignment: .top, spacing: .gjuha.loose) {
+                            VStack(spacing: .gjuha.regular) {
+                                contextRail
+                            }
+                            .frame(maxWidth: 360)
 
-                    if !store.isLoading && store.dueReviewCount > 0 {
-                        DailyReviewCard(count: store.dueReviewCount) {
-                            store.send(.startReviewTapped)
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.top, 16)
-                    }
-
-                    if store.isLoading {
-                        ProgressView()
-                            .padding(.top, 48)
-                    } else if let unit = currentUnit {
-                        VStack(spacing: 20) {
-                            // Current unit header
-                            UnitHeaderCard(
-                                unit: unit,
-                                completedUnits: completedUnitsCount,
-                                totalUnits: store.units.count
-                            )
-
-                            // Course path - zigzag lesson nodes
-                            CoursePathView(
-                                lessons: unit.lessons,
-                                onLessonTap: { lesson in
-                                    store.send(.lessonTapped(lesson))
-                                }
-                            )
-
-                            // Next unit preview
-                            if let nextUnit = nextLockedUnit(after: unit) {
-                                NextUnitPreview(unit: nextUnit)
+                            VStack(spacing: .gjuha.loose) {
+                                lessonColumn
                             }
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.top, 20)
-                        .padding(.bottom, 28)
-                    } else if store.units.isEmpty {
-                        HomeNoContentView()
-                            .padding(.horizontal, 16)
-                            .padding(.top, 20)
+                        .padding(.horizontal, .gjuha.regular)
+                        .padding(.vertical, .gjuha.loose)
                     } else {
-                        // All units done!
-                        AllCompleteView()
-                            .padding(.horizontal, 16)
-                            .padding(.top, 20)
-                    }
-
-                    if !store.isLoading {
-                        ExploreCultureCard { store.send(.exploreCultureTapped) }
-                            .padding(.horizontal, 16)
-                            .padding(.top, 8)
-                            .padding(.bottom, 28)
+                        singleColumn
                     }
                 }
-                .gjuhaReadableWidth()
+                // Keyed on what is actually being drawn, not on the width. Two
+                // columns of cards are not prose, so the reading-measure cap
+                // widens for them; the loading, empty and all-finished states
+                // fall back to one column and keep the prose measure, which they
+                // would otherwise lose on an iPad for no reason.
+                .gjuhaReadableWidth(usesTwoColumns ? 1_040 : 620)
             }
         }
-        .navigationBarHidden(true)
+        // No title: Home draws its own header card. The bar itself is
+        // hidden by the container, which is the only thing that can do it
+        // without fighting the other three tabs for one navigation bar.
         .onAppear {
             if !animateEntrance {
                 animateEntrance = true
             }
             store.send(.onAppear)
         }
+    }
+
+    /// Context: who the learner is today, what is due, and where they are in the
+    /// course. Leads at every width.
+    @ViewBuilder
+    private var contextRail: some View {
+        HomeHeaderView(stats: store.stats)
+
+        if !store.isLoading, store.dueReviewCount > 0 {
+            DailyReviewCard(count: store.dueReviewCount) {
+                store.send(.startReviewTapped)
+            }
+        }
+
+        if let unit = currentUnit {
+            UnitHeaderCard(
+                unit: unit,
+                completedUnits: completedUnitsCount,
+                totalUnits: store.units.count
+            )
+        }
+
+        if !store.isLoading {
+            ExploreCultureCard { store.send(.exploreCultureTapped) }
+        }
+    }
+
+    /// The lessons themselves, and what comes after them.
+    @ViewBuilder
+    private var lessonColumn: some View {
+        if let unit = currentUnit {
+            CoursePathView(
+                lessons: unit.lessons,
+                onLessonTap: { lesson in
+                    store.send(.lessonTapped(lesson))
+                }
+            )
+
+            if let nextUnit = nextLockedUnit(after: unit) {
+                NextUnitPreview(unit: nextUnit)
+            }
+        }
+    }
+
+    /// Compact width, and every state that has no map to put beside a rail:
+    /// loading, no content, and everything finished.
+    @ViewBuilder
+    private var singleColumn: some View {
+        VStack(spacing: .gjuha.regular) {
+            HomeHeaderView(stats: store.stats)
+
+            if !store.isLoading, store.dueReviewCount > 0 {
+                DailyReviewCard(count: store.dueReviewCount) {
+                    store.send(.startReviewTapped)
+                }
+            }
+
+            if store.isLoading {
+                ProgressView()
+                    .padding(.top, .gjuha.hero)
+            } else if let unit = currentUnit {
+                UnitHeaderCard(
+                    unit: unit,
+                    completedUnits: completedUnitsCount,
+                    totalUnits: store.units.count
+                )
+
+                CoursePathView(
+                    lessons: unit.lessons,
+                    onLessonTap: { lesson in
+                        store.send(.lessonTapped(lesson))
+                    }
+                )
+
+                if let nextUnit = nextLockedUnit(after: unit) {
+                    NextUnitPreview(unit: nextUnit)
+                }
+            } else if store.units.isEmpty {
+                HomeNoContentView()
+            } else {
+                AllCompleteView()
+            }
+
+            if !store.isLoading {
+                ExploreCultureCard { store.send(.exploreCultureTapped) }
+            }
+        }
+        .padding(.horizontal, .gjuha.regular)
+        .padding(.top, .gjuha.snug)
+        .padding(.bottom, .gjuha.section)
     }
 
     private func nextLockedUnit(after current: LearningUnit) -> LearningUnit? {
@@ -104,56 +182,179 @@ struct HomeView: View {
 
 // MARK: - Header
 
+/// Streak, today's goal, and lifetime XP.
+///
+/// The goal ring is the part that was missing. The learner picks a daily goal
+/// during onboarding, it is saved, it is editable in Profile, and until now
+/// nothing in the app ever showed progress against it: there was no way to know
+/// whether today counted. The ring closes that loop, and it is the only place
+/// `xpToday` surfaces, which is why the header takes whole stats rather than
+/// two integers.
 private struct HomeHeaderView: View {
-    let streak: Int
-    let xp: Int
+    let stats: UserStats
+
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var pulse = false
 
     var body: some View {
-        HStack {
-            HStack(spacing: 4) {
-                Image(systemName: "flame.fill")
-                    .foregroundStyle(Color.gjuha.streak)
-                    .scaleEffect(reduceMotion ? 1.0 : (pulse ? 1.14 : 0.94))
-                    .animation(
-                        reduceMotion
-                        ? .linear(duration: 0.01)
-                        : .easeInOut(duration: 0.95).repeatForever(autoreverses: true),
-                        value: pulse
-                    )
-                Text(streak, format: .number)
-                    .font(.gjuha.labelBold)
-                    .foregroundStyle(Color.gjuha.streak)
+        // At accessibility text sizes three columns cannot share one line, so
+        // the row becomes a column rather than truncating the numbers.
+        let layout: AnyLayout = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: .gjuha.snug))
+            : AnyLayout(HStackLayout(alignment: .center, spacing: .gjuha.regular))
+
+        layout {
+            HeaderMetric(
+                icon: "flame.fill",
+                value: stats.currentStreak,
+                tint: Color.gjuha.streakStrong,
+                label: "Day streak",
+                pulse: pulse,
+                pulsePhase: 0
+            )
+
+            if !dynamicTypeSize.isAccessibilitySize {
+                Spacer(minLength: 0)
             }
-            Spacer()
-            HStack(spacing: 4) {
-                Image(systemName: "star.fill")
-                    .foregroundStyle(Color.gjuha.xp)
-                    .scaleEffect(reduceMotion ? 1.0 : (pulse ? 0.94 : 1.14))
-                    .animation(
-                        reduceMotion
-                        ? .linear(duration: 0.01)
-                        : .easeInOut(duration: 1.25).repeatForever(autoreverses: true),
-                        value: pulse
-                    )
-                Text(xp, format: .number)
-                    .font(.gjuha.labelBold)
-                    .foregroundStyle(Color.gjuha.xp)
+
+            DailyGoalRing(stats: stats)
+
+            if !dynamicTypeSize.isAccessibilitySize {
+                Spacer(minLength: 0)
             }
+
+            HeaderMetric(
+                icon: "star.fill",
+                value: stats.totalXP,
+                tint: Color.gjuha.xpStrong,
+                label: "Total XP",
+                pulse: pulse,
+                pulsePhase: 0.3
+            )
         }
-        .padding(.horizontal, 24)
-        .padding(.vertical, 16)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay(alignment: .bottom) {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(Color.white.opacity(0.28), lineWidth: 0.8)
-        }
-        .shadow(color: .black.opacity(0.12), radius: 14, y: 8)
+        .padding(.horizontal, .gjuha.loose)
+        .padding(.vertical, .gjuha.regular)
+        .frame(maxWidth: .infinity)
+        .gjuhaCardSurface(cornerRadius: GjuhaSpacing.Radius.large, prominence: .standard)
         .onAppear {
             if reduceMotion { return }
             pulse = true
+        }
+    }
+}
+
+private struct HeaderMetric: View {
+    let icon: String
+    let value: Int
+    let tint: Color
+    /// `LocalizedStringKey`, so the VoiceOver label reaches the String Catalog.
+    let label: LocalizedStringKey
+    let pulse: Bool
+    /// Offsets this metric's breathing animation from the other's, so the two
+    /// are not in lockstep.
+    let pulsePhase: Double
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        HStack(spacing: .gjuha.hairline) {
+            Image(systemName: icon)
+                .foregroundStyle(tint)
+                .scaleEffect(reduceMotion ? 1.0 : (pulse ? 1.12 : 0.95))
+                .animation(
+                    reduceMotion
+                    ? .linear(duration: 0.01)
+                    : .easeInOut(duration: 1.0).repeatForever(autoreverses: true).delay(pulsePhase),
+                    value: pulse
+                )
+            Text(value, format: .number)
+                .font(.gjuha.labelBold)
+                .foregroundStyle(tint)
+                .contentTransition(.numericText())
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(label)
+        .accessibilityValue(Text(value, format: .number))
+    }
+}
+
+/// Today's XP against the learner's chosen daily goal.
+private struct DailyGoalRing: View {
+    let stats: UserStats
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var shown: Double = 0
+
+    private var isMet: Bool { stats.hasMetDailyGoal }
+
+    var body: some View {
+        HStack(spacing: .gjuha.tight) {
+            ZStack {
+                Circle()
+                    .stroke(Color.gjuha.track, lineWidth: 5)
+
+                Circle()
+                    .trim(from: 0, to: shown)
+                    .stroke(
+                        AngularGradient(
+                            colors: isMet
+                                ? [Color.gjuha.success, Color.gjuha.success]
+                                : [Color.gjuha.accent, Color.gjuha.streak],
+                            center: .center
+                        ),
+                        style: StrokeStyle(lineWidth: 5, lineCap: .round)
+                    )
+                    // Start the arc at twelve o'clock, where a progress ring is
+                    // read from, instead of three.
+                    .rotationEffect(.degrees(-90))
+
+                if isMet {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 13, weight: .heavy))
+                        .foregroundStyle(Color.gjuha.successStrong)
+                } else {
+                    Text(stats.xpToday, format: .number)
+                        .font(.system(size: 12, weight: .bold, design: .rounded))
+                        .foregroundStyle(Color.gjuha.textPrimary)
+                        .minimumScaleFactor(0.7)
+                        .lineLimit(1)
+                        .padding(2)
+                }
+            }
+            .frame(width: 40, height: 40)
+
+            VStack(alignment: .leading, spacing: 0) {
+                Text("Today")
+                    .font(.gjuha.caption)
+                    .foregroundStyle(Color.gjuha.textSecondary)
+                Text("\(stats.xpToday)/\(stats.dailyGoalXP) XP")
+                    .font(.gjuha.captionBold)
+                    .foregroundStyle(Color.gjuha.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+        }
+        .onAppear { animate(to: stats.dailyGoalProgress) }
+        .onChange(of: stats.dailyGoalProgress) { _, new in animate(to: new) }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Today's goal")
+        // Spoken as the real numbers plus whether the goal is met, because the
+        // ring and the tick are both unavailable to VoiceOver.
+        .accessibilityValue(
+            isMet
+            ? Text("Goal met. \(stats.xpToday) of \(stats.dailyGoalXP) XP")
+            : Text("\(stats.xpToday) of \(stats.dailyGoalXP) XP")
+        )
+    }
+
+    private func animate(to progress: Double) {
+        guard !reduceMotion else {
+            shown = progress
+            return
+        }
+        withAnimation(.spring(response: 0.6, dampingFraction: 0.85)) {
+            shown = progress
         }
     }
 }
@@ -171,7 +372,7 @@ private struct DailyReviewCard: View {
             HStack(spacing: 14) {
                 Image(systemName: "arrow.triangle.2.circlepath")
                     .font(.system(size: 26, weight: .semibold))
-                    .foregroundStyle(Color.gjuha.accent)
+                    .foregroundStyle(Color.gjuha.accentStrong)
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Daily review")
@@ -190,9 +391,9 @@ private struct DailyReviewCard: View {
                     .foregroundStyle(Color.gjuha.textTertiary)
             }
             .padding(16)
-            .gjuhaLiquidGlassCard(cornerRadius: 20, tintOpacity: 0.12)
+            .gjuhaCardSurface(cornerRadius: 20, prominence: .prominent)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.gjuhaCard)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Daily review")
         .accessibilityValue("\(count) words due for review")
@@ -211,7 +412,7 @@ private struct ExploreCultureCard: View {
             HStack(spacing: 14) {
                 Image(systemName: "globe.europe.africa.fill")
                     .font(.system(size: 26, weight: .semibold))
-                    .foregroundStyle(Color.gjuha.accent)
+                    .foregroundStyle(Color.gjuha.accentStrong)
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Culture & dialects")
@@ -230,9 +431,9 @@ private struct ExploreCultureCard: View {
                     .foregroundStyle(Color.gjuha.textTertiary)
             }
             .padding(16)
-            .gjuhaLiquidGlassCard(cornerRadius: 20, tintOpacity: 0.10)
+            .gjuhaCardSurface(cornerRadius: 20, prominence: .prominent)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.gjuhaCard)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Culture and dialects")
         .accessibilityHint("Opens cultural units and regional forms")
@@ -284,13 +485,13 @@ private struct UnitHeaderCard: View {
                     Spacer()
                     Text("\(Int(progress * 100))%")
                         .font(.gjuha.captionBold)
-                        .foregroundStyle(Color.gjuha.accent)
+                        .foregroundStyle(Color.gjuha.accentStrong)
                 }
 
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
                         Capsule(style: .continuous)
-                            .fill(Color.white.opacity(0.2))
+                            .fill(Color.gjuha.track)
                             .frame(height: 8)
                         Capsule(style: .continuous)
                             .fill(
@@ -321,7 +522,7 @@ private struct UnitHeaderCard: View {
             }
         }
         .padding(16)
-        .gjuhaLiquidGlassCard(cornerRadius: 22, tintOpacity: 0.09)
+        .gjuhaCardSurface(cornerRadius: 22, prominence: .standard)
     }
 }
 
@@ -450,11 +651,11 @@ private struct CourseNodeView: View {
                     } else if lesson.isCompleted {
                         Image(systemName: "checkmark")
                             .font(.system(size: 24, weight: .bold))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(Color.gjuha.onAccent)
                     } else {
                         Image(systemName: lesson.iconName)
                             .font(.system(size: isNext ? 26 : 22, weight: .semibold))
-                            .foregroundStyle(isNext ? .white : Color.gjuha.textPrimary)
+                            .foregroundStyle(isNext ? Color.gjuha.onAccent : Color.gjuha.textPrimary)
                     }
                 }
 
@@ -475,11 +676,11 @@ private struct CourseNodeView: View {
                         Text(lesson.bestXP, format: .number)
                             .font(.system(size: 10, weight: .semibold))
                     }
-                    .foregroundStyle(Color.gjuha.xp)
+                    .foregroundStyle(Color.gjuha.xpStrong)
                 }
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.gjuhaCard)
         .disabled(lesson.isLocked)
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 12)
@@ -576,7 +777,7 @@ private struct HomeMetricChip: View {
         .foregroundStyle(Color.gjuha.textSecondary)
         .padding(.horizontal, 9)
         .padding(.vertical, 6)
-        .background(.white.opacity(0.15))
+        .background(Color.gjuha.chipFill)
         .clipShape(Capsule(style: .continuous))
     }
 }
@@ -594,7 +795,7 @@ private struct HomeNoContentView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(18)
-        .gjuhaLiquidGlassCard(cornerRadius: 20, tintOpacity: 0.07)
+        .gjuhaCardSurface(cornerRadius: 20, prominence: .standard)
     }
 }
 
@@ -612,6 +813,6 @@ private struct AllCompleteView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(24)
-        .gjuhaLiquidGlassCard(cornerRadius: 22, tintOpacity: 0.09)
+        .gjuhaCardSurface(cornerRadius: 22, prominence: .standard)
     }
 }

@@ -88,6 +88,56 @@ final class GjuhaUITests: XCTestCase {
         }
     }
 
+    // MARK: - Finding a tab
+
+    /// A top-level destination, wherever the system decided to put it.
+    ///
+    /// `app.buttons["Words"]` was enough while the app drew its own tab bar. It
+    /// is not enough now: the app uses a real `TabView` with
+    /// `.tabViewStyle(.sidebarAdaptable)`, so at a regular width iPadOS presents
+    /// the same four destinations through a different control, and a query that
+    /// names only `buttons` finds nothing. That is a difference in presentation,
+    /// not in behaviour, so the test should follow the system rather than assert
+    /// one shape of it.
+    ///
+    /// Tried in order of how specific they are, and a hittable match always wins
+    /// over one that merely exists, because a destination can be present in the
+    /// accessibility tree while covered by the launch splash.
+    ///
+    /// Every query is `.firstMatch`, which is what made this fail on iPad: there
+    /// the system publishes each tab button *twice*, as a wrapper and the button
+    /// inside it, so a plain `app.buttons["Words"]` subscript is ambiguous and
+    /// resolving it reports the element as existing but never hittable. The two
+    /// are the same destination, so taking the first is correct rather than a
+    /// workaround.
+    private func tabElement(_ name: String, in app: XCUIApplication) -> XCUIElement {
+        let candidates = [
+            app.tabBars.buttons[name].firstMatch,
+            app.buttons[name].firstMatch,
+            app.collectionViews.buttons[name].firstMatch,
+            app.cells[name].firstMatch,
+            app.staticTexts[name].firstMatch
+        ]
+        if let hittable = candidates.first(where: { $0.exists && $0.isHittable }) {
+            return hittable
+        }
+        if let existing = candidates.first(where: { $0.exists }) {
+            return existing
+        }
+        // Nothing matched. Return the plain button query so the failure message
+        // names what the test was actually looking for.
+        return app.buttons[name].firstMatch
+    }
+
+    /// Waits for a destination to be present, in whichever presentation.
+    @discardableResult
+    private func waitForTab(_ name: String, in app: XCUIApplication) -> Bool {
+        if tabElement(name, in: app).waitForExistence(timeout: timeout) { return true }
+        // `tabElement` resolves once; if the first resolution lost the race with
+        // the launch splash, re-resolve and wait again.
+        return tabElement(name, in: app).waitForExistence(timeout: timeout)
+    }
+
     // MARK: - Launching
 
     private func launchApp(resetState: Bool = true) -> XCUIApplication {
@@ -122,8 +172,8 @@ final class GjuhaUITests: XCTestCase {
 
         // The root tab bar is the proof we reached the app proper.
         XCTAssertTrue(
-            app.buttons["Learn"].waitForExistence(timeout: timeout),
-            "Finishing onboarding should reveal the root tab bar."
+            waitForTab("Learn", in: app),
+            "Finishing onboarding should reveal the root destinations."
         )
     }
 
@@ -133,7 +183,7 @@ final class GjuhaUITests: XCTestCase {
         // Relaunch WITHOUT resetting: onboarding must be remembered.
         let app = launchApp(resetState: false)
         XCTAssertTrue(
-            app.buttons["Learn"].waitForExistence(timeout: timeout),
+            waitForTab("Learn", in: app),
             "A returning learner should go straight to the lesson map."
         )
         XCTAssertFalse(
@@ -149,9 +199,9 @@ final class GjuhaUITests: XCTestCase {
         completeOnboarding(on: app)
 
         for tab in ["Words", "Grammar", "Profile", "Learn"] {
-            tap(app.buttons[tab], "The \(tab) tab")
+            tap(tabElement(tab, in: app), "The \(tab) tab")
             XCTAssertTrue(
-                app.buttons[tab].waitForExistence(timeout: timeout),
+                waitForTab(tab, in: app),
                 "\(tab) tab vanished after tapping it."
             )
         }
@@ -163,7 +213,7 @@ final class GjuhaUITests: XCTestCase {
         let app = launchApp()
         completeOnboarding(on: app)
 
-        tap(app.buttons["Profile"], "The Profile tab")
+        tap(tabElement("Profile", in: app), "The Profile tab")
 
         for label in ["Words seen", "In review", "Mastered"] {
             XCTAssertTrue(
@@ -171,6 +221,69 @@ final class GjuhaUITests: XCTestCase {
                 "Profile should distinguish '\(label)' from the other progress figures."
             )
         }
+    }
+
+    /// The daily goal is the loop the whole header is built around: the learner
+    /// picks one during onboarding, and before this release nothing in the app
+    /// ever showed progress against it. If the ring stops rendering, the goal
+    /// silently becomes invisible again, which no unit test can catch.
+    func testHomeShowsProgressTowardTheDailyGoal() throws {
+        let app = launchApp()
+        completeOnboarding(on: app)
+
+        // The ring is one accessibility element exposing its label and the real
+        // figures as its value, so this also checks it is reachable by VoiceOver
+        // rather than being a decorative shape.
+        let ring = app.otherElements["Today's goal"]
+        XCTAssertTrue(
+            ring.waitForExistence(timeout: timeout),
+            "Home should show progress toward today's goal."
+        )
+
+        // "Regular" is the goal `completeOnboarding` selects, which is 120 XP.
+        // A fresh account has earned nothing yet, so the ring must say 0 of 120
+        // rather than inventing progress.
+        //
+        // Waited for rather than read once: Home renders the ring immediately
+        // from `UserStats.empty`, whose `dailyGoalXP` defaults to the casual
+        // goal of 60, and the chosen 120 only arrives with the asynchronous
+        // `statsLoaded`. Reading the value straight after `waitForExistence`
+        // legitimately catches the 60 on a slow simulator.
+        let namesTheGoal = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "value CONTAINS %@", "120"),
+            object: ring
+        )
+        XCTAssertEqual(
+            XCTWaiter.wait(for: [namesTheGoal], timeout: timeout),
+            .completed,
+            "The goal ring should name the chosen goal. Value was: \(String(describing: ring.value))"
+        )
+    }
+
+    /// Achievements must be visible and honestly locked on a fresh account: the
+    /// grid is the one place the app makes a claim about what the learner has
+    /// achieved, so it must not start out claiming anything.
+    func testAchievementsStartLockedAndAreReachable() throws {
+        let app = launchApp()
+        completeOnboarding(on: app)
+
+        tap(tabElement("Profile", in: app), "The Profile tab")
+
+        XCTAssertTrue(
+            app.staticTexts["Achievements"].waitForExistence(timeout: timeout),
+            "Profile should have an Achievements section."
+        )
+
+        let firstSteps = app.otherElements["First steps"]
+        scrollIntoView(firstSteps)
+        XCTAssertTrue(
+            firstSteps.waitForExistence(timeout: timeout),
+            "The first-lesson achievement should be in the grid."
+        )
+        XCTAssertTrue(
+            (firstSteps.value as? String)?.contains("Locked") == true,
+            "A fresh account must not start with achievements unlocked. Value was: \(String(describing: firstSteps.value))"
+        )
     }
 
     // MARK: - Lessons
@@ -216,7 +329,7 @@ final class GjuhaUITests: XCTestCase {
         tap(exit, "Exit lesson")
 
         XCTAssertTrue(
-            app.buttons["Learn"].waitForExistence(timeout: timeout),
+            waitForTab("Learn", in: app),
             "Leaving a lesson with nothing answered should return to the lesson map."
         )
         XCTAssertFalse(
@@ -231,7 +344,7 @@ final class GjuhaUITests: XCTestCase {
         let app = launchApp()
         completeOnboarding(on: app)
 
-        tap(app.buttons["Profile"], "The Profile tab")
+        tap(tabElement("Profile", in: app), "The Profile tab")
 
         let reset = app.buttons.matching(
             NSPredicate(format: "label CONTAINS[c] %@", "Reset learning data")
@@ -274,6 +387,6 @@ final class GjuhaUITests: XCTestCase {
         )
         tap(app.buttons["Start learning"], "Finish onboarding")
 
-        _ = app.buttons["Learn"].waitForExistence(timeout: timeout)
+        _ = waitForTab("Learn", in: app)
     }
 }

@@ -6,7 +6,7 @@ struct GrammarView: View {
 
     var body: some View {
         ZStack {
-            GjuhaLiquidGlassBackground()
+            GjuhaAmbientBackground()
 
             Group {
                 if let topic = store.selectedTopic {
@@ -31,8 +31,7 @@ struct GrammarView: View {
             }
             .gjuhaReadableWidth()
         }
-        .navigationTitle("Grammar")
-        .navigationBarTitleDisplayMode(.large)
+        .gjuhaScreenTitle("Grammar")
         .onAppear { store.send(.onAppear) }
     }
 }
@@ -74,9 +73,9 @@ private struct GrammarTopicListView: View {
                             }
                             .padding(.horizontal, 14)
                             .padding(.vertical, 12)
-                            .gjuhaLiquidGlassCard(cornerRadius: 14, tintOpacity: 0.06)
+                            .gjuhaCardSurface(cornerRadius: 14, prominence: .nested)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.gjuhaCard)
                     }
                 }
                 .padding(.horizontal, 16)
@@ -115,7 +114,7 @@ private struct GrammarPulseBanner: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
-        .gjuhaLiquidGlassCard(cornerRadius: 14, tintOpacity: 0.07)
+        .gjuhaCardSurface(cornerRadius: 14, prominence: .standard)
         .onAppear {
             if reduceMotion { return }
             pulse = true
@@ -137,7 +136,7 @@ private struct GrammarEmptyStateView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(18)
-        .gjuhaLiquidGlassCard(cornerRadius: 20, tintOpacity: 0.08)
+        .gjuhaCardSurface(cornerRadius: 20, prominence: .standard)
     }
 }
 
@@ -174,7 +173,7 @@ private struct GrammarTopicDetailView: View {
                                 .foregroundStyle(Color.gjuha.textSecondary)
                                 .padding(12)
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .gjuhaLiquidGlassCard(cornerRadius: 12, tintOpacity: 0.05)
+                                .gjuhaCardSurface(cornerRadius: 12, prominence: .nested)
                         }
                     }
                     .padding(.horizontal, 16)
@@ -217,7 +216,7 @@ private struct GrammarCoachSection: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
                 Image(systemName: "sparkles")
-                    .foregroundStyle(Color.gjuha.accent)
+                    .foregroundStyle(Color.gjuha.accentStrong)
                 Text("Explain simply (beta)")
                     .font(.gjuha.headingMedium)
                     .foregroundStyle(Color.gjuha.textPrimary)
@@ -248,7 +247,7 @@ private struct GrammarCoachSection: View {
                 .background(Color.gjuha.accent.opacity(0.14))
                 .clipShape(RoundedRectangle(cornerRadius: 12))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.gjuhaCard)
             .disabled(isGenerating)
             .accessibilityLabel(isGenerating ? "Generating explanation" : "Explain this topic")
 
@@ -267,7 +266,7 @@ private struct GrammarCoachSection: View {
                 }
                 .padding(12)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .gjuhaLiquidGlassCard(cornerRadius: 12, tintOpacity: 0.05)
+                .gjuhaCardSurface(cornerRadius: 12, prominence: .nested)
                 .accessibilityElement(children: .combine)
             }
         }
@@ -310,6 +309,6 @@ private struct ConjugationTableView: View {
                 Divider()
             }
         }
-        .gjuhaLiquidGlassCard(cornerRadius: 12, tintOpacity: 0.05)
+        .gjuhaCardSurface(cornerRadius: 12, prominence: .nested)
     }
 }

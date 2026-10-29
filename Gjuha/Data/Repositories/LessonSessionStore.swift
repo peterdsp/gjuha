@@ -23,8 +23,67 @@ struct LessonSessionSnapshot: Codable, Equatable {
     var xpEarned: Int
     /// Current correct-answer combo.
     var combo: Int
+    /// Answers graded so far this attempt, and how many were correct. Drive the
+    /// accuracy figure on the completion screen.
+    var answeredCount: Int
+    var correctCount: Int
+    /// Best combo reached this attempt. Stored separately from `combo`, which
+    /// every wrong answer resets: without it a learner who reached 6x, slipped,
+    /// then resumed after a termination would be told their best streak was 0.
+    var bestCombo: Int
     /// When the snapshot was written, for diagnostics.
     var savedAt: Date
+
+    init(
+        lesson: LessonSummary,
+        exercises: [Exercise],
+        currentIndex: Int,
+        hearts: Int,
+        xpEarned: Int,
+        combo: Int,
+        answeredCount: Int = 0,
+        correctCount: Int = 0,
+        bestCombo: Int = 0,
+        savedAt: Date
+    ) {
+        self.lesson = lesson
+        self.exercises = exercises
+        self.currentIndex = currentIndex
+        self.hearts = hearts
+        self.xpEarned = xpEarned
+        self.combo = combo
+        self.answeredCount = answeredCount
+        self.correctCount = correctCount
+        self.bestCombo = bestCombo
+        self.savedAt = savedAt
+    }
+
+    /// Decoding is written out rather than synthesised so that `answeredCount`
+    /// and `correctCount`, added after 1.0 was already installable, default to
+    /// zero when they are absent.
+    ///
+    /// Synthesised `Codable` would throw on a payload written by the previous
+    /// version, `load()` would see nil, and a learner who updated the app
+    /// mid-lesson would silently lose their place. Defaulting instead costs
+    /// them an accuracy percentage on one completion screen, which is the right
+    /// side of that trade.
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        lesson = try container.decode(LessonSummary.self, forKey: .lesson)
+        exercises = try container.decode([Exercise].self, forKey: .exercises)
+        currentIndex = try container.decode(Int.self, forKey: .currentIndex)
+        hearts = try container.decode(Int.self, forKey: .hearts)
+        xpEarned = try container.decode(Int.self, forKey: .xpEarned)
+        combo = try container.decode(Int.self, forKey: .combo)
+        answeredCount = try container.decodeIfPresent(Int.self, forKey: .answeredCount) ?? 0
+        correctCount = try container.decodeIfPresent(Int.self, forKey: .correctCount) ?? 0
+        // Absent in payloads from before this field existed. Falling back to
+        // `combo` is the closest true statement available: it is the best run
+        // still in progress at the moment the snapshot was written.
+        bestCombo = try container.decodeIfPresent(Int.self, forKey: .bestCombo)
+            ?? container.decode(Int.self, forKey: .combo)
+        savedAt = try container.decode(Date.self, forKey: .savedAt)
+    }
 }
 
 /// UserDefaults backed persistence for the single in-progress course lesson,

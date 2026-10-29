@@ -109,13 +109,25 @@ private struct SmallWidgetView: View {
         let action = CallToAction(entry: entry)
 
         VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 4) {
+            HStack(spacing: 6) {
                 Image(systemName: "flame.fill")
                     .foregroundStyle(WidgetPalette.streak)
                     .imageScale(.small)
                 Text(streakText)
                     .font(.system(.subheadline, design: .rounded, weight: .bold))
                     .foregroundStyle(WidgetPalette.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+
+                Spacer(minLength: 0)
+
+                // Only when the projection is current and a goal has been
+                // written. A stale snapshot's XP belongs to a day that has
+                // already turned, and a pre-update snapshot has no goal at all,
+                // so in both cases the ring is omitted rather than guessed at.
+                if !entry.isPlaceholder, !entry.isStale, entry.snapshot.dailyGoalXP > 0 {
+                    DailyGoalDot(snapshot: entry.snapshot)
+                }
             }
 
             Spacer(minLength: 0)
@@ -178,11 +190,15 @@ private struct MediumWidgetView: View {
                         value: entry.snapshot.currentStreak,
                         caption: "Day streak"
                     )
+                    // Today's goal rather than the lifetime total: a number
+                    // that can still change today is the one worth a glance.
                     StatCell(
                         symbol: "star.fill",
                         tint: WidgetPalette.xp,
-                        value: entry.snapshot.totalXP,
-                        caption: "Total XP"
+                        value: entry.snapshot.xpToday,
+                        caption: entry.snapshot.dailyGoalXP > 0
+                            ? "of \(entry.snapshot.dailyGoalXP) XP today"
+                            : "XP today"
                     )
                     StatCell(
                         symbol: "checkmark.seal.fill",
@@ -239,6 +255,42 @@ private struct StatCell: View {
     }
 }
 
+// MARK: - Daily goal
+
+/// A compact ring for today's XP against the goal.
+///
+/// Drawn rather than using `Gauge`, because the small Home Screen family renders
+/// a gauge at a size that crowds the streak line next to it.
+private struct DailyGoalDot: View {
+    let snapshot: GjuhaWidgetSnapshot
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(WidgetPalette.track, lineWidth: 3.5)
+            Circle()
+                .trim(from: 0, to: snapshot.dailyGoalProgress)
+                .stroke(
+                    snapshot.hasMetDailyGoal ? WidgetPalette.successFill : WidgetPalette.accentFill,
+                    style: StrokeStyle(lineWidth: 3.5, lineCap: .round)
+                )
+                .rotationEffect(.degrees(-90))
+
+            if snapshot.hasMetDailyGoal {
+                Image(systemName: "checkmark")
+                    .font(.system(size: 9, weight: .heavy))
+                    .foregroundStyle(WidgetPalette.success)
+            }
+        }
+        .frame(width: 22, height: 22)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("Today's goal"))
+        .accessibilityValue(
+            Text("\(snapshot.xpToday) of \(snapshot.dailyGoalXP) XP")
+        )
+    }
+}
+
 // MARK: - Lock Screen
 
 /// Lock Screen accessory families are rendered monochrome by the system, so these
@@ -251,15 +303,28 @@ private struct CircularAccessoryView: View {
         let showCount = !entry.isPlaceholder && !entry.isStale
 
         ZStack {
-            AccessoryWidgetBackground()
             if showCount, entry.snapshot.dueReviewCount > 0 {
+                AccessoryWidgetBackground()
                 VStack(spacing: -2) {
                     Text(entry.snapshot.dueReviewCount, format: .number)
                         .font(.system(.title3, design: .rounded, weight: .bold))
                     Text("due")
                         .font(.system(size: 9, weight: .medium, design: .rounded))
                 }
+            } else if showCount, entry.snapshot.dailyGoalXP > 0 {
+                // Nothing due, but today's goal is still open or just met. A
+                // capacity gauge is the family's own idiom and renders correctly
+                // under the system's monochrome treatment, which a hand drawn
+                // ring in brand colour does not.
+                Gauge(value: entry.snapshot.dailyGoalProgress) {
+                    Image(systemName: "star.fill")
+                } currentValueLabel: {
+                    Image(systemName: entry.snapshot.hasMetDailyGoal ? "checkmark" : "star.fill")
+                        .font(.system(size: 13, weight: .bold))
+                }
+                .gaugeStyle(.accessoryCircularCapacity)
             } else {
+                AccessoryWidgetBackground()
                 Image(systemName: showCount ? "checkmark" : "character.book.closed.fill")
                     .font(.system(size: 16, weight: .semibold))
             }

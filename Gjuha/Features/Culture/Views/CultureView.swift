@@ -8,7 +8,7 @@ struct CultureView: View {
 
     var body: some View {
         ZStack {
-            GjuhaLiquidGlassBackground()
+            GjuhaAmbientBackground()
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
@@ -28,7 +28,7 @@ struct CultureView: View {
                                 Button { store.send(.unitTapped(unit)) } label: {
                                     CulturalUnitRow(unit: unit)
                                 }
-                                .buttonStyle(.plain)
+                                .buttonStyle(.gjuhaCard)
                             }
                         }
 
@@ -39,7 +39,7 @@ struct CultureView: View {
                                 Button { store.send(.packTapped(pack)) } label: {
                                     DialectPackRow(pack: pack)
                                 }
-                                .buttonStyle(.plain)
+                                .buttonStyle(.gjuhaCard)
                             }
                         }
                     }
@@ -57,7 +57,7 @@ struct CultureView: View {
     private func sectionHeader(_ title: LocalizedStringKey, systemImage: String) -> some View {
         HStack(spacing: 8) {
             Image(systemName: systemImage)
-                .foregroundStyle(Color.gjuha.accent)
+                .foregroundStyle(Color.gjuha.accentStrong)
             Text(title)
                 .font(.gjuha.headingSmall)
                 .foregroundStyle(Color.gjuha.textPrimary)
@@ -71,7 +71,7 @@ private struct CultureEmptyStateView: View {
         VStack(spacing: 12) {
             Image(systemName: "hourglass")
                 .font(.system(size: 34, weight: .semibold))
-                .foregroundStyle(Color.gjuha.accent)
+                .foregroundStyle(Color.gjuha.accentStrong)
             Text("In native-speaker review")
                 .font(.gjuha.headingSmall)
                 .foregroundStyle(Color.gjuha.textPrimary)
@@ -83,7 +83,7 @@ private struct CultureEmptyStateView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(24)
-        .gjuhaLiquidGlassCard(cornerRadius: 20, tintOpacity: 0.08)
+        .gjuhaCardSurface(cornerRadius: 20, prominence: .standard)
         .accessibilityElement(children: .combine)
     }
 }
@@ -95,7 +95,7 @@ private struct CulturalUnitRow: View {
         HStack(spacing: 14) {
             Image(systemName: "cup.and.saucer.fill")
                 .font(.system(size: 24, weight: .semibold))
-                .foregroundStyle(Color.gjuha.accent)
+                .foregroundStyle(Color.gjuha.accentStrong)
                 .frame(width: 34)
             VStack(alignment: .leading, spacing: 4) {
                 Text(unit.title)
@@ -111,7 +111,7 @@ private struct CulturalUnitRow: View {
                 .foregroundStyle(Color.gjuha.textTertiary)
         }
         .padding(16)
-        .gjuhaLiquidGlassCard(cornerRadius: 18, tintOpacity: 0.10)
+        .gjuhaCardSurface(cornerRadius: 18, prominence: .prominent)
     }
 }
 
@@ -122,7 +122,7 @@ private struct DialectPackRow: View {
         HStack(spacing: 14) {
             Image(systemName: "character.book.closed.fill")
                 .font(.system(size: 24, weight: .semibold))
-                .foregroundStyle(Color.gjuha.accent)
+                .foregroundStyle(Color.gjuha.accentStrong)
                 .frame(width: 34)
             VStack(alignment: .leading, spacing: 4) {
                 Text(pack.title)
@@ -138,7 +138,7 @@ private struct DialectPackRow: View {
                 .foregroundStyle(Color.gjuha.textTertiary)
         }
         .padding(16)
-        .gjuhaLiquidGlassCard(cornerRadius: 18, tintOpacity: 0.10)
+        .gjuhaCardSurface(cornerRadius: 18, prominence: .prominent)
     }
 }
 
@@ -149,7 +149,7 @@ struct CulturalUnitDetailView: View {
 
     var body: some View {
         ZStack {
-            GjuhaLiquidGlassBackground()
+            GjuhaAmbientBackground()
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
@@ -220,7 +220,7 @@ struct CulturalUnitDetailView: View {
                                 .padding(.vertical, 15)
                                 .background(Color.gjuha.accent, in: RoundedRectangle(cornerRadius: 16))
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.gjuhaCard)
                         .accessibilityHint("Starts a spaced repetition session over this unit's words")
                     }
                 }
@@ -245,7 +245,7 @@ struct CulturalUnitDetailView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
-        .gjuhaLiquidGlassCard(cornerRadius: 18, tintOpacity: 0.08)
+        .gjuhaCardSurface(cornerRadius: 18, prominence: .standard)
     }
 }
 
@@ -256,7 +256,7 @@ struct DialectPackDetailView: View {
 
     var body: some View {
         ZStack {
-            GjuhaLiquidGlassBackground()
+            GjuhaAmbientBackground()
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
@@ -317,7 +317,7 @@ private struct DialectEntryCard: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
-        .gjuhaLiquidGlassCard(cornerRadius: 18, tintOpacity: 0.08)
+        .gjuhaCardSurface(cornerRadius: 18, prominence: .standard)
     }
 
     private func formColumn(label: String, value: String) -> some View {

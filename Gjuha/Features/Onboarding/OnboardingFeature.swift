@@ -77,6 +77,24 @@ enum LearningGoal: String, Equatable, CaseIterable {
         case .intense: 20
         }
     }
+
+    /// XP per day that counts as meeting this goal.
+    ///
+    /// Derived from the minutes the learner picked rather than hand-tuned per
+    /// case, so the two can never disagree. The rate comes from what the engine
+    /// actually awards: exercises are worth 10-15 XP, a lesson runs 8-10 of them
+    /// with a combo bonus every third correct answer, and a lesson takes about
+    /// five minutes. That puts a careful learner near 12 XP per minute, so the
+    /// casual goal is roughly one lesson and the intense goal roughly four.
+    ///
+    /// Deliberately reachable through reviews alone: a review session banks XP
+    /// the same way, so a day spent only strengthening old words can still meet
+    /// the goal. Making the goal lesson-only would push learners past material
+    /// they have not retained, which is the opposite of what this app is for.
+    var dailyXPGoal: Int { minutesPerDay * Self.xpPerMinute }
+
+    /// XP an engaged learner earns per minute of study. See ``dailyXPGoal``.
+    static let xpPerMinute = 12
 }
 
 enum LearningReason: String, Equatable, CaseIterable {

@@ -62,7 +62,7 @@ private struct OnboardingBackdropView: View {
 
     var body: some View {
         ZStack {
-            GjuhaLiquidGlassBackground()
+            GjuhaAmbientBackground()
 
             Circle()
                 .fill(Color.gjuha.accent.opacity(0.08))
@@ -120,7 +120,7 @@ private struct WelcomeStepView: View {
             VStack(spacing: 16) {
                 Text("Mirë se vini")
                     .font(.gjuha.displayLarge)
-                    .foregroundStyle(Color.gjuha.accent)
+                    .foregroundStyle(Color.gjuha.accentStrong)
                     .opacity(reveal ? 1 : 0)
                     .offset(y: reveal ? 0 : 8)
 
@@ -199,16 +199,16 @@ private struct ReasonStepView: View {
                             Spacer()
                             if selected == reason {
                                 Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(Color.gjuha.accent)
+                                    .foregroundStyle(Color.gjuha.accentStrong)
                                     .scaleEffect(1.05)
                             }
                         }
                         .padding(16)
-                        .background(selected == reason ? Color.gjuha.accentSubtle.opacity(0.92) : Color.white.opacity(0.12))
+                        .background(selected == reason ? Color.gjuha.accentSubtle.opacity(0.92) : Color.gjuha.controlFill)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
-                                .stroke(selected == reason ? Color.gjuha.accent : Color.white.opacity(0.22), lineWidth: 1.2)
+                                .stroke(selected == reason ? Color.gjuha.accentStrong : Color.gjuha.hairline, lineWidth: 1.2)
                         )
                         .shadow(
                             color: selected == reason ? Color.gjuha.accent.opacity(0.22) : .clear,
@@ -217,7 +217,7 @@ private struct ReasonStepView: View {
                         )
                         .scaleEffect(selected == reason ? 1.01 : 1.0)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.gjuhaCard)
                     .opacity(revealed ? 1 : 0)
                     .offset(y: revealed ? 0 : 10)
                     .animation(
@@ -290,16 +290,16 @@ private struct GoalStepView: View {
                             Spacer()
                             if selected == goal {
                                 Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(Color.gjuha.accent)
+                                    .foregroundStyle(Color.gjuha.accentStrong)
                                     .scaleEffect(1.05)
                             }
                         }
                         .padding(16)
-                        .background(selected == goal ? Color.gjuha.accentSubtle.opacity(0.92) : Color.white.opacity(0.12))
+                        .background(selected == goal ? Color.gjuha.accentSubtle.opacity(0.92) : Color.gjuha.controlFill)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
-                                .stroke(selected == goal ? Color.gjuha.accent : Color.white.opacity(0.22), lineWidth: 1.2)
+                                .stroke(selected == goal ? Color.gjuha.accentStrong : Color.gjuha.hairline, lineWidth: 1.2)
                         )
                         .shadow(
                             color: selected == goal ? Color.gjuha.accent.opacity(0.22) : .clear,
@@ -308,7 +308,7 @@ private struct GoalStepView: View {
                         )
                         .scaleEffect(selected == goal ? 1.01 : 1.0)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.gjuhaCard)
                     .opacity(revealed ? 1 : 0)
                     .offset(y: revealed ? 0 : 10)
                     .animation(
@@ -417,7 +417,7 @@ private struct OrbitSparkleView: View {
         Image(systemName: "sparkle")
             .font(.system(size: size, weight: .heavy))
             .foregroundStyle(Color.gjuha.warning)
-            .shadow(color: .white.opacity(0.38), radius: 4)
+            .shadow(color: Color.gjuha.glassTint.opacity(0.6), radius: 4)
             .opacity(opacity)
             .scaleEffect(scale)
     }
@@ -437,7 +437,7 @@ private struct FloatingPhraseChip: View {
             .foregroundStyle(Color.gjuha.textPrimary)
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
-            .background(.white.opacity(0.9))
+            .background(Color.gjuha.surface.opacity(0.92))
             .clipShape(Capsule())
             .overlay(
                 Capsule()

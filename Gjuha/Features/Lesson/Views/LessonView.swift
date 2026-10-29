@@ -6,7 +6,7 @@ struct LessonView: View {
 
     var body: some View {
         ZStack {
-            GjuhaLiquidGlassBackground()
+            GjuhaAmbientBackground()
 
             switch store.phase {
             case .loading:
@@ -19,7 +19,17 @@ struct LessonView: View {
             case .inProgress:
                 LessonInProgressView(store: store)
             case .completed(let xp):
-                LessonCompletedView(xp: xp, combo: store.combo, onContinue: { store.send(.exitTapped) })
+                LessonCompletedView(
+                    xp: xp,
+                    bestCombo: store.bestCombo,
+                    accuracy: store.accuracy,
+                    answeredCount: store.answeredCount,
+                    isReview: store.isReview,
+                    newAchievements: store.newAchievements,
+                    metDailyGoal: store.metDailyGoalThisSession,
+                    stats: store.statsAfterSession,
+                    onContinue: { store.send(.exitTapped) }
+                )
             case .failed:
                 LessonFailedView(onRetry: { store.send(.onAppear) }, onExit: { store.send(.exitTapped) })
             }
@@ -122,19 +132,19 @@ private struct AnswerFeedbackBanner: View {
             HStack(spacing: 12) {
                 Image(systemName: iconName)
                     .font(.system(size: 28, weight: .bold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(bannerForeground)
                     .scaleEffect(scale)
                     .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
                         .font(.gjuha.labelBold)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(bannerForeground)
 
                     if let answerLine {
                         Text(answerLine)
                             .font(.gjuha.caption)
-                            .foregroundStyle(.white.opacity(0.9))
+                            .foregroundStyle(bannerForeground.opacity(0.9))
                             .fixedSize(horizontal: false, vertical: true)
                     }
                 }
@@ -144,10 +154,10 @@ private struct AnswerFeedbackBanner: View {
                 if case let .correct(xpAwarded, _) = result {
                     Text("+\(xpAwarded) XP")
                         .font(.gjuha.labelBold)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(bannerForeground)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 4)
-                        .background(.white.opacity(0.2))
+                        .background(bannerForeground.opacity(0.18))
                         .clipShape(Capsule())
                 }
             }
@@ -155,7 +165,7 @@ private struct AnswerFeedbackBanner: View {
             if let explanation = result.explanation, !explanation.isEmpty {
                 Text(explanation)
                     .font(.gjuha.caption)
-                    .foregroundStyle(.white.opacity(0.92))
+                    .foregroundStyle(bannerForeground.opacity(0.92))
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -206,6 +216,19 @@ private struct AnswerFeedbackBanner: View {
         }
     }
 
+    /// The foreground that is legible on `bannerColor`.
+    ///
+    /// This was a flat `.white` for all three states. On the amber near-miss
+    /// banner white measured 1.76:1, so the line that tells the learner what
+    /// they got wrong was the hardest line in the app to read. `warning` keeps
+    /// its amber and takes the dark foreground; the other two keep white.
+    private var bannerForeground: Color {
+        switch result {
+        case .nearMiss: return Color.gjuha.onWarning
+        case .correct, .wrong: return Color.gjuha.onAccent
+        }
+    }
+
     private var answerLine: LocalizedStringResource? {
         switch result {
         case .correct:
@@ -246,6 +269,11 @@ private struct LessonProgressBar: View {
                 Image(systemName: "xmark")
                     .foregroundStyle(Color.gjuha.textSecondary)
                     .font(.body.weight(.semibold))
+                    // A bare 17pt glyph is roughly 17x17pt to touch, well under
+                    // the 28x28pt minimum, on the one control that gets a learner
+                    // out of a lesson.
+                    .gjuhaMinimumHitTarget()
+                    .contentShape(Rectangle())
             }
             .accessibilityLabel("Exit lesson")
 
@@ -273,7 +301,7 @@ private struct LessonProgressBar: View {
             if combo >= 2 {
                 Text("\(combo)x")
                     .font(.gjuha.captionBold)
-                    .foregroundStyle(Color.gjuha.xp)
+                    .foregroundStyle(Color.gjuha.xpStrong)
                     .transition(.scale.combined(with: .opacity))
                     .accessibilityLabel("\(combo) correct in a row")
             }
@@ -281,7 +309,7 @@ private struct LessonProgressBar: View {
             HStack(spacing: 2) {
                 ForEach(0..<3, id: \.self) { i in
                     Image(systemName: i < hearts ? "heart.fill" : "heart")
-                        .foregroundStyle(i < hearts ? Color.gjuha.error : Color.gjuha.textTertiary)
+                        .foregroundStyle(i < hearts ? Color.gjuha.errorStrong : Color.gjuha.textTertiary)
                         .font(.caption)
                         .scaleEffect(i < hearts ? 1.0 : 0.85)
                         .animation(.spring(response: 0.3, dampingFraction: 0.5), value: hearts)
@@ -293,7 +321,7 @@ private struct LessonProgressBar: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .gjuhaLiquidGlassCard(cornerRadius: 14, tintOpacity: 0.05)
+        .gjuhaCardSurface(cornerRadius: 14, prominence: .nested)
         .padding(.horizontal, 12)
         .padding(.top, 8)
         .animation(.easeInOut(duration: 0.2), value: combo)
@@ -385,6 +413,7 @@ private struct MultipleChoiceAnswers: View {
     let onSelect: (String) -> Void
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
     /// Collapse to a single column at accessibility text sizes so long options
     /// stay readable instead of truncating in a cramped two-column grid.
@@ -422,7 +451,7 @@ private struct MultipleChoiceAnswers: View {
                             }
                         }
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.gjuhaCard)
                 .scaleEffect(selectedAnswer == option ? 0.96 : 1.0)
                 .animation(.spring(response: 0.2, dampingFraction: 0.7), value: selectedAnswer)
                 .accessibilityLabel(option)
@@ -438,10 +467,10 @@ private struct MultipleChoiceAnswers: View {
     private func statusSymbol(for option: String) -> (name: String, color: Color)? {
         guard answerResult != nil else { return nil }
         if option == correctAnswer {
-            return ("checkmark.circle.fill", Color.gjuha.success)
+            return ("checkmark.circle.fill", Color.gjuha.successStrong)
         }
         if option == selectedAnswer {
-            return ("xmark.circle.fill", Color.gjuha.error)
+            return ("xmark.circle.fill", Color.gjuha.errorStrong)
         }
         return nil
     }
@@ -454,8 +483,9 @@ private struct MultipleChoiceAnswers: View {
     }
 
     private func backgroundColor(for option: String) -> some ShapeStyle {
+        let resting = GjuhaSurfaceStyle.restingControlFill(reduceTransparency: reduceTransparency)
         guard let result = answerResult, let selected = selectedAnswer else {
-            return AnyShapeStyle(.ultraThinMaterial)
+            return resting
         }
         if option == correctAnswer {
             return AnyShapeStyle(Color.gjuha.success.opacity(0.2))
@@ -463,20 +493,23 @@ private struct MultipleChoiceAnswers: View {
         if option == selected, case .wrong = result {
             return AnyShapeStyle(Color.gjuha.error.opacity(0.2))
         }
-        return AnyShapeStyle(.ultraThinMaterial)
+        return resting
     }
 
     private func borderColor(for option: String) -> Color {
+        // The resting border was `Color.white.opacity(0.24)` over
+        // `.ultraThinMaterial`: in light appearance a tappable answer option had
+        // no visible edge, so nothing marked it as a control.
         guard let result = answerResult, let selected = selectedAnswer else {
-            return Color.white.opacity(0.24)
+            return Color.gjuha.hairline
         }
         if option == correctAnswer {
-            return Color.gjuha.success
+            return Color.gjuha.successStrong
         }
         if option == selected, case .wrong = result {
-            return Color.gjuha.error
+            return Color.gjuha.errorStrong
         }
-        return Color.white.opacity(0.24)
+        return Color.gjuha.hairline
     }
 
     private func borderWidth(for option: String) -> CGFloat {
@@ -490,12 +523,14 @@ private struct MultipleChoiceAnswers: View {
             return Color.gjuha.textPrimary
         }
         if option == correctAnswer {
-            return Color.gjuha.success
+            return Color.gjuha.successStrong
         }
         if option == selected, case .wrong = result {
-            return Color.gjuha.error
+            return Color.gjuha.errorStrong
         }
-        return Color.gjuha.textPrimary.opacity(0.5)
+        // `textSecondary` rather than primary at 50%: a half-transparent label
+        // over a material measures below the text floor, a token does not.
+        return Color.gjuha.textSecondary
     }
 }
 
@@ -527,7 +562,7 @@ private struct TextInputAnswer: View {
                 .autocorrectionDisabled(true)
                 .submitLabel(.done)
                 .padding(16)
-                .gjuhaLiquidGlassCard(cornerRadius: 12, tintOpacity: 0.06)
+                .gjuhaCardSurface(cornerRadius: 12, prominence: .nested)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .stroke(borderColor, lineWidth: answerResult != nil ? 2.5 : 0)
@@ -540,17 +575,8 @@ private struct TextInputAnswer: View {
 
             Button(action: { if !trimmed.isEmpty { onSubmit(trimmed) } }) {
                 Text("Check")
-                    .font(.gjuha.labelBold)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(
-                        trimmed.isEmpty
-                            ? Color.gjuha.textTertiary
-                            : Color.gjuha.accent
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
             }
+            .buttonStyle(.gjuhaPrimary)
             .disabled(trimmed.isEmpty || answerResult != nil)
             .padding(.horizontal, 16)
             .padding(.bottom, 100)
@@ -609,17 +635,19 @@ private struct ChipLabel: View {
     let text: String
     var muted: Bool = false
 
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+
     var body: some View {
         Text(text)
             .font(.gjuha.answerOption)
             .foregroundStyle(muted ? Color.gjuha.textTertiary : Color.gjuha.textPrimary)
             .padding(.horizontal, 14)
             .padding(.vertical, 10)
-            .background(.ultraThinMaterial)
+            .background(GjuhaSurfaceStyle.restingControlFill(reduceTransparency: reduceTransparency))
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .stroke(Color.white.opacity(0.22), lineWidth: 0.8)
+                    .stroke(Color.gjuha.hairline, lineWidth: 0.8)
             )
     }
 }
@@ -646,14 +674,14 @@ private struct ArrangeWordsAnswer: View {
                     Button { if !isGraded { placed.removeAll { $0 == index } } } label: {
                         ChipLabel(text: tokens[index])
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.gjuhaCard)
                     .accessibilityLabel("Placed word \(tokens[index]), tap to remove")
                 }
             }
             .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
             .padding(12)
             .frame(maxWidth: .infinity)
-            .gjuhaLiquidGlassCard(cornerRadius: 12, tintOpacity: 0.05)
+            .gjuhaCardSurface(cornerRadius: 12, prominence: .nested)
             .padding(.horizontal, 16)
 
             // Word bank
@@ -662,7 +690,7 @@ private struct ArrangeWordsAnswer: View {
                     Button { if !isGraded { placed.append(index) } } label: {
                         ChipLabel(text: tokens[index])
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.gjuhaCard)
                     .accessibilityLabel("Word \(tokens[index]), tap to add")
                 }
             }
@@ -673,13 +701,8 @@ private struct ArrangeWordsAnswer: View {
                 onSubmit(sentence)
             } label: {
                 Text("Check")
-                    .font(.gjuha.labelBold)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(placed.isEmpty ? Color.gjuha.textTertiary : Color.gjuha.accent)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
             }
+            .buttonStyle(.gjuhaPrimary)
             .disabled(placed.isEmpty || isGraded)
             .padding(.horizontal, 16)
             .padding(.bottom, 100)
@@ -700,6 +723,8 @@ private struct WordMatchAnswer: View {
     @State private var matched: Set<Int> = []
     @State private var wrongFlash: Int?
     @State private var didSetup = false
+
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
@@ -729,7 +754,7 @@ private struct WordMatchAnswer: View {
                                 .stroke(border(pairIndex, isLeft: isLeft), lineWidth: 2)
                         )
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.gjuhaCard)
                 .disabled(matched.contains(pairIndex))
                 .accessibilityLabel(text)
                 .accessibilityValue(matched.contains(pairIndex) ? "matched" : "not matched")
@@ -768,21 +793,21 @@ private struct WordMatchAnswer: View {
     }
 
     private func foreground(_ i: Int, isLeft: Bool) -> Color {
-        if matched.contains(i) { return Color.gjuha.success }
+        if matched.contains(i) { return Color.gjuha.successStrong }
         return Color.gjuha.textPrimary
     }
 
     private func background(_ i: Int, isLeft: Bool) -> some ShapeStyle {
         if matched.contains(i) { return AnyShapeStyle(Color.gjuha.success.opacity(0.18)) }
         if wrongFlash == i, !isLeft { return AnyShapeStyle(Color.gjuha.error.opacity(0.18)) }
-        return AnyShapeStyle(.ultraThinMaterial)
+        return GjuhaSurfaceStyle.restingControlFill(reduceTransparency: reduceTransparency)
     }
 
     private func border(_ i: Int, isLeft: Bool) -> Color {
-        if matched.contains(i) { return Color.gjuha.success }
-        if wrongFlash == i, !isLeft { return Color.gjuha.error }
-        if isLeft, selectedLeft == i { return Color.gjuha.accent }
-        return Color.white.opacity(0.22)
+        if matched.contains(i) { return Color.gjuha.successStrong }
+        if wrongFlash == i, !isLeft { return Color.gjuha.errorStrong }
+        if isLeft, selectedLeft == i { return Color.gjuha.accentStrong }
+        return Color.gjuha.hairline
     }
 }
 
@@ -801,7 +826,7 @@ private struct ListeningAnswer: View {
             Button(action: onPlay) {
                 Image(systemName: "speaker.wave.3.fill")
                     .font(.system(size: 34, weight: .bold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color.gjuha.onAccent)
                     .frame(width: 96, height: 96)
                     .background(
                         LinearGradient(
@@ -812,7 +837,7 @@ private struct ListeningAnswer: View {
                     )
                     .clipShape(Circle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.gjuhaCard)
             .accessibilityLabel("Play audio")
             .accessibilityHint("Plays the word to identify")
 
@@ -832,90 +857,159 @@ private struct ListeningAnswer: View {
 
 private struct LessonCompletedView: View {
     let xp: Int
-    let combo: Int
+    let bestCombo: Int
+    /// Nil when there is nothing to report: a session resumed from a snapshot
+    /// written before the counters existed. Omitted rather than shown as 0%.
+    let accuracy: Double?
+    let answeredCount: Int
+    let isReview: Bool
+    let newAchievements: [Achievement]
+    let metDailyGoal: Bool
+    let stats: UserStats?
     let onContinue: () -> Void
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @State private var starScale: CGFloat = 0.3
-    @State private var showXP = false
+    @State private var showDetail = false
     @State private var confettiVisible = false
 
     var body: some View {
-        VStack(spacing: 32) {
-            Spacer()
+        ScrollView {
+            VStack(spacing: .gjuha.loose) {
+                celebration
 
-            ZStack {
-                // Confetti-like circles
-                ForEach(0..<8, id: \.self) { i in
-                    Circle()
-                        .fill(confettiColor(i))
-                        .frame(width: 12, height: 12)
-                        .offset(confettiOffset(i))
-                        .opacity(confettiVisible ? 1 : 0)
-                        .scaleEffect(confettiVisible ? 1.0 : 0.1)
-                        .animation(
-                            .spring(response: 0.5, dampingFraction: 0.6).delay(Double(i) * 0.06),
-                            value: confettiVisible
-                        )
+                VStack(spacing: .gjuha.tight) {
+                    Text(isReview ? "Review complete!" : "Lesson complete!")
+                        .font(.gjuha.headingLarge)
+                        .foregroundStyle(Color.gjuha.textPrimary)
+                        .multilineTextAlignment(.center)
+
+                    Text("+\(xp) XP")
+                        .font(.gjuha.displayMedium)
+                        .foregroundStyle(Color.gjuha.accentStrong)
+                        .opacity(showDetail ? 1 : 0)
+                        .offset(y: showDetail ? 0 : 20)
                 }
 
-                Image(systemName: "star.fill")
-                    .font(.system(size: 72))
-                    .foregroundStyle(Color.gjuha.xp)
-                    .scaleEffect(starScale)
-            }
+                summaryTiles
+                    .opacity(showDetail ? 1 : 0)
 
-            VStack(spacing: 8) {
-                Text("Lesson Complete!")
-                    .font(.gjuha.headingLarge)
-                    .foregroundStyle(Color.gjuha.textPrimary)
+                if metDailyGoal {
+                    DailyGoalMetBanner()
+                        .opacity(showDetail ? 1 : 0)
+                }
 
-                Text("+\(xp) XP")
-                    .font(.gjuha.displayMedium)
-                    .foregroundStyle(Color.gjuha.accent)
-                    .opacity(showXP ? 1 : 0)
-                    .offset(y: showXP ? 0 : 20)
-
-                if combo >= 3 {
-                    Text("Best combo: \(combo)x")
-                        .font(.gjuha.captionBold)
-                        .foregroundStyle(Color.gjuha.xp)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 4)
-                        .background(Color.gjuha.xp.opacity(0.15))
-                        .clipShape(Capsule())
-                        .opacity(showXP ? 1 : 0)
+                if !newAchievements.isEmpty {
+                    UnlockedAchievementsCard(achievements: newAchievements)
+                        .opacity(showDetail ? 1 : 0)
                 }
             }
-
-            Spacer()
-
+            .padding(.horizontal, .gjuha.loose)
+            .padding(.top, .gjuha.section)
+            .padding(.bottom, .gjuha.regular)
+            .gjuhaReadableWidth()
+        }
+        // The screen used two `Spacer()`s around fixed content, so at larger
+        // Dynamic Type sizes, or with an achievement card present, the Continue
+        // button was pushed off the bottom with no way to reach it. A scroll view
+        // with the action pinned below keeps the button reachable at every text
+        // size.
+        .safeAreaInset(edge: .bottom) {
             Button(action: onContinue) {
                 Text("Continue")
-                    .font(.gjuha.labelBold)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(
-                        LinearGradient(
-                            colors: [Color.gjuha.accent, Color.gjuha.streak.opacity(0.94)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
             }
-            .padding(.horizontal, 24)
-            .padding(.bottom, 48)
+            .buttonStyle(.gjuhaPrimary)
+            .padding(.horizontal, .gjuha.loose)
+            .padding(.bottom, .gjuha.loose)
+            .background(GjuhaSurfaceStyle.floatingBarFill(reduceTransparency: reduceTransparency))
         }
-        .gjuhaReadableWidth()
         .onAppear {
             withAnimation(.spring(response: 0.5, dampingFraction: 0.6)) {
                 starScale = 1.0
             }
             withAnimation(.easeOut(duration: 0.4).delay(0.3)) {
-                showXP = true
+                showDetail = true
             }
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.5).delay(0.15)) {
+            if !reduceMotion {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.5).delay(0.15)) {
+                    confettiVisible = true
+                }
+            } else {
                 confettiVisible = true
+            }
+        }
+    }
+
+    // MARK: Celebration
+
+    private var celebration: some View {
+        ZStack {
+            ForEach(0..<8, id: \.self) { i in
+                Circle()
+                    .fill(confettiColor(i))
+                    .frame(width: 12, height: 12)
+                    .offset(confettiOffset(i))
+                    .opacity(confettiVisible ? 1 : 0)
+                    .scaleEffect(confettiVisible ? 1.0 : 0.1)
+                    .animation(
+                        reduceMotion
+                        ? .linear(duration: 0.01)
+                        : .spring(response: 0.5, dampingFraction: 0.6).delay(Double(i) * 0.06),
+                        value: confettiVisible
+                    )
+            }
+
+            Image(systemName: "star.fill")
+                .font(.system(size: 72))
+                .foregroundStyle(Color.gjuha.xpStrong)
+                .scaleEffect(starScale)
+        }
+        .frame(height: 150)
+        .accessibilityHidden(true)
+    }
+
+    // MARK: Summary
+
+    /// What the session actually produced. The screen previously showed XP and a
+    /// "best combo" that was really `combo` at the final question, so a learner
+    /// who slipped on the last answer was told their best combo was 0.
+    @ViewBuilder
+    private var summaryTiles: some View {
+        let columns = [GridItem(.flexible()), GridItem(.flexible())]
+        LazyVGrid(columns: columns, spacing: .gjuha.snug) {
+            if let accuracy {
+                SessionStatTile(
+                    icon: "target",
+                    value: accuracy.formatted(.percent.precision(.fractionLength(0))),
+                    label: "Accuracy",
+                    tint: accuracy >= 0.8 ? Color.gjuha.successStrong : Color.gjuha.accentStrong
+                )
+            }
+
+            SessionStatTile(
+                icon: "list.number",
+                value: answeredCount.formatted(),
+                label: isReview ? "Words reviewed" : "Questions",
+                tint: Color.gjuha.accentStrong
+            )
+
+            if bestCombo >= 2 {
+                SessionStatTile(
+                    icon: "bolt.fill",
+                    value: "\(bestCombo)x",
+                    label: "Best streak",
+                    tint: Color.gjuha.xpStrong
+                )
+            }
+
+            if let stats {
+                SessionStatTile(
+                    icon: "flame.fill",
+                    value: stats.currentStreak.formatted(),
+                    label: "Day streak",
+                    tint: Color.gjuha.streakStrong
+                )
             }
         }
     }
@@ -932,6 +1026,111 @@ private struct LessonCompletedView: View {
     }
 }
 
+// MARK: - Session Stat Tile
+
+private struct SessionStatTile: View {
+    let icon: String
+    let value: String
+    /// `LocalizedStringKey`, so the label reaches the String Catalog.
+    let label: LocalizedStringKey
+    let tint: Color
+
+    var body: some View {
+        VStack(spacing: .gjuha.hairline) {
+            Image(systemName: icon)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(tint)
+            Text(value)
+                .font(.gjuha.headingMedium)
+                .foregroundStyle(Color.gjuha.textPrimary)
+            Text(label)
+                .font(.gjuha.caption)
+                .foregroundStyle(Color.gjuha.textSecondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.gjuha.snug)
+        .gjuhaCardSurface(cornerRadius: GjuhaSpacing.Radius.medium, prominence: .nested)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(label)
+        .accessibilityValue(value)
+    }
+}
+
+// MARK: - Daily Goal Met
+
+private struct DailyGoalMetBanner: View {
+    var body: some View {
+        HStack(spacing: .gjuha.snug) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 24, weight: .bold))
+                .foregroundStyle(Color.gjuha.onAccent)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Daily goal met")
+                    .font(.gjuha.labelBold)
+                    .foregroundStyle(Color.gjuha.onAccent)
+                // Was "Your streak is safe for today", which is not what the
+                // code does: `markDailyActivity` credits the streak for any
+                // finished lesson or review, whether or not the goal was met.
+                // The old copy both implied the goal protects the streak and
+                // withheld the reassurance from someone who studied but fell
+                // short, which is the overstatement this app exists to avoid.
+                Text("You have hit your target for today.")
+                    .font(.gjuha.caption)
+                    .foregroundStyle(Color.gjuha.onAccent.opacity(0.92))
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(.gjuha.regular)
+        .background(Color.gjuha.success)
+        .clipShape(RoundedRectangle(cornerRadius: GjuhaSpacing.Radius.large, style: .continuous))
+        .accessibilityElement(children: .combine)
+    }
+}
+
+// MARK: - Unlocked Achievements
+
+private struct UnlockedAchievementsCard: View {
+    let achievements: [Achievement]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: .gjuha.snug) {
+            Text(achievements.count == 1 ? "New achievement" : "New achievements")
+                .font(.gjuha.headingSmall)
+                .foregroundStyle(Color.gjuha.textPrimary)
+
+            ForEach(achievements) { achievement in
+                HStack(spacing: .gjuha.snug) {
+                    Image(systemName: achievement.symbolName)
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundStyle(Color.gjuha.onWarning)
+                        .frame(width: 40, height: 40)
+                        .background(Color.gjuha.xp)
+                        .clipShape(Circle())
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(achievement.title)
+                            .font(.gjuha.labelBold)
+                            .foregroundStyle(Color.gjuha.textPrimary)
+                        Text(achievement.detail)
+                            .font(.gjuha.caption)
+                            .foregroundStyle(Color.gjuha.textSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer(minLength: 0)
+                }
+                .accessibilityElement(children: .combine)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.gjuha.regular)
+        .gjuhaCardSurface(cornerRadius: GjuhaSpacing.Radius.large, prominence: .standard)
+    }
+}
+
 // MARK: - Lesson Failed
 
 private struct LessonFailedView: View {
@@ -944,7 +1143,7 @@ private struct LessonFailedView: View {
             Spacer()
             Image(systemName: "heart.slash.fill")
                 .font(.system(size: 72))
-                .foregroundStyle(Color.gjuha.error)
+                .foregroundStyle(Color.gjuha.errorStrong)
                 .scaleEffect(heartScale)
 
             VStack(spacing: 8) {
@@ -961,24 +1160,13 @@ private struct LessonFailedView: View {
             VStack(spacing: 12) {
                 Button(action: onRetry) {
                     Text("Try again")
-                        .font(.gjuha.labelBold)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(
-                            LinearGradient(
-                                colors: [Color.gjuha.accent, Color.gjuha.streak.opacity(0.94)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
+                .buttonStyle(.gjuhaPrimary)
+
                 Button(action: onExit) {
                     Text("Back to lessons")
-                        .font(.gjuha.labelBold)
-                        .foregroundStyle(Color.gjuha.textSecondary)
                 }
+                .buttonStyle(.gjuhaSecondary)
             }
             .padding(.horizontal, 24)
             .padding(.bottom, 48)

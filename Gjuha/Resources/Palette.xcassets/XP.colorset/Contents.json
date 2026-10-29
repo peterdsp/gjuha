@@ -13,22 +13,62 @@
       "idiom": "universal"
     },
     {
-      "appearances": [
-        {
-          "appearance": "luminosity",
-          "value": "dark"
-        }
-      ],
       "color": {
         "color-space": "srgb",
         "components": {
           "alpha": "1.000",
           "red": "1.000",
-          "green": "0.800",
-          "blue": "0.200"
+          "green": "0.780",
+          "blue": "0.196"
         }
       },
-      "idiom": "universal"
+      "idiom": "universal",
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ]
+    },
+    {
+      "color": {
+        "color-space": "srgb",
+        "components": {
+          "alpha": "1.000",
+          "red": "0.941",
+          "green": "0.667",
+          "blue": "0.078"
+        }
+      },
+      "idiom": "universal",
+      "appearances": [
+        {
+          "appearance": "contrast",
+          "value": "high"
+        }
+      ]
+    },
+    {
+      "color": {
+        "color-space": "srgb",
+        "components": {
+          "alpha": "1.000",
+          "red": "1.000",
+          "green": "0.831",
+          "blue": "0.286"
+        }
+      },
+      "idiom": "universal",
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        },
+        {
+          "appearance": "contrast",
+          "value": "high"
+        }
+      ]
     }
   ],
   "info": {

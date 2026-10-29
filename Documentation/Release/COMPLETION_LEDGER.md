@@ -252,7 +252,7 @@ two String Catalogs; app bundle assets 8.3 MB to 4.7 MB; bundled seed content
    automated protection. Fixed by lowering the floor to iOS 26 and removing the
    one redundant iOS 27 only API. CI now builds, unit tests, and UI tests on every
    push, with no skip conditions.
-5. Native-speaker review of the 170 Albanian interface strings (`REVIEW_PACKAGE.md`
+5. Native-speaker review of the 226 Albanian interface strings (`REVIEW_PACKAGE.md`
    section 4).
 6. The widget's *rendering* and the App Intents' *invocation* are not runtime
    verified. The data path underneath both is: the shared container is created,
@@ -264,6 +264,276 @@ two String Catalogs; app bundle assets 8.3 MB to 4.7 MB; bundled seed content
    built app with no dropped phrases, which is evidence that extraction worked,
    not that Siri answers. The device checklist is in `APP_STORE_SUBMISSION.md`
    section 8.
+
+## Fourth pass: design system and retention loop
+
+Opened 2026-10-29. The brief was to bring the app to release-grade polish. The
+work divided cleanly into defects found by measuring, and one loop that was built
+but never closed.
+
+### Colour, measured rather than asserted
+
+The palette had light and dark variants and nothing else, and several tokens were
+being used in a role they could not carry. Measuring every pair the app actually
+renders produced this:
+
+| What | Measured | Effect |
+|---|---|---|
+| Gold (`XP`) as text on `Surface` | **1.76:1** | The XP number on Home, the Total XP and Mastered stat tiles, and the widget's star were all effectively unreadable in light appearance. |
+| White on the amber near-miss banner | **1.76:1** | The line telling a learner what they spelled wrong was the hardest line in the app to read. |
+| White on the `Success` banner | **2.70:1** | Below even the 3:1 graphical floor. |
+| White on the `Streak` gradient stop | **2.61:1** | Under the bold label of every primary button. |
+| `TextTertiary` on `Background` | **2.70:1** light, **2.99:1** dark | Real captions, in both appearances. |
+| `Error` as fill under white | **4.06:1** | Under a 12pt caption. |
+
+Fixed by splitting fill from on-surface text (`accent` vs `accentStrong`, and so
+on), deepening the four fills that carry white until white clears 4.5:1, and
+keeping `Warning` and `XP` bright with a dark `onWarning` foreground instead,
+because deepening gold far enough for white turns it brown.
+
+| Item | Acceptance criteria | Status |
+|---|---|---|
+| Fill / on-surface token split | Every brand and state colour has a documented role; a `*Strong` member exists for text and icons; `onAccent` / `onWarning` name what goes on a fill | done |
+| Increased-contrast variants | Every token ships four appearances; the Increase Contrast setting has an effect | done (23 pairs x 4 appearances asserted) |
+| Contrast enforced at both ends | `gen_colors.py` exits non-zero below 4.5:1; `GjuhaContrastTests` measures the same pairs on resolved runtime colours | done (script and runtime agree to 3 decimal places) |
+| Overlay tints tokenised | No `Color.white.opacity(...)` left on an adaptive surface; card edges, tracks, chips and option borders visible in light appearance | done (40 call sites across 6 views) |
+| 4pt grid codified | `GjuhaSpacing` named steps, radii, 44pt hit target; asserted on the grid | done |
+| Button styles | Primary / secondary / card; press feedback; gradient stop opaque so it keeps its measured ratio | done (replaced 4 hand-built copies) |
+
+The script and the test are deliberately redundant. The script alone proves
+nothing, because the asset catalog can be edited in Xcode without running it. The
+measured agreement between the two is the only reason either claim is worth
+anything. Verified by mutation: raising the test floor to 25:1 produces failures
+quoting the real runtime numbers.
+
+### Native tab bar
+
+The custom floating capsule bar was replaced with `TabView` + `Tab`. Three
+defects, not a matter of taste:
+
+1. **Tab state was destroyed on every switch.** The bar drove a `switch` inside a
+   `ZStack` carrying `.id(selectedTab)`, so leaving Words discarded its search
+   text, CEFR filter and scroll position. Apple's tab-bar guidance is explicit
+   that a section keeps state independently of selection.
+2. **The selected label failed contrast.** The capsule was a hardcoded black
+   gradient in both appearances with the selected item tinted accent, which is
+   about 3.3:1 behind an 11pt semibold label.
+3. **It reimplemented system behaviour**: Liquid Glass, the scroll-edge effect,
+   iPad sidebar adaptation for a universal app, tab-bar minimise, and VoiceOver
+   position reporting.
+
+| Item | Acceptance criteria | Status |
+|---|---|---|
+| Native tab bar | Per-tab state survives a round trip; iPad adapts to a sidebar; existing UI tests still find each tab by label | done (6 pre-existing UI tests pass unchanged) |
+
+### Launch
+
+The splash was held for a fixed 1.45s whether or not the app was ready, which is
+the branded launch delay Apple's launch guidance calls out. It now tracks
+`AppFeature.State.isReadyForFirstScreen`, with a short floor so a warm launch does
+not strobe and a 2.5s cap so a content failure cannot trap the learner behind it.
+
+| Item | Acceptance criteria | Status |
+|---|---|---|
+| Readiness-driven splash | Dismisses when the curriculum is in state, not on a timer; capped; Reduce Motion path shortened further | done |
+
+### The daily goal loop
+
+The learner picked a daily goal during onboarding, it was persisted, it was
+editable in Profile, and **nothing in the app ever showed progress against it**.
+There was no way to know whether today counted.
+
+| Item | Acceptance criteria | Status |
+|---|---|---|
+| Daily XP accounting | Day-stamped, so the rollover is a read-time comparison and needs no timer, no background task and no assumption that the app was open at midnight; follows the device across time zones like the streak does | done (7 unit tests incl. rollover and reset) |
+| Goal derived from the chosen minutes | One rate constant, so the four options cannot drift apart; reachable by reviewing alone, so a learner is never pushed past unretained material to fill a ring | done |
+| Surfaced on Home, in Profile, in the widget | Ring in the header, full bar in Profile, ring on the small widget and a capacity gauge on the circular accessory when nothing is due | done (1 UI test) |
+| Goal-met is announced once | The session that crosses the line says so; later sessions that day do not | done (goal state read before XP is banked) |
+
+### Achievements
+
+| Item | Acceptance criteria | Status |
+|---|---|---|
+| Achievement catalogue | 12 milestones over streak, lessons, XP, breadth and mastery; pure evaluation over `UserStats`, no clock and no randomness | done (13 unit tests) |
+| Mastery milestones are honest | Read `wordsMastered` from the scheduler, so "100 kept" means survived to the documented long-term interval, never "seen once" | done (asserted: 4,000 words seen with none mastered unlocks no mastery badge) |
+| Durable unlock ledger | An unlock is a historical fact and is never recomputed downward, so a broken streak does not take the badge back | done (9 unit tests) |
+| Celebrated exactly once | Tracked separately from the ledger, so a celebration survives the app being killed between earning and seeing it | done |
+| Surfaced | Grid in Profile with a "next up" row showing real distance; new badges on the completion screen | done (1 UI test: fresh account starts locked) |
+
+### Session summary
+
+The completion screen showed XP and a "best combo" that was really `combo` at the
+final question, so a learner who slipped on the last answer was told their best
+combo was 0. It now reports accuracy, question count, the true best combo and the
+streak, and the screen scrolls with the action pinned, because at accessibility
+text sizes the two `Spacer()`s pushed Continue off the bottom with no way to reach
+it.
+
+| Item | Acceptance criteria | Status |
+|---|---|---|
+| Accuracy tracking | Correct and answered counted per attempt; near miss counts as answered, not correct, matching how it is graded and scheduled | done |
+| Best combo | Tracked as a maximum rather than read at the end | done |
+| Pre-upgrade sessions still resume | Both stored payloads that gained fields decode a previous-version payload with defaults rather than throwing | done (4 unit tests) |
+| Reachable at every text size | Scroll view with the action in a bottom safe-area inset | done |
+
+### Stored-payload compatibility
+
+Two persisted structs gained fields after 1.0 was already installable, and
+synthesised `Codable` throws on a payload missing a non-optional key. Both failure
+modes are silent: a learner mid-lesson loses their place, and a placed widget
+falls back to its placeholder. Both now decode with defaults, and the tests build
+their fixtures by encoding a real value and deleting the new keys, rather than
+hand-writing a payload that would drift from the schema and then test nothing but
+itself.
+
+### Fifth sub-pass: HIG design audit
+
+Audited against Apple's Human Interface Guidelines after the colour work landed.
+The audit found one thing the previous pass got wrong and three it had not
+reached.
+
+**What the previous pass got wrong.** `GjuhaContrastTests` measured every text
+token against `surface` and `background`, and the cards do not draw on either:
+they drew on `.ultraThinMaterial` over an animated gradient, so the background
+actually behind the text was neither of the two surfaces the guarantee was proven
+against. The guarantee had a hole in it.
+
+| Item | Acceptance criteria | Status |
+|---|---|---|
+| Reduce Transparency has an answer | No material or tint survives the setting, at any prominence, with Increase Contrast on or off | done (8 unit tests; mutation verified) |
+| Text-bearing surfaces use a thicker material | `.regularMaterial`, not `.ultraThinMaterial`, so the measured contrast describes something closer to what renders | done (32 card call sites, 5 control fills) |
+| Material is not stacked on material | A surface drawn inside another surface carries a tint and no shadow | done (`.nested` prominence) |
+| The modifier says what it draws | `gjuhaLiquidGlassCard` renamed to `gjuhaCardSurface`; `GjuhaLiquidGlassBackground` to `GjuhaAmbientBackground` | done |
+| Hit targets meet the platform floor | The lesson exit button and the CEFR filter pill were roughly 17pt and 24pt tall against a 44pt default and a 28pt minimum | done |
+| Layout adapts by size class | Profile splits into two columns at regular width; cap widens 620 to 1040 | done |
+| Title casing is consistent | "Lesson Complete!" was the only title-case string in an app that is sentence case throughout; Albanian carried over to the new key | done |
+
+The naming mattered more than it looks. Apple's model has a content layer and a
+functional layer of controls floating above it, and Liquid Glass belongs only to
+the second: in the content layer it "can result in unnecessary complexity and a
+confusing visual hierarchy". Every one of these surfaces is content, so none was
+ever a candidate for glass, and the old name told every future reader otherwise.
+The app's real functional layer is the tab bar and navigation bar, which get the
+material from the system now that the custom bar is gone.
+
+`GjuhaSurfaceStyle.resolve` is a pure function for a specific reason: a
+`ViewModifier` cannot be inspected from a unit test, so leaving the fallback
+inside the modifier would have made it a comment with nothing behind it. Verified
+by mutation: disabling the Reduce Transparency branch fails
+`reduceTransparencyLeavesNothingTranslucent` and
+`anOpaqueNestedSurfaceStillSeparatesFromItsParent` with the expected messages.
+
+### Sixth sub-pass: platform conventions, performance, and the iPad gap
+
+Three findings the colour and surface work had not reached.
+
+**The app was never run on iPad, and its own test suite failed there.** It ships
+as a universal app with `TARGETED_DEVICE_FAMILY: "1,2"`, and every UI test
+located a destination with `app.buttons["Words"]`. On iPad the system publishes
+each tab button twice, as a wrapper and the button inside it, so that subscript
+is ambiguous: the element reports as existing and never becomes hittable. Four of
+eight UI tests failed, with a message ("existed but never became tappable") that
+describes the symptom and not the cause. Fixed by resolving `.firstMatch` through
+a helper that also accepts the sidebar presentation, since the two are the same
+destination.
+
+**A `WKWebView` per mascot.** `AnimatedMascotView` base64-encoded the 1.2 MB
+mascot GIF into an HTML document and handed it to a web view to play. Each
+instance started an out-of-process web content renderer; Grammar and Words each
+place two, so browsing vocabulary could run several at once to show a looping
+badge. It also linked WebKit into an app that has no web content. Replaced with
+`CGAnimateImageDataWithBlock`, which is the API for this: it decodes on demand
+and honours the GIF's own frame delays, so memory stays at a frame or two instead
+of the 25 MB that holding all 37 frames of a 420x420 loop would cost. WebKit is
+no longer linked.
+
+**Neither Home nor Profile adapted to width.** The app had no `horizontalSizeClass`
+branch anywhere; its only width behaviour was a 620pt reading cap, so an iPad
+showed a phone column centred in a wide window.
+
+| Item | Acceptance criteria | Status |
+|---|---|---|
+| UI suite passes on iPad | All 8 UI tests green on a 13" iPad at the iOS 26.5 deployment floor | done (verified, 213s) |
+| Mascot animates without WebKit | No WebKit symbol in the app; animation verified running, not assumed | done (3 unit tests; runtime pixel-delta measured) |
+| Home adapts to width | Context rail and lesson map in two columns at regular width | done (runtime verified on iPad) |
+| Profile adapts to width | Progress and settings in two columns at regular width | done |
+| CI enforces the contrast floor | The generator runs and a diff fails the build, so the catalog cannot be hand-edited past the floor | done |
+| Press feedback everywhere | 15 further controls moved off `.buttonStyle(.plain)` | done |
+| Token roles correct outside the screens already audited | 9 fill tokens used as a foreground moved to their on-surface member | done |
+| Hit targets | The vocabulary play button (34pt) joined the lesson exit button and the filter pill | done |
+| Vocabulary rows are one VoiceOver stop | A 350 word list was three or four swipes per row | done |
+
+The mascot animation is verified rather than asserted. A unit test cannot drive
+it: `CGAnimateImageDataWithBlock` schedules on a run loop a test does not spin, so
+awaiting the stream hangs instead of failing. The tests cover what is
+deterministic (the asset is a multi-frame GIF that Image I/O decodes end to end),
+and the animation itself was measured on a running simulator: successive
+screenshots differ by a mean absolute pixel delta of 17.6 to 25.8 in the mascot
+region against 2.4 to 4.7 in a background-only region, so the movement is the
+mascot and not the ambient drift.
+
+### Seventh sub-pass: acting on a code review of the branch
+
+A review of the five commits found eight issues, one of which was a regression
+the design pass introduced and the screenshot pass then failed to notice.
+
+**Three tab titles stopped rendering.** Replacing the custom tab bar with a real
+`TabView` was correct, but it changed a premise the screens relied on. The old
+`switch` carrying `.id(selectedTab)` meant exactly one screen existed at a time,
+so each could set its own navigation preferences. A `TabView` keeps all four
+alive, so Home's `navigationBarHidden(true)` and the `navigationTitle` on
+Vocabulary, Grammar and Profile all applied to the same bar at once. Home won,
+and the other three titles silently disappeared. Worse, the App Store
+screenshots were captured and reviewed in that state without the missing titles
+being spotted.
+
+The textbook fix is a `NavigationStack` inside each `Tab`, and it is the wrong
+one here: `AppFeature` drives navigation from a single `StackState<Path.State>`
+that deep links, the lesson flow and the resume path all append to, so four
+stacks sharing one path would show the same pushed screen in every tab.
+Splitting it into four paths is a real refactor of tested navigation behaviour.
+Instead the container now owns the chrome, and `gjuhaScreenTitle` titles a
+screen when it is pushed while standing aside when it is a tab root. Every tab
+root already draws its own header card, so the bar is hidden consistently rather
+than being fought over.
+
+| Item | Acceptance criteria | Status |
+|---|---|---|
+| One navigation policy for the tab roots | No two tabs set competing preferences; a pushed screen still titles itself | done (recaptured and checked visually) |
+| `.prominent` actually is prominent | It resolved identically to `.standard`, so eight leading cards asked for emphasis and got none | done (elevation now differs; asserted) |
+| Unknown achievement ids are not counted | A removed milestone read as "13/12" and hid the "next up" row for good; the row still stays in storage | done (2 tests) |
+| Best combo survives a resume | It was not persisted, so a 6x run that was later broken reported 0 after a relaunch | done (2 tests, with a fallback for old payloads) |
+| The frame stream is bounded | `AsyncStream` defaulted to unbounded, so a main-actor stall could buffer about 20 MB of decoded frames per mascot | done (`.bufferingNewest(1)`) |
+| The goal banner stops over-claiming | "Your streak is safe for today" is not what the code does: any finished lesson or review credits the streak, goal or no goal | done |
+| The capture script cannot delete the repo | `rm -rf "$OUT"` with `OUT` overridable from the environment | done (validated before the delete) |
+| The ring assertion stops racing | It read the value immediately, catching the default casual goal of 60 before the chosen 120 arrived | done (waits on a predicate) |
+
+Two of these are worth naming as a pattern rather than a list: the dead
+`.prominent` case and the unpersisted `bestCombo` were both introduced by this
+branch's own work, and both are the same mistake the branch was written to fix,
+which is claiming something the code does not do.
+
+### Not done in this pass
+
+- Albanian for the 51 new strings is entered and marked `needs_review`, like every
+  other Albanian entry. Still the same open gate.
+- `xpPerMinute = 12` is a judgement from what the engine awards, not a measurement
+  against real learners. Recorded in `APP_STORE_SUBMISSION.md` section 9.
+- The widget's install-over-an-older-build path is unit tested but not device
+  verified. Added to the device checklist.
+- Increase Contrast now has an effect for the first time, which means it has never
+  been looked at on hardware. Added to the device checklist.
+- **Contrast over a material is still not measured.** The cards now use the
+  regular material rather than the thinnest one, and Reduce Transparency makes
+  them fully opaque, so the measured token-versus-surface ratios describe the
+  opaque path exactly and the translucent path closely. A SwiftUI `Material`
+  cannot be resolved to a colour from a unit test, so the translucent path is
+  reasoned about rather than measured. Checking it needs a screenshot on hardware,
+  in both appearances, which is on the device checklist.
+- **Home keeps a single column at regular width.** Profile splits because its
+  sections are independent; the lesson map is one vertical flow and reads correctly
+  centred. Putting the next-unit and culture cards in a side rail at regular width
+  is a sensible next step and was not done here.
 
 ## Verification log
 

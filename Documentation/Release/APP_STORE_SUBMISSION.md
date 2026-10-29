@@ -210,7 +210,36 @@ Character limits are App Store Connect's.
 
 **Category**: Primary `Education`, secondary `Reference`.
 
-## 7. Screenshots (**you**)
+## 7. Screenshots
+
+### Capturing them
+
+```sh
+bash Scripts/capture_screenshots.sh
+```
+
+One command. It creates a 6.9 inch simulator if there is not one already,
+drives the real UI through `GjuhaUITests/ScreenshotCapture`, and writes PNGs to
+`AppStoreScreenshots/` at **1320 x 2868**, the size App Store Connect requires
+for the 6.9 inch display. The folder is gitignored, because it is regenerable
+and roughly 14 MB.
+
+Six screens are captured: the lesson map, a lesson question, the vocabulary
+browser, the grammar guides, Profile's three honest figures, and the achievement
+grid.
+
+Everything in them is real state reached by driving the app. **Nothing is
+seeded**, which means a fresh run shows a fresh account: zeroes on every counter
+and an empty goal ring. That is accurate, and it is also a weak lead screenshot.
+To show populated figures, study on the simulator by hand before running the
+capture, or capture from a device you have actually been using. Do not seed the
+numbers: an app whose entire progress model exists to avoid overstating what a
+learner has done should not overstate it in its own store listing.
+
+The capture test skips itself unless `GJUHA_CAPTURE=1` reaches the test runner,
+so it costs CI nothing.
+
+### What to shoot, and in what order (**you**)
 
 Required: 6.9" iPhone. Strongly recommended: 13" iPad, since the app ships an
 iPad-tailored layout and is listed as a universal app.

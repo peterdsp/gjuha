@@ -24,11 +24,16 @@ matters: the first three stop a submission, the last two do not.
 
 | Item | What it needs | Who |
 |---|---|---|
-| **Privacy policy URL** | A reachable URL on a domain you control. It is a required field. Draft text is in `APP_STORE_SUBMISSION.md` section 3 and is accurate as written: the app has no servers, no accounts and no analytics. | Account holder |
-| **Support URL** | Also a required field. | Account holder |
-| **Screenshots** | At least one 6.9" iPhone screenshot is mandatory; 13" iPad is strongly recommended for a universal app. The six to take, in order, are in `APP_STORE_SUBMISSION.md` section 7. | Account holder |
+| **Privacy policy URL** | **Written and ready.** `docs/privacy.html`, every claim checked against the code. Goes live at `https://peterdsp.github.io/gjuha/privacy.html` once PR #10 is merged; GitHub Pages is already configured to serve `main` from `/docs`. | Merge PR #10 |
+| **Support URL** | **Written and ready.** `docs/support.html`, live at `https://peterdsp.github.io/gjuha/support.html` on the same merge. | Merge PR #10 |
+| **Screenshots** | **Generated.** `bash Scripts/capture_screenshots.sh` writes six real 1320 x 2868 captures to `AppStoreScreenshots/`, which satisfies the requirement. What is left is a judgement call: they show a fresh account, so every counter reads zero. Study on the simulator first and re-run if you want populated figures. | Done, review optional |
 
-Roughly an hour of account work, none of it engineering.
+All three are now prepared rather than pending. The privacy and support pages
+need PR #10 merged to go live, and the screenshots exist on disk. For the
+branded `gjuha.peterdsp.dev` domain instead of `peterdsp.github.io`, one
+Cloudflare DNS record is needed (a `CNAME` for `gjuha` pointing at
+`peterdsp.github.io`) plus a `CNAME` file in `docs/`. The `github.io` URLs are
+valid App Store Connect URLs without it.
 
 ### Quality gates: App Review would pass the app without them
 

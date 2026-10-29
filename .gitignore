@@ -92,3 +92,7 @@ temp/
 # Content pipeline - raw source downloads (large, regeneratable)
 sources/
 content/generated/
+
+# Generated App Store screenshots. Regenerate with Scripts/capture_screenshots.sh
+# rather than committing ~14 MB of PNGs that any checkout can rebuild.
+AppStoreScreenshots/

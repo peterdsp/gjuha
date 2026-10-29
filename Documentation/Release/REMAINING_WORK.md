@@ -10,24 +10,35 @@ iOS 26 deployment floor, localization and seed checks clean, every measured
 colour pair at or above 4.5:1.
 
 The three sections are ordered by who is blocked. Nothing in section 1 can be
-unblocked by writing code.
+unblocked by writing code, and within it the hard blockers are separated from the
+quality gates, because only the first group actually stops a submission.
 
 ---
 
-## 1. Blocked on a human, and blocking release
+## 1. Blocked on a human
 
-These are the only items that stand between the current tree and submitting.
+Nothing here can be unblocked by writing code. Two kinds, and the distinction
+matters: the first three stop a submission, the last two do not.
+
+### Hard blockers: App Store Connect will not accept a submission without these
 
 | Item | What it needs | Who |
 |---|---|---|
-| **Albanian interface strings** | A native speaker reads the 226 strings (205 app, 21 widget) and clears the `needs_review` state. They are UI chrome, not teaching content, so the risk is low, but "low" is not "checked". | Native speaker |
-| **Privacy policy and support URLs** | Two reachable URLs on a domain you control. Draft policy text is in `APP_STORE_SUBMISSION.md` section 3 and is accurate as written. | Account holder |
-| **Screenshots** | 6.9" iPhone required, 13" iPad strongly recommended. The six to take, in order, are listed in `APP_STORE_SUBMISSION.md` section 7. | Account holder |
-| **Device pass** | The checklist in `APP_STORE_SUBMISSION.md` section 8. Widgets in every family, Siri phrases, a VoiceOver drive-through, Increase Contrast, Reduce Transparency, and the Albanian locale. | Account holder, on hardware |
+| **Privacy policy URL** | A reachable URL on a domain you control. It is a required field. Draft text is in `APP_STORE_SUBMISSION.md` section 3 and is accurate as written: the app has no servers, no accounts and no analytics. | Account holder |
+| **Support URL** | Also a required field. | Account holder |
+| **Screenshots** | At least one 6.9" iPhone screenshot is mandatory; 13" iPad is strongly recommended for a universal app. The six to take, in order, are in `APP_STORE_SUBMISSION.md` section 7. | Account holder |
 
-The achievement titles deserve the most attention in the Albanian pass. Several
-are idiomatic in English ("Halfway to fluent", "Three in a row") and a literal
-translation will read oddly.
+Roughly an hour of account work, none of it engineering.
+
+### Quality gates: App Review would pass the app without them
+
+Neither of these is a compliance requirement. Both are recorded because shipping
+without them carries a real risk that no automated check can see.
+
+| Item | What it needs | Why it is here |
+|---|---|---|
+| **Albanian interface strings** | A native speaker reads the 226 strings (205 app, 21 widget) and clears the `needs_review` state. | App Review will not catch this. But for an app whose premise is teaching Albanian, shipping Albanian chrome that no Albanian speaker has read is a credibility risk. The achievement titles matter most: "Halfway to fluent" and "Three in a row" are idioms that translate badly word for word. |
+| **Device pass** | The checklist in `APP_STORE_SUBMISSION.md` section 8: widgets in every family, the four Siri phrases, a VoiceOver drive-through, Increase Contrast, Reduce Transparency, and the Albanian locale. | Widgets, Siri and VoiceOver have never run on hardware; only the data paths beneath them are unit tested. "The deep link is correct" is not "tapping the widget opens the right screen." |
 
 ---
 
@@ -104,8 +115,8 @@ Two smaller ideas worth recording while they are fresh:
 
 ## What has been closed
 
-For contrast with the above, the items that were open before these passes and are
-not any more: the daily goal loop had no surface at all; achievements did not
+Three hard blockers, two quality gates. For contrast, the items that were open
+before these passes and are not any more: the daily goal loop had no surface at all; achievements did not
 exist; there was no Reduce Transparency answer anywhere; the palette had no
 increased-contrast variants; the tab bar was custom and lost each tab's state; the
 splash was held on a fixed timer; the app had never been run on iPad and four of

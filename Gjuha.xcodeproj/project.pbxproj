@@ -44,6 +44,7 @@
 		707ED465F0018AAE8D21DBC3 /* GjuhaFonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6597BB7B8728D68DC39F74C /* GjuhaFonts.swift */; };
 		71179906B06DDB5AA573B130 /* UITestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19238B84252A7BB5C81E7896 /* UITestSupport.swift */; };
 		74B72A45ABD0B5B657E388E6 /* Word.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88EE2AB0F0B8EAB44CC86A4E /* Word.swift */; };
+		7806CD640E7E43329A40CC2E /* MascotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819F13541C3594F8DEE48D5F /* MascotView.swift */; };
 		822ABF92B5D7B03AB3FB778F /* ContentCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB380FCFEB4B1B53B5BF74 /* ContentCatalog.swift */; };
 		82975B7B74EB98D82841F87A /* Lesson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45B6E18A23F08E097CDCC1C0 /* Lesson.swift */; };
 		86732254B4F74FD4FDD64C33 /* GjuhaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3B08FE65E3B3A31A662EEB /* GjuhaTests.swift */; };
@@ -67,6 +68,7 @@
 		C773242143A2ECE04E9105A7 /* ProgressStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7429D8078387001A24BAF936 /* ProgressStore.swift */; };
 		CA74F5B2BBE1BBED168EAC52 /* a1_grammar.json in Resources */ = {isa = PBXBuildFile; fileRef = C93F1D6598730E6CC29C6702 /* a1_grammar.json */; };
 		D4A97907ED28B4DB4235350A /* GjuhaWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCE5A1CA9363982BA62D074 /* GjuhaWidgetSnapshot.swift */; };
+		D52B56F910F7C240C366B542 /* GjuhaSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AB23A8F180FBA5E4554422B /* GjuhaSurface.swift */; };
 		D6AF2EC3C005898B9E17BD41 /* GjuhaSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92AEB3EDF54D9925DC1E8F9 /* GjuhaSchema.swift */; };
 		D89E4F1070F40357190F1135 /* GjuhaProgressWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = D465FF4632F9ED5E907F1052 /* GjuhaProgressWidget.swift */; };
 		D945479473E2E370BCEF9874 /* CurriculumRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 964F6F114F09EEBD358573A8 /* CurriculumRepository.swift */; };
@@ -139,6 +141,7 @@
 		1A3F6E6485810D5DA179CC73 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		27D7C6A35FE547540A195CB4 /* GjuhaButtonStyles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GjuhaButtonStyles.swift; sourceTree = "<group>"; };
 		29CEE69D8DE5D4FC20321000 /* WidgetSyncClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSyncClient.swift; sourceTree = "<group>"; };
+		2AB23A8F180FBA5E4554422B /* GjuhaSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GjuhaSurface.swift; sourceTree = "<group>"; };
 		2CFDDA191EC2592A6DBCDBC4 /* VocabularyRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyRepository.swift; sourceTree = "<group>"; };
 		2EFEF556D9B098C6A7E93831 /* GjuhaDeepLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GjuhaDeepLink.swift; sourceTree = "<group>"; };
 		31F47E815E0E062FB5D28A55 /* GjuhaUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = GjuhaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -172,6 +175,7 @@
 		7AF761B0EBE9456459F5E43C /* LessonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonView.swift; sourceTree = "<group>"; };
 		7BB42A1B4980DF9F1D81AD0E /* lessons.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = lessons.json; sourceTree = "<group>"; };
 		7FCE5A1CA9363982BA62D074 /* GjuhaWidgetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GjuhaWidgetSnapshot.swift; sourceTree = "<group>"; };
+		819F13541C3594F8DEE48D5F /* MascotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MascotView.swift; sourceTree = "<group>"; };
 		88EE2AB0F0B8EAB44CC86A4E /* Word.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Word.swift; sourceTree = "<group>"; };
 		89CBC36224DC7B72439E5EFB /* Gjuha.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Gjuha.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8C7C8F01805342D81163BDF0 /* AppView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppView.swift; sourceTree = "<group>"; };
@@ -358,6 +362,14 @@
 			path = Typography;
 			sourceTree = "<group>";
 		};
+		5167FE73F8C864CA5440D830 /* Mascot */ = {
+			isa = PBXGroup;
+			children = (
+				819F13541C3594F8DEE48D5F /* MascotView.swift */,
+			);
+			path = Mascot;
+			sourceTree = "<group>";
+		};
 		52EC266B10565684D1609062 /* Spacing */ = {
 			isa = PBXGroup;
 			children = (
@@ -402,6 +414,14 @@
 			path = Grammar;
 			sourceTree = "<group>";
 		};
+		686B860752FDBA05E01A7843 /* Surfaces */ = {
+			isa = PBXGroup;
+			children = (
+				2AB23A8F180FBA5E4554422B /* GjuhaSurface.swift */,
+			);
+			path = Surfaces;
+			sourceTree = "<group>";
+		};
 		71383686133BC3C3AF39E1F9 = {
 			isa = PBXGroup;
 			children = (
@@ -437,7 +457,9 @@
 			children = (
 				FFCB513C031796832A0C7442 /* Buttons */,
 				9E54FACF020EA21CF8FD1B89 /* Colors */,
+				5167FE73F8C864CA5440D830 /* Mascot */,
 				52EC266B10565684D1609062 /* Spacing */,
+				686B860752FDBA05E01A7843 /* Surfaces */,
 				4673FE665D609FB3CA71A166 /* Typography */,
 			);
 			path = DesignSystem;
@@ -880,6 +902,7 @@
 				48BBAD79DA06FBB63D020B5C /* GjuhaIntentRouter.swift in Sources */,
 				D6AF2EC3C005898B9E17BD41 /* GjuhaSchema.swift in Sources */,
 				F0B9F5F7C4A84E27D9727330 /* GjuhaSpacing.swift in Sources */,
+				D52B56F910F7C240C366B542 /* GjuhaSurface.swift in Sources */,
 				D4A97907ED28B4DB4235350A /* GjuhaWidgetSnapshot.swift in Sources */,
 				A318CA82DFF882AB933046F3 /* GrammarCoach.swift in Sources */,
 				682641D868819BB48C143621 /* GrammarFeature.swift in Sources */,
@@ -892,6 +915,7 @@
 				DCEDDEDC5678AE0F27511790 /* LessonFeature.swift in Sources */,
 				1F39D918C364B2B034AAEFD7 /* LessonSessionStore.swift in Sources */,
 				B262ED45E030021638E3E8EB /* LessonView.swift in Sources */,
+				7806CD640E7E43329A40CC2E /* MascotView.swift in Sources */,
 				276BE94BADE844502CFE3B24 /* OnboardingFeature.swift in Sources */,
 				874258381653387BC8345C0F /* OnboardingView.swift in Sources */,
 				4EC332C4772E5AC5BADE0CA9 /* ProfileFeature.swift in Sources */,

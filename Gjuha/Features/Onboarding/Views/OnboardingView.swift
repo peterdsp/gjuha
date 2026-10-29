@@ -62,7 +62,7 @@ private struct OnboardingBackdropView: View {
 
     var body: some View {
         ZStack {
-            GjuhaLiquidGlassBackground()
+            GjuhaAmbientBackground()
 
             Circle()
                 .fill(Color.gjuha.accent.opacity(0.08))
@@ -120,7 +120,7 @@ private struct WelcomeStepView: View {
             VStack(spacing: 16) {
                 Text("Mirë se vini")
                     .font(.gjuha.displayLarge)
-                    .foregroundStyle(Color.gjuha.accent)
+                    .foregroundStyle(Color.gjuha.accentStrong)
                     .opacity(reveal ? 1 : 0)
                     .offset(y: reveal ? 0 : 8)
 
@@ -199,7 +199,7 @@ private struct ReasonStepView: View {
                             Spacer()
                             if selected == reason {
                                 Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(Color.gjuha.accent)
+                                    .foregroundStyle(Color.gjuha.accentStrong)
                                     .scaleEffect(1.05)
                             }
                         }
@@ -217,7 +217,7 @@ private struct ReasonStepView: View {
                         )
                         .scaleEffect(selected == reason ? 1.01 : 1.0)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.gjuhaCard)
                     .opacity(revealed ? 1 : 0)
                     .offset(y: revealed ? 0 : 10)
                     .animation(
@@ -290,7 +290,7 @@ private struct GoalStepView: View {
                             Spacer()
                             if selected == goal {
                                 Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(Color.gjuha.accent)
+                                    .foregroundStyle(Color.gjuha.accentStrong)
                                     .scaleEffect(1.05)
                             }
                         }
@@ -308,7 +308,7 @@ private struct GoalStepView: View {
                         )
                         .scaleEffect(selected == goal ? 1.01 : 1.0)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.gjuhaCard)
                     .opacity(revealed ? 1 : 0)
                     .offset(y: revealed ? 0 : 10)
                     .animation(

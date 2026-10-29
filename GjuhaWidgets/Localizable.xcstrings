@@ -211,16 +211,6 @@
         }
       }
     },
-    "Total XP": {
-      "localizations": {
-        "sq": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "XP gjithsej"
-          }
-        }
-      }
-    },
     "XP today": {
       "comment": "Caption under today's XP, when no goal has been written yet.",
       "localizations": {

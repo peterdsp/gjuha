@@ -6,7 +6,7 @@ struct LessonView: View {
 
     var body: some View {
         ZStack {
-            GjuhaLiquidGlassBackground()
+            GjuhaAmbientBackground()
 
             switch store.phase {
             case .loading:
@@ -269,6 +269,11 @@ private struct LessonProgressBar: View {
                 Image(systemName: "xmark")
                     .foregroundStyle(Color.gjuha.textSecondary)
                     .font(.body.weight(.semibold))
+                    // A bare 17pt glyph is roughly 17x17pt to touch, well under
+                    // the 28x28pt minimum, on the one control that gets a learner
+                    // out of a lesson.
+                    .gjuhaMinimumHitTarget()
+                    .contentShape(Rectangle())
             }
             .accessibilityLabel("Exit lesson")
 
@@ -316,7 +321,7 @@ private struct LessonProgressBar: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .gjuhaLiquidGlassCard(cornerRadius: 14, tintOpacity: 0.05)
+        .gjuhaCardSurface(cornerRadius: 14, prominence: .nested)
         .padding(.horizontal, 12)
         .padding(.top, 8)
         .animation(.easeInOut(duration: 0.2), value: combo)
@@ -408,6 +413,7 @@ private struct MultipleChoiceAnswers: View {
     let onSelect: (String) -> Void
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
     /// Collapse to a single column at accessibility text sizes so long options
     /// stay readable instead of truncating in a cramped two-column grid.
@@ -445,7 +451,7 @@ private struct MultipleChoiceAnswers: View {
                             }
                         }
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.gjuhaCard)
                 .scaleEffect(selectedAnswer == option ? 0.96 : 1.0)
                 .animation(.spring(response: 0.2, dampingFraction: 0.7), value: selectedAnswer)
                 .accessibilityLabel(option)
@@ -477,8 +483,9 @@ private struct MultipleChoiceAnswers: View {
     }
 
     private func backgroundColor(for option: String) -> some ShapeStyle {
+        let resting = GjuhaSurfaceStyle.restingControlFill(reduceTransparency: reduceTransparency)
         guard let result = answerResult, let selected = selectedAnswer else {
-            return AnyShapeStyle(.ultraThinMaterial)
+            return resting
         }
         if option == correctAnswer {
             return AnyShapeStyle(Color.gjuha.success.opacity(0.2))
@@ -486,7 +493,7 @@ private struct MultipleChoiceAnswers: View {
         if option == selected, case .wrong = result {
             return AnyShapeStyle(Color.gjuha.error.opacity(0.2))
         }
-        return AnyShapeStyle(.ultraThinMaterial)
+        return resting
     }
 
     private func borderColor(for option: String) -> Color {
@@ -555,7 +562,7 @@ private struct TextInputAnswer: View {
                 .autocorrectionDisabled(true)
                 .submitLabel(.done)
                 .padding(16)
-                .gjuhaLiquidGlassCard(cornerRadius: 12, tintOpacity: 0.06)
+                .gjuhaCardSurface(cornerRadius: 12, prominence: .nested)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .stroke(borderColor, lineWidth: answerResult != nil ? 2.5 : 0)
@@ -628,13 +635,15 @@ private struct ChipLabel: View {
     let text: String
     var muted: Bool = false
 
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+
     var body: some View {
         Text(text)
             .font(.gjuha.answerOption)
             .foregroundStyle(muted ? Color.gjuha.textTertiary : Color.gjuha.textPrimary)
             .padding(.horizontal, 14)
             .padding(.vertical, 10)
-            .background(.ultraThinMaterial)
+            .background(GjuhaSurfaceStyle.restingControlFill(reduceTransparency: reduceTransparency))
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -665,14 +674,14 @@ private struct ArrangeWordsAnswer: View {
                     Button { if !isGraded { placed.removeAll { $0 == index } } } label: {
                         ChipLabel(text: tokens[index])
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.gjuhaCard)
                     .accessibilityLabel("Placed word \(tokens[index]), tap to remove")
                 }
             }
             .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
             .padding(12)
             .frame(maxWidth: .infinity)
-            .gjuhaLiquidGlassCard(cornerRadius: 12, tintOpacity: 0.05)
+            .gjuhaCardSurface(cornerRadius: 12, prominence: .nested)
             .padding(.horizontal, 16)
 
             // Word bank
@@ -681,7 +690,7 @@ private struct ArrangeWordsAnswer: View {
                     Button { if !isGraded { placed.append(index) } } label: {
                         ChipLabel(text: tokens[index])
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.gjuhaCard)
                     .accessibilityLabel("Word \(tokens[index]), tap to add")
                 }
             }
@@ -715,6 +724,8 @@ private struct WordMatchAnswer: View {
     @State private var wrongFlash: Int?
     @State private var didSetup = false
 
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             column(order: leftOrder, isLeft: true)
@@ -743,7 +754,7 @@ private struct WordMatchAnswer: View {
                                 .stroke(border(pairIndex, isLeft: isLeft), lineWidth: 2)
                         )
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.gjuhaCard)
                 .disabled(matched.contains(pairIndex))
                 .accessibilityLabel(text)
                 .accessibilityValue(matched.contains(pairIndex) ? "matched" : "not matched")
@@ -789,7 +800,7 @@ private struct WordMatchAnswer: View {
     private func background(_ i: Int, isLeft: Bool) -> some ShapeStyle {
         if matched.contains(i) { return AnyShapeStyle(Color.gjuha.success.opacity(0.18)) }
         if wrongFlash == i, !isLeft { return AnyShapeStyle(Color.gjuha.error.opacity(0.18)) }
-        return AnyShapeStyle(.ultraThinMaterial)
+        return GjuhaSurfaceStyle.restingControlFill(reduceTransparency: reduceTransparency)
     }
 
     private func border(_ i: Int, isLeft: Bool) -> Color {
@@ -826,7 +837,7 @@ private struct ListeningAnswer: View {
                     )
                     .clipShape(Circle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.gjuhaCard)
             .accessibilityLabel("Play audio")
             .accessibilityHint("Plays the word to identify")
 
@@ -858,6 +869,7 @@ private struct LessonCompletedView: View {
     let onContinue: () -> Void
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @State private var starScale: CGFloat = 0.3
     @State private var showDetail = false
     @State private var confettiVisible = false
@@ -868,7 +880,7 @@ private struct LessonCompletedView: View {
                 celebration
 
                 VStack(spacing: .gjuha.tight) {
-                    Text(isReview ? "Review complete!" : "Lesson Complete!")
+                    Text(isReview ? "Review complete!" : "Lesson complete!")
                         .font(.gjuha.headingLarge)
                         .foregroundStyle(Color.gjuha.textPrimary)
                         .multilineTextAlignment(.center)
@@ -910,7 +922,7 @@ private struct LessonCompletedView: View {
             .buttonStyle(.gjuhaPrimary)
             .padding(.horizontal, .gjuha.loose)
             .padding(.bottom, .gjuha.loose)
-            .background(.ultraThinMaterial)
+            .background(GjuhaSurfaceStyle.floatingBarFill(reduceTransparency: reduceTransparency))
         }
         .onAppear {
             withAnimation(.spring(response: 0.5, dampingFraction: 0.6)) {
@@ -1038,7 +1050,7 @@ private struct SessionStatTile: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.gjuha.snug)
-        .gjuhaLiquidGlassCard(cornerRadius: GjuhaSpacing.Radius.medium, tintOpacity: 0.06)
+        .gjuhaCardSurface(cornerRadius: GjuhaSpacing.Radius.medium, prominence: .nested)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(label)
         .accessibilityValue(value)
@@ -1109,7 +1121,7 @@ private struct UnlockedAchievementsCard: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.gjuha.regular)
-        .gjuhaLiquidGlassCard(cornerRadius: GjuhaSpacing.Radius.large, tintOpacity: 0.08)
+        .gjuhaCardSurface(cornerRadius: GjuhaSpacing.Radius.large, prominence: .standard)
     }
 }
 
@@ -1125,7 +1137,7 @@ private struct LessonFailedView: View {
             Spacer()
             Image(systemName: "heart.slash.fill")
                 .font(.system(size: 72))
-                .foregroundStyle(Color.gjuha.error)
+                .foregroundStyle(Color.gjuha.errorStrong)
                 .scaleEffect(heartScale)
 
             VStack(spacing: 8) {

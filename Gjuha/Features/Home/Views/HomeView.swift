@@ -18,71 +18,57 @@ struct HomeView: View {
         }.count
     }
 
+    /// At a regular width the context cards move into a leading rail and the
+    /// lesson map keeps its own column.
+    ///
+    /// The map is a single vertical flow and reads correctly centred, so it is
+    /// not split. What was wrong at a regular width is everything *around* it:
+    /// the unit card, the review prompt and the culture card were stacked above
+    /// and below the map, which on an iPad meant scrolling past a screen of
+    /// context to reach the lessons and scrolling the whole map again to find the
+    /// culture card. Apple's iPhone Duo guidance is to "show an additional level
+    /// of hierarchy on the larger inner display if it makes sense for your
+    /// content", and two columns is an even split, which is what the fold wants.
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    private var isRegularWidth: Bool { horizontalSizeClass == .regular }
+
+    /// Two columns need the width *and* a map to put in the second one. The
+    /// loading, no-content and all-finished states have nothing to pair with the
+    /// rail, so they stay a single column at every width.
+    private var usesTwoColumns: Bool {
+        isRegularWidth && !store.isLoading && currentUnit != nil
+    }
+
     var body: some View {
         ZStack {
-            GjuhaLiquidGlassBackground()
+            GjuhaAmbientBackground()
 
             ScrollView {
-                VStack(spacing: 0) {
-                    HomeHeaderView(stats: store.stats)
-                        .padding(.horizontal, .gjuha.regular)
-                        .padding(.top, .gjuha.snug)
+                Group {
+                    if usesTwoColumns {
+                        HStack(alignment: .top, spacing: .gjuha.loose) {
+                            VStack(spacing: .gjuha.regular) {
+                                contextRail
+                            }
+                            .frame(maxWidth: 360)
 
-                    if !store.isLoading && store.dueReviewCount > 0 {
-                        DailyReviewCard(count: store.dueReviewCount) {
-                            store.send(.startReviewTapped)
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.top, 16)
-                    }
-
-                    if store.isLoading {
-                        ProgressView()
-                            .padding(.top, 48)
-                    } else if let unit = currentUnit {
-                        VStack(spacing: 20) {
-                            // Current unit header
-                            UnitHeaderCard(
-                                unit: unit,
-                                completedUnits: completedUnitsCount,
-                                totalUnits: store.units.count
-                            )
-
-                            // Course path - zigzag lesson nodes
-                            CoursePathView(
-                                lessons: unit.lessons,
-                                onLessonTap: { lesson in
-                                    store.send(.lessonTapped(lesson))
-                                }
-                            )
-
-                            // Next unit preview
-                            if let nextUnit = nextLockedUnit(after: unit) {
-                                NextUnitPreview(unit: nextUnit)
+                            VStack(spacing: .gjuha.loose) {
+                                lessonColumn
                             }
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.top, 20)
-                        .padding(.bottom, 28)
-                    } else if store.units.isEmpty {
-                        HomeNoContentView()
-                            .padding(.horizontal, 16)
-                            .padding(.top, 20)
+                        .padding(.horizontal, .gjuha.regular)
+                        .padding(.vertical, .gjuha.loose)
                     } else {
-                        // All units done!
-                        AllCompleteView()
-                            .padding(.horizontal, 16)
-                            .padding(.top, 20)
-                    }
-
-                    if !store.isLoading {
-                        ExploreCultureCard { store.send(.exploreCultureTapped) }
-                            .padding(.horizontal, 16)
-                            .padding(.top, 8)
-                            .padding(.bottom, 28)
+                        singleColumn
                     }
                 }
-                .gjuhaReadableWidth()
+                // Keyed on what is actually being drawn, not on the width. Two
+                // columns of cards are not prose, so the reading-measure cap
+                // widens for them; the loading, empty and all-finished states
+                // fall back to one column and keep the prose measure, which they
+                // would otherwise lose on an iPad for no reason.
+                .gjuhaReadableWidth(usesTwoColumns ? 1_040 : 620)
             }
         }
         .navigationBarHidden(true)
@@ -92,6 +78,96 @@ struct HomeView: View {
             }
             store.send(.onAppear)
         }
+    }
+
+    /// Context: who the learner is today, what is due, and where they are in the
+    /// course. Leads at every width.
+    @ViewBuilder
+    private var contextRail: some View {
+        HomeHeaderView(stats: store.stats)
+
+        if !store.isLoading, store.dueReviewCount > 0 {
+            DailyReviewCard(count: store.dueReviewCount) {
+                store.send(.startReviewTapped)
+            }
+        }
+
+        if let unit = currentUnit {
+            UnitHeaderCard(
+                unit: unit,
+                completedUnits: completedUnitsCount,
+                totalUnits: store.units.count
+            )
+        }
+
+        if !store.isLoading {
+            ExploreCultureCard { store.send(.exploreCultureTapped) }
+        }
+    }
+
+    /// The lessons themselves, and what comes after them.
+    @ViewBuilder
+    private var lessonColumn: some View {
+        if let unit = currentUnit {
+            CoursePathView(
+                lessons: unit.lessons,
+                onLessonTap: { lesson in
+                    store.send(.lessonTapped(lesson))
+                }
+            )
+
+            if let nextUnit = nextLockedUnit(after: unit) {
+                NextUnitPreview(unit: nextUnit)
+            }
+        }
+    }
+
+    /// Compact width, and every state that has no map to put beside a rail:
+    /// loading, no content, and everything finished.
+    @ViewBuilder
+    private var singleColumn: some View {
+        VStack(spacing: .gjuha.regular) {
+            HomeHeaderView(stats: store.stats)
+
+            if !store.isLoading, store.dueReviewCount > 0 {
+                DailyReviewCard(count: store.dueReviewCount) {
+                    store.send(.startReviewTapped)
+                }
+            }
+
+            if store.isLoading {
+                ProgressView()
+                    .padding(.top, .gjuha.hero)
+            } else if let unit = currentUnit {
+                UnitHeaderCard(
+                    unit: unit,
+                    completedUnits: completedUnitsCount,
+                    totalUnits: store.units.count
+                )
+
+                CoursePathView(
+                    lessons: unit.lessons,
+                    onLessonTap: { lesson in
+                        store.send(.lessonTapped(lesson))
+                    }
+                )
+
+                if let nextUnit = nextLockedUnit(after: unit) {
+                    NextUnitPreview(unit: nextUnit)
+                }
+            } else if store.units.isEmpty {
+                HomeNoContentView()
+            } else {
+                AllCompleteView()
+            }
+
+            if !store.isLoading {
+                ExploreCultureCard { store.send(.exploreCultureTapped) }
+            }
+        }
+        .padding(.horizontal, .gjuha.regular)
+        .padding(.top, .gjuha.snug)
+        .padding(.bottom, .gjuha.section)
     }
 
     private func nextLockedUnit(after current: LearningUnit) -> LearningUnit? {
@@ -158,7 +234,7 @@ private struct HomeHeaderView: View {
         .padding(.horizontal, .gjuha.loose)
         .padding(.vertical, .gjuha.regular)
         .frame(maxWidth: .infinity)
-        .gjuhaLiquidGlassCard(cornerRadius: GjuhaSpacing.Radius.large, tintOpacity: 0.08)
+        .gjuhaCardSurface(cornerRadius: GjuhaSpacing.Radius.large, prominence: .standard)
         .onAppear {
             if reduceMotion { return }
             pulse = true
@@ -313,7 +389,7 @@ private struct DailyReviewCard: View {
                     .foregroundStyle(Color.gjuha.textTertiary)
             }
             .padding(16)
-            .gjuhaLiquidGlassCard(cornerRadius: 20, tintOpacity: 0.12)
+            .gjuhaCardSurface(cornerRadius: 20, prominence: .prominent)
         }
         .buttonStyle(.gjuhaCard)
         .accessibilityElement(children: .ignore)
@@ -353,7 +429,7 @@ private struct ExploreCultureCard: View {
                     .foregroundStyle(Color.gjuha.textTertiary)
             }
             .padding(16)
-            .gjuhaLiquidGlassCard(cornerRadius: 20, tintOpacity: 0.10)
+            .gjuhaCardSurface(cornerRadius: 20, prominence: .prominent)
         }
         .buttonStyle(.gjuhaCard)
         .accessibilityElement(children: .ignore)
@@ -444,7 +520,7 @@ private struct UnitHeaderCard: View {
             }
         }
         .padding(16)
-        .gjuhaLiquidGlassCard(cornerRadius: 22, tintOpacity: 0.09)
+        .gjuhaCardSurface(cornerRadius: 22, prominence: .standard)
     }
 }
 
@@ -717,7 +793,7 @@ private struct HomeNoContentView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(18)
-        .gjuhaLiquidGlassCard(cornerRadius: 20, tintOpacity: 0.07)
+        .gjuhaCardSurface(cornerRadius: 20, prominence: .standard)
     }
 }
 
@@ -735,6 +811,6 @@ private struct AllCompleteView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(24)
-        .gjuhaLiquidGlassCard(cornerRadius: 22, tintOpacity: 0.09)
+        .gjuhaCardSurface(cornerRadius: 22, prominence: .standard)
     }
 }

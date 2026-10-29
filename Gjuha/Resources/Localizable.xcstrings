@@ -1159,7 +1159,7 @@
         }
       }
     },
-    "Lesson Complete!": {
+    "Lesson complete!": {
       "localizations": {
         "sq": {
           "stringUnit": {
@@ -1167,7 +1167,8 @@
             "value": "Mësimi u përfundua!"
           }
         }
-      }
+      },
+      "comment": "Title of the completion screen after a course lesson."
     },
     "Lesson progress": {
       "localizations": {

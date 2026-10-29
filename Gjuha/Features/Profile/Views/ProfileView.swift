@@ -4,32 +4,51 @@ import ComposableArchitecture
 struct ProfileView: View {
     let store: StoreOf<ProfileFeature>
 
+    /// Profile is the app's one genuinely wide screen: six stat tiles, a twelve
+    /// badge grid, a goal picker and two settings blocks, all independent of each
+    /// other. On a compact width that is a long scroll, and on a regular width
+    /// the previous single 620pt column left most of an iPad empty.
+    ///
+    /// Size class, not device or orientation: Apple's Layout guidance is to
+    /// "determine layout based on size classes, not device type or orientation",
+    /// and the two that matter here are the same app at two widths. It is also
+    /// what gives iPhone Duo its layout for free, where the outer display is
+    /// compact and the inner one regular.
+    ///
+    /// Two columns rather than three: on iPhone Duo's inner display the fold
+    /// divides the screen, and the iPhone Duo guidance asks for an even number of
+    /// columns "so content divides cleanly".
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    private var isRegularWidth: Bool { horizontalSizeClass == .regular }
+
     var body: some View {
         ZStack {
-            GjuhaLiquidGlassBackground()
+            GjuhaAmbientBackground()
 
             ScrollView {
-                VStack(spacing: .gjuha.loose) {
-                    DailyGoalCard(stats: store.stats)
-
-                    StatsGridView(stats: store.stats)
-
-                    AchievementsSection(
-                        stats: store.stats,
-                        unlockDates: store.achievementUnlockDates,
-                        nextUp: store.nextAchievement
-                    )
-
-                    GoalPickerView(selected: store.selectedGoal) { goal in
-                        store.send(.goalChanged(goal))
+                Group {
+                    if isRegularWidth {
+                        HStack(alignment: .top, spacing: .gjuha.loose) {
+                            VStack(spacing: .gjuha.loose) {
+                                progressSection
+                            }
+                            VStack(spacing: .gjuha.loose) {
+                                settingsSection
+                            }
+                        }
+                    } else {
+                        VStack(spacing: .gjuha.loose) {
+                            progressSection
+                            settingsSection
+                        }
                     }
-
-                    ReminderSettingsView(store: store)
-
-                    DataControlsView(store: store)
                 }
-                .padding(16)
-                .gjuhaReadableWidth()
+                .padding(.gjuha.regular)
+                // The 620pt cap exists to keep prose at a readable measure. Two
+                // columns of cards and grids are not prose, so the cap doubles
+                // rather than squeezing both columns into one column's width.
+                .gjuhaReadableWidth(isRegularWidth ? 1_040 : 620)
             }
         }
         .navigationTitle("Profile")
@@ -61,6 +80,35 @@ struct ProfileView: View {
     }
 }
 
+extension ProfileView {
+    /// What the learner has done. Ordered so today's goal leads, then the honest
+    /// progress figures, then the milestones built from them.
+    @ViewBuilder
+    fileprivate var progressSection: some View {
+        DailyGoalCard(stats: store.stats)
+
+        StatsGridView(stats: store.stats)
+
+        AchievementsSection(
+            stats: store.stats,
+            unlockDates: store.achievementUnlockDates,
+            nextUp: store.nextAchievement
+        )
+    }
+
+    /// What the learner can change.
+    @ViewBuilder
+    fileprivate var settingsSection: some View {
+        GoalPickerView(selected: store.selectedGoal) { goal in
+            store.send(.goalChanged(goal))
+        }
+
+        ReminderSettingsView(store: store)
+
+        DataControlsView(store: store)
+    }
+}
+
 private struct DataControlsView: View {
     let store: StoreOf<ProfileFeature>
 
@@ -88,12 +136,12 @@ private struct DataControlsView: View {
                 .background(Color.gjuha.error.opacity(0.1))
                 .clipShape(RoundedRectangle(cornerRadius: 12))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.gjuhaCard)
             .accessibilityLabel("Reset learning data")
             .accessibilityHint("Clears your progress and review schedule on this device")
         }
         .padding(16)
-        .gjuhaLiquidGlassCard(cornerRadius: 18, tintOpacity: 0.07)
+        .gjuhaCardSurface(cornerRadius: 18, prominence: .standard)
     }
 }
 
@@ -155,7 +203,7 @@ private struct ReminderSettingsView: View {
             }
         }
         .padding(16)
-        .gjuhaLiquidGlassCard(cornerRadius: 18, tintOpacity: 0.07)
+        .gjuhaCardSurface(cornerRadius: 18, prominence: .standard)
         .accessibilityElement(children: .contain)
     }
 }
@@ -198,7 +246,7 @@ private struct StatCardView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(16)
-        .gjuhaLiquidGlassCard(cornerRadius: 14, tintOpacity: 0.06)
+        .gjuhaCardSurface(cornerRadius: 14, prominence: .nested)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(label)
         .accessibilityValue(value)
@@ -244,11 +292,11 @@ private struct GoalPickerView: View {
                             .stroke(selected == goal ? Color.gjuha.accentStrong.opacity(0.65) : Color.gjuha.hairline, lineWidth: 0.8)
                     )
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.gjuhaCard)
             }
         }
         .padding(16)
-        .gjuhaLiquidGlassCard(cornerRadius: 18, tintOpacity: 0.07)
+        .gjuhaCardSurface(cornerRadius: 18, prominence: .standard)
     }
 }
 
@@ -313,7 +361,7 @@ private struct DailyGoalCard: View {
             .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.gjuha.regular)
-        .gjuhaLiquidGlassCard(cornerRadius: GjuhaSpacing.Radius.large, tintOpacity: 0.08)
+        .gjuhaCardSurface(cornerRadius: GjuhaSpacing.Radius.large, prominence: .standard)
         .onAppear { set(stats.dailyGoalProgress) }
         .onChange(of: stats.dailyGoalProgress) { _, new in set(new) }
         .accessibilityElement(children: .ignore)
@@ -373,7 +421,7 @@ private struct AchievementsSection: View {
             }
         }
         .padding(.gjuha.regular)
-        .gjuhaLiquidGlassCard(cornerRadius: GjuhaSpacing.Radius.large, tintOpacity: 0.07)
+        .gjuhaCardSurface(cornerRadius: GjuhaSpacing.Radius.large, prominence: .standard)
     }
 }
 

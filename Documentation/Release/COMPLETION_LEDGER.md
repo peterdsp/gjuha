@@ -386,6 +386,92 @@ their fixtures by encoding a real value and deleting the new keys, rather than
 hand-writing a payload that would drift from the schema and then test nothing but
 itself.
 
+### Fifth sub-pass: HIG design audit
+
+Audited against Apple's Human Interface Guidelines after the colour work landed.
+The audit found one thing the previous pass got wrong and three it had not
+reached.
+
+**What the previous pass got wrong.** `GjuhaContrastTests` measured every text
+token against `surface` and `background`, and the cards do not draw on either:
+they drew on `.ultraThinMaterial` over an animated gradient, so the background
+actually behind the text was neither of the two surfaces the guarantee was proven
+against. The guarantee had a hole in it.
+
+| Item | Acceptance criteria | Status |
+|---|---|---|
+| Reduce Transparency has an answer | No material or tint survives the setting, at any prominence, with Increase Contrast on or off | done (8 unit tests; mutation verified) |
+| Text-bearing surfaces use a thicker material | `.regularMaterial`, not `.ultraThinMaterial`, so the measured contrast describes something closer to what renders | done (32 card call sites, 5 control fills) |
+| Material is not stacked on material | A surface drawn inside another surface carries a tint and no shadow | done (`.nested` prominence) |
+| The modifier says what it draws | `gjuhaLiquidGlassCard` renamed to `gjuhaCardSurface`; `GjuhaLiquidGlassBackground` to `GjuhaAmbientBackground` | done |
+| Hit targets meet the platform floor | The lesson exit button and the CEFR filter pill were roughly 17pt and 24pt tall against a 44pt default and a 28pt minimum | done |
+| Layout adapts by size class | Profile splits into two columns at regular width; cap widens 620 to 1040 | done |
+| Title casing is consistent | "Lesson Complete!" was the only title-case string in an app that is sentence case throughout; Albanian carried over to the new key | done |
+
+The naming mattered more than it looks. Apple's model has a content layer and a
+functional layer of controls floating above it, and Liquid Glass belongs only to
+the second: in the content layer it "can result in unnecessary complexity and a
+confusing visual hierarchy". Every one of these surfaces is content, so none was
+ever a candidate for glass, and the old name told every future reader otherwise.
+The app's real functional layer is the tab bar and navigation bar, which get the
+material from the system now that the custom bar is gone.
+
+`GjuhaSurfaceStyle.resolve` is a pure function for a specific reason: a
+`ViewModifier` cannot be inspected from a unit test, so leaving the fallback
+inside the modifier would have made it a comment with nothing behind it. Verified
+by mutation: disabling the Reduce Transparency branch fails
+`reduceTransparencyLeavesNothingTranslucent` and
+`anOpaqueNestedSurfaceStillSeparatesFromItsParent` with the expected messages.
+
+### Sixth sub-pass: platform conventions, performance, and the iPad gap
+
+Three findings the colour and surface work had not reached.
+
+**The app was never run on iPad, and its own test suite failed there.** It ships
+as a universal app with `TARGETED_DEVICE_FAMILY: "1,2"`, and every UI test
+located a destination with `app.buttons["Words"]`. On iPad the system publishes
+each tab button twice, as a wrapper and the button inside it, so that subscript
+is ambiguous: the element reports as existing and never becomes hittable. Four of
+eight UI tests failed, with a message ("existed but never became tappable") that
+describes the symptom and not the cause. Fixed by resolving `.firstMatch` through
+a helper that also accepts the sidebar presentation, since the two are the same
+destination.
+
+**A `WKWebView` per mascot.** `AnimatedMascotView` base64-encoded the 1.2 MB
+mascot GIF into an HTML document and handed it to a web view to play. Each
+instance started an out-of-process web content renderer; Grammar and Words each
+place two, so browsing vocabulary could run several at once to show a looping
+badge. It also linked WebKit into an app that has no web content. Replaced with
+`CGAnimateImageDataWithBlock`, which is the API for this: it decodes on demand
+and honours the GIF's own frame delays, so memory stays at a frame or two instead
+of the 25 MB that holding all 37 frames of a 420x420 loop would cost. WebKit is
+no longer linked.
+
+**Neither Home nor Profile adapted to width.** The app had no `horizontalSizeClass`
+branch anywhere; its only width behaviour was a 620pt reading cap, so an iPad
+showed a phone column centred in a wide window.
+
+| Item | Acceptance criteria | Status |
+|---|---|---|
+| UI suite passes on iPad | All 8 UI tests green on a 13" iPad at the iOS 26.5 deployment floor | done (verified, 213s) |
+| Mascot animates without WebKit | No WebKit symbol in the app; animation verified running, not assumed | done (3 unit tests; runtime pixel-delta measured) |
+| Home adapts to width | Context rail and lesson map in two columns at regular width | done (runtime verified on iPad) |
+| Profile adapts to width | Progress and settings in two columns at regular width | done |
+| CI enforces the contrast floor | The generator runs and a diff fails the build, so the catalog cannot be hand-edited past the floor | done |
+| Press feedback everywhere | 15 further controls moved off `.buttonStyle(.plain)` | done |
+| Token roles correct outside the screens already audited | 9 fill tokens used as a foreground moved to their on-surface member | done |
+| Hit targets | The vocabulary play button (34pt) joined the lesson exit button and the filter pill | done |
+| Vocabulary rows are one VoiceOver stop | A 350 word list was three or four swipes per row | done |
+
+The mascot animation is verified rather than asserted. A unit test cannot drive
+it: `CGAnimateImageDataWithBlock` schedules on a run loop a test does not spin, so
+awaiting the stream hangs instead of failing. The tests cover what is
+deterministic (the asset is a multi-frame GIF that Image I/O decodes end to end),
+and the animation itself was measured on a running simulator: successive
+screenshots differ by a mean absolute pixel delta of 17.6 to 25.8 in the mascot
+region against 2.4 to 4.7 in a background-only region, so the movement is the
+mascot and not the ambient drift.
+
 ### Not done in this pass
 
 - Albanian for the 51 new strings is entered and marked `needs_review`, like every
@@ -396,6 +482,17 @@ itself.
   verified. Added to the device checklist.
 - Increase Contrast now has an effect for the first time, which means it has never
   been looked at on hardware. Added to the device checklist.
+- **Contrast over a material is still not measured.** The cards now use the
+  regular material rather than the thinnest one, and Reduce Transparency makes
+  them fully opaque, so the measured token-versus-surface ratios describe the
+  opaque path exactly and the translucent path closely. A SwiftUI `Material`
+  cannot be resolved to a colour from a unit test, so the translucent path is
+  reasoned about rather than measured. Checking it needs a screenshot on hardware,
+  in both appearances, which is on the device checklist.
+- **Home keeps a single column at regular width.** Profile splits because its
+  sections are independent; the lesson map is one vertical flow and reads correctly
+  centred. Putting the next-unit and culture cards in a side rail at regular width
+  is a sensible next step and was not done here.
 
 ## Verification log
 

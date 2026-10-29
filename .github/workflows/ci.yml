@@ -142,3 +142,28 @@ jobs:
           set -euo pipefail
           # Pure stdlib on purpose, so this job needs no dependency install.
           python3 Scripts/validate_seed.py
+
+      - name: Palette is generated, committed, and above the contrast floor
+        run: |
+          set -euo pipefail
+          # Two things in one step, because the generator is the only writer of
+          # the colour catalog.
+          #
+          # It exits non-zero when any foreground/background pair it ships falls
+          # below 4.5:1, so this enforces the contrast floor. And because it
+          # regenerates every colorset from its own table, a diff afterwards means
+          # someone edited the catalog in Xcode instead of the generator, which is
+          # how a hand-tuned colour would slip past the floor entirely.
+          #
+          # GjuhaContrastTests covers the other half: that the colours the running
+          # app resolves match these numbers. Both halves are needed, because this
+          # step cannot see what the app renders and the test cannot see the
+          # generator.
+          python3 Scripts/gen_colors.py
+          if ! git diff --quiet -- Gjuha/Resources/Palette.xcassets; then
+            echo "::error::Palette.xcassets does not match Scripts/gen_colors.py. Edit the script's COLORS table and re-run it, rather than editing the catalog."
+            git --no-pager diff --stat -- Gjuha/Resources/Palette.xcassets
+            exit 1
+          fi
+          echo "Palette matches the generator and clears the contrast floor."
+

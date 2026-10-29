@@ -814,3 +814,180 @@ struct StoredPayloadCompatibilityTests {
         #expect(GjuhaWidgetSnapshot.placeholder.dailyGoalProgress == 0)
     }
 }
+
+// MARK: - Surfaces
+
+/// The content-layer surface and its accessibility fallbacks.
+///
+/// `GjuhaSurfaceStyle.resolve` exists as a pure function precisely so this suite
+/// can assert it. A `ViewModifier` cannot be inspected from a unit test, so
+/// without the split the Reduce Transparency answer would be a comment with
+/// nothing behind it, which is the state the app was in before: roughly thirty
+/// surfaces built on a material and not one of them checked the setting.
+struct GjuhaSurfaceTests {
+
+    private func resolve(
+        _ prominence: GjuhaSurfaceProminence,
+        reduceTransparency: Bool = false,
+        increaseContrast: Bool = false
+    ) -> GjuhaSurfaceResolution {
+        GjuhaSurfaceStyle.resolve(
+            prominence: prominence,
+            reduceTransparency: reduceTransparency,
+            increaseContrast: increaseContrast
+        )
+    }
+
+    /// The headline guarantee: ask for less transparency and nothing translucent
+    /// is left on any surface, at any prominence, with or without Increase
+    /// Contrast also on.
+    @Test
+    func reduceTransparencyLeavesNothingTranslucent() {
+        for prominence in [GjuhaSurfaceProminence.nested, .standard, .prominent] {
+            for contrast in [false, true] {
+                let resolved = resolve(
+                    prominence,
+                    reduceTransparency: true,
+                    increaseContrast: contrast
+                )
+                #expect(
+                    !resolved.isTranslucent,
+                    "\(prominence) stayed translucent under Reduce Transparency (contrast: \(contrast))"
+                )
+            }
+        }
+    }
+
+    /// And a nested surface stays distinguishable from the card it sits in, which
+    /// is the one thing going opaque could have broken: both resolving to
+    /// `surface` would make a stat tile invisible inside its own card.
+    @Test
+    func anOpaqueNestedSurfaceStillSeparatesFromItsParent() {
+        let parent = resolve(.standard, reduceTransparency: true)
+        let child = resolve(.nested, reduceTransparency: true)
+
+        #expect(parent.fill == .opaqueSurface)
+        #expect(child.fill == .opaqueSurfaceSecondary)
+        #expect(parent.fill != child.fill)
+    }
+
+    /// Text-bearing surfaces get the regular material, not the ultra-thin one
+    /// they used to have. Apple's Materials guidance: thicker materials give
+    /// better contrast for text and fine detail.
+    @Test
+    func textBearingSurfacesUseTheThickerMaterial() {
+        #expect(resolve(.standard).fill == .regularMaterial)
+        #expect(resolve(.prominent).fill == .regularMaterial)
+    }
+
+    /// A surface drawn inside another surface carries no material and no shadow.
+    /// Material on material is the stacked-glass case that blurs the hierarchy
+    /// the material exists to create, and two nested shadows describe a depth
+    /// no physical arrangement has.
+    @Test
+    func aNestedSurfaceNeitherStacksMaterialNorShadow() {
+        let nested = resolve(.nested)
+        #expect(nested.fill == .chipFill)
+        #expect(!nested.hasShadow)
+    }
+
+    @Test
+    func topLevelSurfacesKeepTheirShadow() {
+        #expect(resolve(.standard).hasShadow)
+        #expect(resolve(.prominent).hasShadow)
+        #expect(resolve(.standard, reduceTransparency: true).hasShadow,
+                "an opaque fill still reads as depth, so the shadow stays")
+    }
+
+    /// Increase Contrast widens the edge as well as darkening it. The `hairline`
+    /// token already carries a stronger value in its increased-contrast
+    /// appearance; the extra width is what makes a boundary unmistakable rather
+    /// than merely darker.
+    @Test
+    func increaseContrastThickensEveryEdge() {
+        for prominence in [GjuhaSurfaceProminence.nested, .standard, .prominent] {
+            let normal = resolve(prominence)
+            let high = resolve(prominence, increaseContrast: true)
+            #expect(high.strokeWidth > normal.strokeWidth, "\(prominence) edge did not thicken")
+        }
+    }
+
+    /// Every surface draws a border at every setting. The border is what marks a
+    /// card's bounds once the material is gone, so it is never zero.
+    @Test
+    func everySurfaceDrawsABorder() {
+        for prominence in [GjuhaSurfaceProminence.nested, .standard, .prominent] {
+            for transparency in [false, true] {
+                for contrast in [false, true] {
+                    let resolved = resolve(
+                        prominence,
+                        reduceTransparency: transparency,
+                        increaseContrast: contrast
+                    )
+                    #expect(resolved.strokeWidth > 0)
+                }
+            }
+        }
+    }
+
+    /// Resolution is a pure function of its three inputs, with no hidden state.
+    @Test
+    func resolutionIsDeterministic() {
+        #expect(resolve(.standard) == resolve(.standard))
+        #expect(resolve(.nested, reduceTransparency: true) == resolve(.nested, reduceTransparency: true))
+    }
+}
+
+// MARK: - Mascot animation
+
+/// The mascot loop asset, which now feeds Image I/O instead of a `WKWebView`.
+///
+/// Worth checking rather than eyeballing, because the failure mode is silent: if
+/// the asset stops decoding, the view falls back to the still image and looks
+/// merely a bit flat, with nothing in the logs to say so.
+///
+/// What is *not* tested here is `MascotLoop.frames(from:)` itself.
+/// `CGAnimateImageDataWithBlock` schedules its callbacks on a run loop, and a
+/// unit test has none spinning, so awaiting that stream hangs rather than
+/// failing. Driving it needs the app running, so it is a device-checklist item.
+/// These tests cover the part that can be checked deterministically: that the
+/// asset is a real multi-frame GIF that Image I/O can decode, which is the thing
+/// that would actually break.
+struct MascotLoopTests {
+
+    @Test
+    func theLoopAssetIsPresentAndIsAGIF() throws {
+        let data = try #require(MascotLoop.data, "MascotLoop is missing from the asset catalog")
+        #expect(data.count > 0)
+        #expect(data.prefix(3) == Data("GIF".utf8))
+    }
+
+    /// Image I/O decodes it, and it has more than one frame. A single-frame GIF
+    /// would animate to nothing while still passing a "is it a GIF" check.
+    @Test
+    func imageIODecodesEveryFrame() throws {
+        let data = try #require(MascotLoop.data)
+        let source = try #require(
+            CGImageSourceCreateWithData(data as CFData, nil),
+            "Image I/O could not open the asset"
+        )
+
+        let count = CGImageSourceGetCount(source)
+        #expect(count > 1, "a loop needs more than one frame, found \(count)")
+
+        // Spot-check the ends rather than every frame: a truncated GIF decodes
+        // its first frames and fails on its last.
+        for index in [0, count - 1] {
+            let frame = CGImageSourceCreateImageAtIndex(source, index, nil)
+            let image = try #require(frame, "frame \(index) of \(count) failed to decode")
+            #expect(image.width > 0 && image.height > 0)
+        }
+    }
+
+    /// The still fallback has to exist too, because it is what Reduce Motion and
+    /// a missing loop both fall back to.
+    @Test
+    func theStillFallbackImageExists() {
+        #expect(UIImage(named: "MascotIcon") != nil, "MascotIcon is missing from the asset catalog")
+    }
+}

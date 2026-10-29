@@ -6,8 +6,8 @@ import SwiftUI
 /// `Gjuha/Resources/Palette.xcassets`, which both the app and this extension
 /// include, so the widget and the app can never drift to different reds. This file
 /// is only the thin accessor, because the app's `GjuhaColors` lives in a file that
-/// also pulls in WebKit and the animated mascot, which a widget has no business
-/// linking.
+/// is part of the app's SwiftUI design-system code, which a widget has no
+/// business compiling.
 ///
 /// `Color(_:)` with no bundle resolves against `Bundle.main`, which for an app
 /// extension is the extension's own bundle, so the palette must be a resource of

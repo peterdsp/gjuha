@@ -45,6 +45,7 @@ This is not a hobby project. It is a long-term platform designed to reach **Duol
 ✦  12 achievements, honest ones    ✦  Gheg dialect mode (gated on review)
 ✦  Offline-first - always works    ✦  Siri & Shortcuts (4 App Intents)
 ✦  Measured-contrast design system ✦  Home + Lock Screen widgets
+✦  Adapts to iPad and iPhone Duo    ✦  Reduce Transparency + Increase Contrast
 ✦  English + Albanian interface    ✦  Honest progress accounting
 ```
 
@@ -356,13 +357,17 @@ xcodebuild test -project Gjuha.xcodeproj -scheme Gjuha \
   -skipMacroValidation -only-testing:GjuhaTests
 ```
 
-131 unit tests in 16 suites, plus 6 UI tests.
+142 unit tests in 18 suites, plus 8 UI tests. The UI suite is run on both an
+iPhone and a 13" iPad at the iOS 26 deployment floor, because the app ships as a
+universal app and the two present the tab bar differently.
 
 `-skipMacroValidation` is required from the CLI: TCA's macros are trusted through
 the Xcode GUI, which a command line build does not have.
 
-For release engineering, submission steps, and the open review gates, see
+For release engineering and submission steps, see
 [`Documentation/Release/APP_STORE_SUBMISSION.md`](Documentation/Release/APP_STORE_SUBMISSION.md).
+For a single consolidated view of everything still open, and who is blocked on
+what, see [`Documentation/Release/REMAINING_WORK.md`](Documentation/Release/REMAINING_WORK.md).
 
 ---
 

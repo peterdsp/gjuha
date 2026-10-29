@@ -42,8 +42,14 @@ It also widens the install base, which matters for the diaspora audience in
 `RESEARCH.md` who are likeliest to be on older hardware.
 
 Verified at the floor, not just on the newest runtime: the suite was run on an
-iOS 26.5 simulator and all tests pass. The suite is now 131 unit tests in 16
+iOS 26.5 simulator and all tests pass. The suite is now 142 unit tests in 18
 suites plus 8 UI tests.
+
+The UI suite is run on **both** an iPhone and a 13" iPad, because the app is
+listed for both families and the two present the tab bar differently. That is not
+hypothetical: four of the eight UI tests failed the first time they were run on
+iPad, because the system publishes each tab button twice there and the tests'
+element query was ambiguous. Running one family only would have shipped that.
 
 ## 2. Signing and capabilities
 
@@ -122,6 +128,14 @@ and can say, accurately:
 > deleted at any time from Profile, with "Reset learning data". Local
 > notifications, if you turn on the daily reminder, are scheduled on your device
 > and contain no personal data.
+
+### No WebKit
+
+Worth stating because it changed in this pass and App Review asks about web
+content: the app links no WebKit and opens no web views. The mascot animation was
+the only thing that had ever pulled it in, and it now uses Image I/O. There is no
+in-app browser, no remote content, and nothing for the "does your app contain web
+views" questions to apply to.
 
 ## 4. Export compliance
 
@@ -256,6 +270,23 @@ Then, by hand on a device:
       palette ships increased-contrast variants for the first time, so this is
       the first release where that setting does anything. Check a lesson, Home
       and Profile in both light and dark.
+- [ ] Reduce Transparency on (same Settings section). Every card, answer option,
+      chip and the page background should go fully opaque, and a stat tile should
+      still be distinguishable from the card around it. The resolution table is
+      unit tested; what a device cannot be substituted for is whether the opaque
+      result still looks deliberate.
+- [ ] Text contrast on a real screen, light and dark. The palette's ratios are
+      measured against the opaque surfaces, and the cards render over a material
+      above a gradient, which a unit test cannot resolve. One screenshot of a
+      lesson and of Profile in each appearance is enough to confirm it.
+- [ ] iPad, or iPhone Duo's inner display: Home should show a context rail beside
+      the lesson map, and Profile should split into progress and settings
+      columns. Both are verified on a simulated 13" iPad; what a device adds is
+      whether the proportions feel right in the hand.
+- [ ] The mascot animates. It is no longer played by a web view, so this is the
+      one visual that changed implementation rather than appearance. Verified on
+      a simulator by measuring pixel change between successive screenshots, but
+      worth one glance on hardware.
 - [ ] Tab state. Open Words, search for something, switch to Grammar and back.
       The query and scroll position must survive, which is the behaviour the
       native tab bar replaced the custom one to get.
@@ -269,6 +300,10 @@ Then, by hand on a device:
       see the native review gate in section 9.
 
 ## 9. Open gates before 1.0 ships
+
+A consolidated view of everything still open, including the items that are not
+release gates, is in [`REMAINING_WORK.md`](REMAINING_WORK.md). The four gates
+below are the subset that blocks submission.
 
 These are real and are not closed by this pass.
 

@@ -8,6 +8,8 @@ Source of truth:
 
 - Colours: `Scripts/gen_colors.py` generates `Gjuha/Resources/Palette.xcassets`,
   surfaced by `Gjuha/Core/DesignSystem/Colors/GjuhaColors.swift`.
+- Surfaces: `Gjuha/Core/DesignSystem/Surfaces/GjuhaSurface.swift`.
+- Mascot: `Gjuha/Core/DesignSystem/Mascot/MascotView.swift`.
 - Spacing and radii: `Gjuha/Core/DesignSystem/Spacing/GjuhaSpacing.swift`.
 - Type scale: `Gjuha/Core/DesignSystem/Typography/GjuhaFonts.swift`.
 - Button styles: `Gjuha/Core/DesignSystem/Buttons/GjuhaButtonStyles.swift`.
@@ -87,6 +89,123 @@ python3 Scripts/gen_colors.py   # regenerates and prints the full table
 
 ---
 
+## Surfaces and the two layers
+
+Apple's materials model has exactly two layers, and which one a view belongs to
+decides what it may be made of.
+
+| Layer | What is in it | What it is made of |
+|---|---|---|
+| **Content** | Cards, stat tiles, rows, chips, page backgrounds | Opaque colours or **standard materials**. Never Liquid Glass. |
+| **Functional** | Tab bar, navigation bar, sheets, a bar pinned over scrolling content | Liquid Glass, which the system applies to its own components for free |
+
+Everything this app draws in a card is content. The modifier that draws it was
+called `gjuhaLiquidGlassCard`, which told every reader the opposite of the truth,
+and the app's real functional layer is now the native tab bar and navigation bar,
+where the system supplies the material.
+
+Use `.gjuhaCardSurface(cornerRadius:prominence:)`:
+
+| Prominence | When | Draws |
+|---|---|---|
+| `.nested` | Inside another surface: a stat tile in a card, a chip in a row | `chipFill`, no shadow |
+| `.standard` | A content card on the page | `.regularMaterial`, shadow |
+| `.prominent` | The one surface a screen leads with | `.regularMaterial`, shadow |
+
+`.nested` is not a cosmetic level. A material inside a material is the stacked
+glass case that blurs the hierarchy the material exists to create, and it also
+stacks two shadows that describe a depth nothing physical has.
+
+The material is **regular**, not ultra-thin. Every one of these surfaces is full
+of text, and Apple's Materials guidance is that "thicker materials, which are more
+opaque, can provide better contrast for text and other elements with fine
+features". The previous ultra-thin material was the thinnest option available,
+under the text of a question a learner has to read to answer it.
+
+### Accessibility fallbacks
+
+`GjuhaSurfaceStyle.resolve(prominence:reduceTransparency:increaseContrast:)` is a
+pure function, split out so it can be asserted. A `ViewModifier` cannot be
+inspected from a unit test, so without the split the Reduce Transparency answer
+would be a comment with nothing behind it, which is the state the app was in:
+roughly thirty surfaces were built on a material and not one of them read the
+setting.
+
+- **Reduce Transparency** removes every material and tint. A nested surface goes
+  to `surfaceSecondary` rather than `surface`, so a stat tile does not vanish into
+  the card holding it.
+- **Increase Contrast** widens the border as well as darkening it, because the
+  `hairline` token already carries a stronger increased-contrast value and width
+  is what makes a boundary unmistakable.
+- **Reduce Motion** stops the ambient background's drift, and Reduce Transparency
+  flattens it to a single colour: its blurred shapes are translucent forms, and
+  keeping them while claiming to have reduced transparency would be a half-answer.
+
+For a text-bearing interactive control that is not a card, use
+`GjuhaSurfaceStyle.restingControlFill(reduceTransparency:)`. For a bar floating
+over scrolling content, use `floatingBarFill(reduceTransparency:)`: that one
+really is the functional layer, so a material belongs there.
+
+`GjuhaSurfaceTests` asserts the whole table, including that nothing translucent
+survives Reduce Transparency at any prominence with Increase Contrast either on or
+off.
+
+---
+
+## Adapting to width
+
+Decide layout from the **horizontal size class**, never from device or
+orientation: Apple's Layout guidance is to "determine layout based on size
+classes, not device type or orientation", and it is also what gives iPhone Duo its
+layout for free, where the outer display is compact and the inner one regular.
+
+`Profile` is the worked example. Six stat tiles, twelve badges, a goal picker and
+two settings blocks are independent of each other, so at a regular width they
+split into two columns and the readable-width cap widens from 620 to 1040. Two
+columns rather than three on purpose: iPhone Duo's fold divides the inner display,
+and that guidance asks for an even number of columns "so content divides cleanly".
+
+`Home` splits the same way, for a different reason. The lesson map is one
+vertical flow and reads correctly centred, so it is not split; what was wrong at a
+regular width was everything around it. The unit card, the review prompt and the
+culture card were stacked above and below the map, so reaching the lessons meant
+scrolling past a screen of context and finding the culture card meant scrolling
+the whole map again. They move into a leading rail and the map keeps its column.
+
+`gjuhaReadableWidth(_:)` caps a single column of prose at a comfortable measure.
+Pass a wider value when the content is a grid of cards rather than text, because
+the measure argument does not apply to it.
+
+**Test both widths.** The app ships for iPhone and iPad, and the UI suite runs on
+both. That is not ceremony: the first iPad run failed four of eight tests, because
+iPadOS publishes each tab button twice and the tests' element query was ambiguous.
+A suite that only ever ran on one family would have reported green.
+
+---
+
+## Imagery
+
+The mascot is the app's one piece of character art, and it animates through
+`CGAnimateImageDataWithBlock` in `MascotView.swift`.
+
+It used to animate through a `WKWebView`: the 1.2 MB GIF was base64-encoded into
+an HTML document and handed to a web view to play, once per mascot on screen.
+That started an out-of-process web renderer per instance, inflated the asset by a
+third on every load, and linked WebKit into an app with no web content. Image I/O
+decodes frames on demand and honours the GIF's own delays, so memory stays at a
+frame or two rather than the 25 MB that holding all 37 frames would cost.
+
+Two rules for any animated art added later:
+
+- **Reduce Motion gets the still image**, not a slower loop. Gating only the
+  fallback, which an earlier version of this view did, leaves the animation
+  running for exactly the people who asked for less of it.
+- **The art is `accessibilityHidden`.** The mascot repeats what the text beside it
+  already says, so announcing it adds a stop to the VoiceOver path and no
+  information.
+
+---
+
 ## Spacing
 
 The 4pt grid, as named steps: `hairline` 4, `tight` 8, `snug` 12, `regular` 16,
@@ -126,7 +245,7 @@ A pressed primary button *darkens*. Brightening would push it under the floor.
 
 ---
 
-## Motion
+## Motion policy
 
 Every repeating or decorative animation checks
 `@Environment(\.accessibilityReduceMotion)` and collapses to

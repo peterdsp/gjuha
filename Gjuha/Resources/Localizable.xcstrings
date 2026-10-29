@@ -353,16 +353,6 @@
       "comment": "XP award. 'XP' is used untranslated in Albanian too.",
       "shouldTranslate": false
     },
-    "- %lld min/day": {
-      "localizations": {
-        "sq": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "- %lld min/ditë"
-          }
-        }
-      }
-    },
     "A full week": {
       "comment": "Achievement title: seven consecutive study days.",
       "localizations": {
@@ -527,16 +517,6 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Kthehu te mësimet"
-          }
-        }
-      }
-    },
-    "Best combo: %lldx": {
-      "localizations": {
-        "sq": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Kombinimi më i mirë: %lldx"
           }
         }
       }
@@ -2295,6 +2275,17 @@
         }
       }
     },
+    "You have hit your target for today.": {
+      "comment": "Subtitle of the daily-goal-met banner on the lesson completion screen.",
+      "localizations": {
+        "sq": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "E arritët objektivin tuaj për sot."
+          }
+        }
+      }
+    },
     "You have not started a streak yet. %lld words are due for review.": {
       "comment": "The verb agrees with the count, so the whole clause is the substitution.",
       "localizations": {
@@ -2402,17 +2393,6 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Ecuria në këtë mësim nuk do të ruhet. Mund ta nisni përsëri në çdo kohë."
-          }
-        }
-      }
-    },
-    "Your streak is safe for today.": {
-      "comment": "Subtitle of the daily-goal-met banner.",
-      "localizations": {
-        "sq": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Ditët rresht janë të sigurta për sot."
           }
         }
       }

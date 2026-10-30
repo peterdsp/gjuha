@@ -2,17 +2,18 @@ rootProject.name = "gjuha-android"
 
 pluginManagement {
     repositories {
+        google()
         gradlePluginPortal()
         mavenCentral()
-        google()
     }
 }
 
 dependencyResolutionManagement {
     repositories {
-        mavenCentral()
         google()
+        mavenCentral()
     }
 }
 
 include(":core")
+include(":app")

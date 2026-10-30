@@ -5,6 +5,7 @@ import com.gjuha.core.AchievementCatalog
 import com.gjuha.core.advanceStreak
 import com.gjuha.core.DailyXp
 import com.gjuha.core.LearningGoal
+import com.gjuha.core.LessonSessionSnapshot
 import com.gjuha.core.LessonVocabulary
 import com.gjuha.core.ReviewGrade
 import com.gjuha.core.ReviewItemState
@@ -66,6 +67,7 @@ class ProgressRepository(context: Context) {
         const val UNLOCKED = "achievementsUnlocked"
         const val REVIEW = "reviewSchedule"
         const val ONBOARDED = "hasCompletedOnboarding"
+        const val SESSION = "lessonSession.v1"
     }
 
     var hasCompletedOnboarding: Boolean
@@ -246,6 +248,25 @@ class ProgressRepository(context: Context) {
         prefs.getStringSet(Keys.UNLOCKED, emptySet()).orEmpty()
             .filter { AchievementCatalog.achievement(it) != null }
             .toSet()
+
+    /**
+     * The lesson in progress, if one was interrupted.
+     *
+     * Stored rather than regenerated, because generation shuffles options and
+     * picks distractors randomly: regenerating would hand the learner a
+     * different lesson than the one they were halfway through.
+     */
+    var lessonSession: LessonSessionSnapshot?
+        get() = LessonSessionSnapshot.decode(prefs.getString(Keys.SESSION, null))
+        set(value) {
+            val editor = prefs.edit()
+            if (value == null || !value.isResumable) {
+                editor.remove(Keys.SESSION)
+            } else {
+                editor.putString(Keys.SESSION, LessonSessionSnapshot.encode(value))
+            }
+            editor.apply()
+        }
 
     fun reset() = prefs.edit().clear().apply()
 }

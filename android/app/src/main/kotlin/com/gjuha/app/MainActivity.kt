@@ -120,13 +120,14 @@ private fun GjuhaApp(content: ContentRepository, progress: ProgressRepository) {
         LessonScreen(
             lesson = lesson,
             content = content,
+            progress = progress,
             onFinished = { xp, wordIds ->
                 progress.completeLesson(lesson.id, xp, wordIds)
                 val unlocked = progress.recordUnlocks()
                 revision++
                 unlocked.mapNotNull { AchievementCatalog.achievement(it) }
             },
-            onQuit = { openLesson = null },
+            onQuit = { revision++; openLesson = null },
         )
         return
     }

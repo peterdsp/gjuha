@@ -23,6 +23,7 @@ import com.gjuha.core.AnswerNormalizer
 import com.gjuha.core.Exercise
 import com.gjuha.core.ExerciseEngine
 import com.gjuha.core.ExerciseType
+import com.gjuha.core.LessonSessionSnapshot
 import com.gjuha.core.ReviewGrade
 import com.gjuha.core.SeedLesson
 import com.gjuha.core.toReviewGrade
@@ -46,18 +47,33 @@ import kotlinx.coroutines.delay
 fun LessonScreen(
     lesson: SeedLesson,
     content: ContentRepository,
+    progress: ProgressRepository,
     onFinished: (xpEarned: Int, wordIds: List<String>) -> List<Achievement>,
     onQuit: () -> Unit,
 ) {
     val lessonWords = remember(lesson.id) { content.wordsFor(lesson) }
-    val exercises = remember(lesson.id) {
-        ExerciseEngine(content.words).exercises(lesson, lessonWords)
+
+    // A session interrupted part way through is resumed with its own questions
+    // rather than a freshly generated set.
+    val resumed = remember(lesson.id) {
+        progress.lessonSession?.takeIf { it.lessonId == lesson.id && it.isResumable }
     }
+    val exercises = remember(lesson.id) {
+        resumed?.exercises ?: ExerciseEngine(content.words).exercises(lesson, lessonWords)
+    }
+
     LessonSession(
         exercises = exercises,
         wordIdByIndex = emptyMap(),
         onReviewOutcome = null,
-        onFinished = { xp -> onFinished(xp, lessonWords.map { it.id }) },
+        resumeFrom = resumed,
+        onProgress = { snapshot ->
+            progress.lessonSession = snapshot.copy(lessonId = lesson.id)
+        },
+        onFinished = { xp ->
+            progress.lessonSession = null
+            onFinished(xp, lessonWords.map { it.id })
+        },
         onQuit = onQuit,
     )
 }
@@ -95,6 +111,10 @@ fun ReviewScreen(
         exercises = session.map { it.second },
         wordIdByIndex = session.indices.associateWith { session[it].first },
         onReviewOutcome = { wordId, grade -> progress.recordReviewOutcome(wordId, grade) },
+        // A review is not resumable: its words are rescheduled as they are
+        // answered, so re-asking them would record the same recall twice.
+        resumeFrom = null,
+        onProgress = {},
         onFinished = onFinished,
         onQuit = onQuit,
     )
@@ -108,6 +128,8 @@ private fun LessonSession(
     exercises: List<Exercise>,
     wordIdByIndex: Map<Int, String>,
     onReviewOutcome: ((String, ReviewGrade) -> Unit)?,
+    resumeFrom: LessonSessionSnapshot?,
+    onProgress: (LessonSessionSnapshot) -> Unit,
     onFinished: (xpEarned: Int) -> List<Achievement>,
     onQuit: () -> Unit,
 ) {
@@ -117,13 +139,13 @@ private fun LessonSession(
     // it. Guarded because a recomposition must not bank the XP twice.
     var earned by remember { mutableStateOf<List<Achievement>?>(null) }
 
-    var index by remember { mutableIntStateOf(0) }
-    var hearts by remember { mutableIntStateOf(3) }
-    var xp by remember { mutableIntStateOf(0) }
-    var combo by remember { mutableIntStateOf(0) }
-    var bestCombo by remember { mutableIntStateOf(0) }
-    var answered by remember { mutableIntStateOf(0) }
-    var correctCount by remember { mutableIntStateOf(0) }
+    var index by remember { mutableIntStateOf(resumeFrom?.currentIndex ?: 0) }
+    var hearts by remember { mutableIntStateOf(resumeFrom?.hearts ?: 3) }
+    var xp by remember { mutableIntStateOf(resumeFrom?.xpEarned ?: 0) }
+    var combo by remember { mutableIntStateOf(resumeFrom?.combo ?: 0) }
+    var bestCombo by remember { mutableIntStateOf(resumeFrom?.bestCombo ?: 0) }
+    var answered by remember { mutableIntStateOf(resumeFrom?.answeredCount ?: 0) }
+    var correctCount by remember { mutableIntStateOf(resumeFrom?.correctCount ?: 0) }
     var feedback by remember { mutableStateOf<Feedback?>(null) }
 
     val finished = index >= exercises.size
@@ -195,6 +217,22 @@ private fun LessonSession(
                     wordIdByIndex[index]?.let { wordId ->
                         onReviewOutcome?.invoke(wordId, grade.toReviewGrade())
                     }
+                    // Saved on every answer rather than on exit, because an app
+                    // that is killed never gets to run an exit path.
+                    onProgress(
+                        LessonSessionSnapshot(
+                            lessonId = "",
+                            exercises = exercises,
+                            currentIndex = index + 1,
+                            hearts = hearts,
+                            xpEarned = xp,
+                            combo = combo,
+                            bestCombo = bestCombo,
+                            answeredCount = answered,
+                            correctCount = correctCount,
+                            isReview = isReview,
+                        )
+                    )
                     feedback = Feedback(
                         grade = grade,
                         correctAnswer = exercise.correctAnswer,

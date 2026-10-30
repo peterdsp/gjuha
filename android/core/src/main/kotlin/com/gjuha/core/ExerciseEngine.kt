@@ -1,8 +1,11 @@
 package com.gjuha.core
 
+import kotlinx.serialization.Serializable
+
 import kotlin.random.Random
 
 /** The exercise shapes the engine can build. Mirrors the iOS `ExerciseType`. */
+@Serializable
 enum class ExerciseType {
     MULTIPLE_CHOICE_TRANSLATE,
     TRANSLATE_TEXT_INPUT,
@@ -32,6 +35,7 @@ enum class ExerciseType {
 }
 
 /** One Albanian/English pair in a matching exercise. */
+@Serializable
 data class MatchPair(val albanian: String, val english: String)
 
 /**
@@ -43,6 +47,7 @@ data class MatchPair(val albanian: String, val english: String)
  * way: a computed property that shuffled on every access made the buttons jump
  * on each view update.
  */
+@Serializable
 data class Exercise(
     val type: ExerciseType,
     val prompt: String,

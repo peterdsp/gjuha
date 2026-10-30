@@ -231,8 +231,17 @@ private struct WordRowView: View {
             }
 
             VStack(alignment: .leading, spacing: .gjuha.hairline) {
+                // The Albanian word is the thing being taught, so it is the
+                // display element of the row. It was set at 14 points with its
+                // English gloss at 16, which put the translation above the
+                // language on a screen whose whole purpose is the language.
+                //
+                // This is also where the art direction lives: at this size the
+                // diacritics and the digraphs are shapes rather than specks,
+                // which is the point of them being the motif at all.
                 Text(word.albanian)
-                    .font(.gjuha.labelBold)
+                    .font(.gjuha.headingMedium)
+                    .gjuhaDisplayTracking(-0.4)
                     .foregroundStyle(Color.gjuha.textPrimary)
                 Text(word.english)
                     .font(.gjuha.bodyRegular)

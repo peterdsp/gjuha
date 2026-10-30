@@ -483,9 +483,16 @@ private struct UnitHeaderCard: View {
                         .font(.gjuha.captionBold)
                         .foregroundStyle(Color.gjuha.textPrimary)
                     Spacer()
+                    // The brand colour is spent on the action and on status,
+                    // not on a neutral figure. A unit at 0% rendered in the
+                    // accent reads as a warning about the learner rather than
+                    // as a fact about the unit, and every extra place the
+                    // accent appears makes it mean less where it matters.
                     Text("\(Int(progress * 100))%")
                         .font(.gjuha.captionBold)
-                        .foregroundStyle(Color.gjuha.accentStrong)
+                        .foregroundStyle(
+                            progress > 0 ? Color.gjuha.accentStrong : Color.gjuha.textSecondary
+                        )
                 }
 
                 GeometryReader { geo in

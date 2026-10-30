@@ -57,11 +57,47 @@ private enum class Screen { LEARN, PROFILE }
 private fun GjuhaApp(content: ContentRepository, progress: ProgressRepository) {
     var screen by remember { mutableStateOf(Screen.LEARN) }
     var openLesson by remember { mutableStateOf<SeedLesson?>(null) }
+    var inReview by remember { mutableStateOf(false) }
+    var onboarded by remember { mutableStateOf(progress.hasCompletedOnboarding) }
     // Bumped whenever progress changes, so the screens re-read their figures.
     var revision by remember { mutableIntStateOf(0) }
 
+    if (!onboarded) {
+        OnboardingScreen(initial = progress.goal) { chosen ->
+            progress.goal = chosen
+            progress.hasCompletedOnboarding = true
+            onboarded = true
+            revision++
+        }
+        return
+    }
+
     val stats = remember(revision) { progress.stats() }
     val completed = remember(revision) { progress.completedLessonIds }
+    val dueCount = remember(revision) { progress.dueCount() }
+
+    if (inReview) {
+        ReviewScreen(
+            content = content,
+            progress = progress,
+            onFinished = { xp ->
+                // Banks XP and counts the day, but completes no lesson and
+                // unlocks nothing: the words were rescheduled as they were
+                // answered.
+                progress.recordReviewActivity(xp)
+                progress.recordUnlocks()
+                revision++
+                inReview = false
+            },
+            onQuit = {
+                // Outcomes were recorded per answer, so leaving early keeps
+                // what was measured and simply banks no XP.
+                revision++
+                inReview = false
+            },
+        )
+        return
+    }
 
     val lesson = openLesson
     if (lesson != null) {
@@ -99,7 +135,14 @@ private fun GjuhaApp(content: ContentRepository, progress: ProgressRepository) {
     ) { padding ->
         Box(Modifier.padding(padding)) {
             when (screen) {
-                Screen.LEARN -> LearnScreen(content, stats, completed) { openLesson = it }
+                Screen.LEARN -> LearnScreen(
+                    content = content,
+                    stats = stats,
+                    completed = completed,
+                    dueCount = dueCount,
+                    onStartReview = { inReview = true },
+                    onOpen = { openLesson = it },
+                )
                 Screen.PROFILE -> ProfileScreen(progress, stats)
             }
         }
@@ -113,6 +156,8 @@ private fun LearnScreen(
     content: ContentRepository,
     stats: UserStats,
     completed: Set<String>,
+    dueCount: Int,
+    onStartReview: () -> Unit,
     onOpen: (SeedLesson) -> Unit,
 ) {
     val unit = remember { content.units.minByOrNull { it.unit } }
@@ -124,6 +169,12 @@ private fun LearnScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item { HeaderCard(stats) }
+
+        // Only shown when something is actually due. A permanent Review button
+        // that opens an empty session teaches people to ignore it.
+        if (dueCount > 0) {
+            item { ReviewCard(dueCount, onStartReview) }
+        }
 
         item {
             unit?.let {
@@ -159,6 +210,36 @@ private fun LearnScreen(
             // comes from the seed, not from a hardcoded index.
             val isLocked = lesson.unlock.requiresLessonIds.any { it !in completed }
             LessonRow(lesson, isDone, isLocked) { if (!isLocked) onOpen(lesson) }
+        }
+    }
+}
+
+@Composable
+private fun ReviewCard(dueCount: Int, onStart: () -> Unit) {
+    Card(
+        onClick = onStart,
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = GjuhaColors.Success),
+    ) {
+        Row(
+            Modifier.fillMaxWidth().padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text("\uD83D\uDD01", fontSize = 22.sp)
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    "Review",
+                    fontWeight = FontWeight.Bold,
+                    color = GjuhaColors.OnAccent,
+                )
+                Text(
+                    if (dueCount == 1) "1 word is ready" else "$dueCount words are ready",
+                    fontSize = 13.sp,
+                    color = GjuhaColors.OnAccent,
+                )
+            }
+            Text("\u25B6", color = GjuhaColors.OnAccent)
         }
     }
 }

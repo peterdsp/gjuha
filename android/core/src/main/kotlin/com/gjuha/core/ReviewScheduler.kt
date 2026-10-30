@@ -179,3 +179,17 @@ class ReviewScheduler(private val zone: ZoneId = ZoneId.systemDefault()) {
         return if (limit != null && limit >= 0) due.take(limit) else due
     }
 }
+
+/**
+ * How a graded answer becomes a scheduling signal.
+ *
+ * A near miss maps to HARD rather than to GOOD or AGAIN: the word was
+ * recalled, so it is not a failure, but the spelling was not, so it should
+ * come back sooner than a clean recall. Collapsing it either way would
+ * misreport how well the word is actually known.
+ */
+fun AnswerGrade.toReviewGrade(): ReviewGrade = when (this) {
+    AnswerGrade.CORRECT -> ReviewGrade.GOOD
+    AnswerGrade.NEAR_MISS -> ReviewGrade.HARD
+    AnswerGrade.INCORRECT -> ReviewGrade.AGAIN
+}

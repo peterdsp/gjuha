@@ -5,6 +5,7 @@ import com.gjuha.core.AchievementCatalog
 import com.gjuha.core.DailyXp
 import com.gjuha.core.LearningGoal
 import com.gjuha.core.LessonVocabulary
+import com.gjuha.core.ReviewGrade
 import com.gjuha.core.ReviewItemState
 import com.gjuha.core.ReviewScheduler
 import com.gjuha.core.SeedContent
@@ -61,7 +62,12 @@ class ProgressRepository(context: Context) {
         const val GOAL = "learningGoal"
         const val UNLOCKED = "achievementsUnlocked"
         const val REVIEW = "reviewSchedule"
+        const val ONBOARDED = "hasCompletedOnboarding"
     }
+
+    var hasCompletedOnboarding: Boolean
+        get() = prefs.getBoolean(Keys.ONBOARDED, false)
+        set(value) = prefs.edit().putBoolean(Keys.ONBOARDED, value).apply()
 
     var goal: LearningGoal
         get() = LearningGoal.fromRawValue(prefs.getString(Keys.GOAL, null))
@@ -113,8 +119,58 @@ class ProgressRepository(context: Context) {
         ).apply()
     }
 
-    fun dueCount(today: LocalDate = LocalDate.now()): Int =
-        scheduler.dueItems(reviewItems(), today).size
+    fun dueCount(today: LocalDate = LocalDate.now()): Int = dueWordIds(today).size
+
+    /** Word ids the scheduler says are due, soonest first. */
+    fun dueWordIds(today: LocalDate = LocalDate.now()): List<String> =
+        scheduler.dueItems(reviewItems(), today).map { it.wordId }
+
+    /**
+     * Reschedules one word from how it was answered.
+     *
+     * Called as the learner answers rather than at the end, so a session
+     * abandoned half way still records what it measured. A word is recorded
+     * once per session: re-recording it would feed the same recall into the
+     * schedule twice.
+     */
+    fun recordReviewOutcome(
+        wordId: String,
+        grade: ReviewGrade,
+        today: LocalDate = LocalDate.now(),
+    ) {
+        val items = reviewItems()
+        val existing = items.firstOrNull { it.wordId == wordId } ?: return
+        val updated = scheduler.apply(grade, existing, today)
+        writeReviewItems(items.map { if (it.wordId == wordId) updated else it })
+    }
+
+    /**
+     * Banks a finished review's XP and counts the day for the streak.
+     *
+     * Deliberately NOT completeLesson: a review must not mark a course lesson
+     * finished or touch unlock state, or practising would walk the learner
+     * through the course without teaching it. Its words were already
+     * rescheduled as they were answered.
+     */
+    fun recordReviewActivity(xpEarned: Int, today: LocalDate = LocalDate.now()) {
+        val editor = prefs.edit()
+        editor.putInt(Keys.TOTAL_XP, totalXp + xpEarned)
+
+        val updated = dailyXp.adding(xpEarned, today)
+        editor.putInt(Keys.XP_TODAY, updated.earnedOn(today))
+        editor.putString(Keys.XP_TODAY_DAY, today.toString())
+
+        val last = prefs.getString(Keys.LAST_ACTIVITY, null)?.let(LocalDate::parse)
+        val newStreak = when {
+            last == null -> 1
+            last == today -> streak
+            last.plusDays(1) == today -> streak + 1
+            else -> 1
+        }
+        editor.putInt(Keys.STREAK, newStreak)
+        editor.putString(Keys.LAST_ACTIVITY, today.toString())
+        editor.apply()
+    }
 
     fun stats(today: LocalDate = LocalDate.now()): UserStats {
         val items = reviewItems()

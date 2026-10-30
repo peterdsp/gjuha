@@ -17,7 +17,9 @@ import com.gjuha.core.AnswerNormalizer
 import com.gjuha.core.Exercise
 import com.gjuha.core.ExerciseEngine
 import com.gjuha.core.ExerciseType
+import com.gjuha.core.ReviewGrade
 import com.gjuha.core.SeedLesson
+import com.gjuha.core.toReviewGrade
 import com.gjuha.core.gradeAnswer
 import kotlinx.coroutines.delay
 
@@ -45,6 +47,65 @@ fun LessonScreen(
     val exercises = remember(lesson.id) {
         ExerciseEngine(content.words).exercises(lesson, lessonWords)
     }
+    LessonSession(
+        exercises = exercises,
+        wordIdByIndex = emptyMap(),
+        onReviewOutcome = null,
+        onFinished = { xp -> onFinished(xp, lessonWords.map { it.id }) },
+        onQuit = onQuit,
+    )
+}
+
+/**
+ * A review session over words the scheduler says are due.
+ *
+ * It reuses the lesson session rather than reimplementing one, which is what
+ * iOS does too, and for the same reason: the grading, the feedback and the
+ * combo are the same behaviour, and a second copy of them would drift.
+ *
+ * Three rules differ, and all three protect the schedule:
+ *
+ * - **Every word is rescheduled as it is answered**, not at the end, so a
+ *   session abandoned half way still records what it measured.
+ * - **A review always advances**, whatever the grade. Retry-until-correct would
+ *   re-record the same word and corrupt its spacing.
+ * - **There are no hearts.** Failing a review is the normal way to find out a
+ *   word needs more work, so it cannot end the session.
+ */
+@Composable
+fun ReviewScreen(
+    content: ContentRepository,
+    progress: ProgressRepository,
+    onFinished: (xpEarned: Int) -> Unit,
+    onQuit: () -> Unit,
+) {
+    val session = remember {
+        val dueIds = progress.dueWordIds()
+        val dueWords = dueIds.mapNotNull { id -> content.words.firstOrNull { it.id == id } }
+        ExerciseEngine(content.words).reviewExercises(dueWords)
+    }
+
+    LessonSession(
+        exercises = session.map { it.second },
+        wordIdByIndex = session.indices.associateWith { session[it].first },
+        onReviewOutcome = { wordId, grade -> progress.recordReviewOutcome(wordId, grade) },
+        onFinished = onFinished,
+        onQuit = onQuit,
+    )
+}
+
+/**
+ * The shared session body. [wordIdByIndex] being non-empty makes it a review.
+ */
+@Composable
+private fun LessonSession(
+    exercises: List<Exercise>,
+    wordIdByIndex: Map<Int, String>,
+    onReviewOutcome: ((String, ReviewGrade) -> Unit)?,
+    onFinished: (xpEarned: Int) -> Unit,
+    onQuit: () -> Unit,
+) {
+    val isReview = onReviewOutcome != null
 
     var index by remember { mutableIntStateOf(0) }
     var hearts by remember { mutableIntStateOf(3) }
@@ -56,7 +117,7 @@ fun LessonScreen(
     var feedback by remember { mutableStateOf<Feedback?>(null) }
 
     val finished = index >= exercises.size
-    val failed = hearts <= 0
+    val failed = !isReview && hearts <= 0
 
     // Advance after showing the outcome, as on iOS. A wrong answer still moves
     // on: the word returns through the review schedule rather than by making
@@ -65,7 +126,9 @@ fun LessonScreen(
         val shown = feedback ?: return@LaunchedEffect
         delay(1400)
         feedback = null
-        if (shown.grade != AnswerGrade.CORRECT && hearts <= 0) return@LaunchedEffect
+        // A review always advances: the word has been rescheduled once already,
+        // and asking again would record the same recall twice.
+        if (!isReview && shown.grade != AnswerGrade.CORRECT && hearts <= 0) return@LaunchedEffect
         index++
     }
 
@@ -77,14 +140,15 @@ fun LessonScreen(
             accuracy = if (answered == 0) null else correctCount.toDouble() / answered,
             answered = answered,
             bestCombo = bestCombo,
-            onContinue = { onFinished(xp, lessonWords.map { it.id }) },
+            isReview = isReview,
+            onContinue = { onFinished(xp) },
         )
         else -> {
             val exercise = exercises[index]
             Column(Modifier.fillMaxSize().padding(16.dp)) {
                 LessonHeader(
                     progress = index.toFloat() / exercises.size,
-                    hearts = hearts,
+                    hearts = if (isReview) null else hearts,
                     combo = combo,
                     onQuit = onQuit,
                 )
@@ -105,8 +169,15 @@ fun LessonScreen(
                         }
                         AnswerGrade.NEAR_MISS, AnswerGrade.INCORRECT -> {
                             combo = 0
-                            hearts--
+                            // A review has no hearts: being wrong is how a word
+                            // is found to need more work, not a way to fail.
+                            if (!isReview) hearts--
                         }
+                    }
+                    // Reschedule now rather than at the end, so quitting half
+                    // way still records what was measured.
+                    wordIdByIndex[index]?.let { wordId ->
+                        onReviewOutcome?.invoke(wordId, grade.toReviewGrade())
                     }
                     feedback = Feedback(
                         grade = grade,
@@ -130,7 +201,7 @@ private data class Feedback(
 )
 
 @Composable
-private fun LessonHeader(progress: Float, hearts: Int, combo: Int, onQuit: () -> Unit) {
+private fun LessonHeader(progress: Float, hearts: Int?, combo: Int, onQuit: () -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         TextButton(onClick = onQuit) { Text("Close") }
         LinearProgressIndicator(
@@ -141,7 +212,12 @@ private fun LessonHeader(progress: Float, hearts: Int, combo: Int, onQuit: () ->
             Text("${combo}x", color = xpStrong(), fontWeight = FontWeight.Bold)
             Spacer(Modifier.width(8.dp))
         }
-        Text("❤".repeat(hearts.coerceAtLeast(0)))
+        if (hearts != null) {
+            Text("❤".repeat(hearts.coerceAtLeast(0)))
+        } else {
+            // A review shows what it is instead of a heart count it does not keep.
+            Text("Review", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
     }
 }
 
@@ -333,6 +409,7 @@ private fun LessonComplete(
     accuracy: Double?,
     answered: Int,
     bestCombo: Int,
+    isReview: Boolean,
     onContinue: () -> Unit,
 ) {
     Column(
@@ -342,7 +419,11 @@ private fun LessonComplete(
     ) {
         Text("⭐", fontSize = 56.sp)
         Spacer(Modifier.height(16.dp))
-        Text("Lesson complete!", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Text(
+            if (isReview) "Review complete!" else "Lesson complete!",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+        )
         Text("+$xp XP", fontSize = 32.sp, fontWeight = FontWeight.Bold, color = accentStrong())
         Spacer(Modifier.height(24.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {

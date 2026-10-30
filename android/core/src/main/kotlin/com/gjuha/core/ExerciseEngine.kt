@@ -352,6 +352,35 @@ class ExerciseEngine(
      * no example sentence does not drop out of a lesson because word-order
      * happened to be next in line.
      */
+    /**
+     * Builds a review session over words that are due, pairing each exercise
+     * with the word it is testing.
+     *
+     * The pairing is the point. A review reschedules the word behind the
+     * exercise, so the caller has to know which word an answer was about;
+     * deriving it from the prompt afterwards would break for word order and
+     * cloze, where the prompt is a sentence rather than the word.
+     *
+     * Unlike a lesson this has no plan to follow, so it rotates every type the
+     * word can support. Matching is left out: it covers four words at once and
+     * so cannot reschedule any one of them from a single answer.
+     */
+    fun reviewExercises(dueWords: List<SeedWord>, limit: Int = MAX_EXERCISES): List<Pair<String, Exercise>> {
+        if (dueWords.isEmpty()) return emptyList()
+
+        val types = ExerciseType.entries.filter { it != ExerciseType.WORD_MATCH }
+        val out = mutableListOf<Pair<String, Exercise>>()
+        var rotation = 0
+
+        for (word in dueWords.shuffled(random)) {
+            if (out.size >= limit) break
+            val built = buildRotating(types, rotation, word) ?: continue
+            out += word.id to built.first
+            rotation = built.second
+        }
+        return out
+    }
+
     private fun buildRotating(
         types: List<ExerciseType>,
         startAt: Int,

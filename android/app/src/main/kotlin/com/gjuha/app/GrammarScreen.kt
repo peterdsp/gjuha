@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -72,7 +73,7 @@ private fun GuideCard(guide: SeedGrammar, isOpen: Boolean, onToggle: () -> Unit)
 
                     if (guide.examples.isNotEmpty()) {
                         Spacer(Modifier.height(16.dp))
-                        Text("Examples", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                        Text(stringResource(R.string.examples), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                         Spacer(Modifier.height(6.dp))
                         for (example in guide.examples) {
                             // The seed writes an example as "Albanian - English".

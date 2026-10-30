@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Generated from the iOS String Catalog by Scripts/sync_android_strings.py.
+  Do not hand edit: the English is deliberately identical to the iOS key so
+  both apps show the same copy and one native review covers both.
+-->
+<resources>
+    <string name="tab_learn">Mëso</string>
+    <string name="tab_words">Fjalë</string>
+    <string name="tab_grammar">Gramatikë</string>
+    <string name="tab_profile">Profili</string>
+    <string name="today">Sot</string>
+    <string name="day_streak">Ditë rresht</string>
+    <string name="total_xp">XP gjithsej</string>
+    <string name="words_seen">Fjalë të shikuara</string>
+    <string name="lessons_done">Mësime të kryera</string>
+    <string name="in_review">Në përsëritje</string>
+    <string name="mastered">Të zotëruara</string>
+    <string name="accuracy">Saktësia</string>
+    <string name="questions">Pyetje</string>
+    <string name="best_streak">Seria më e mirë</string>
+    <string name="correct">Saktë!</string>
+    <string name="near_miss">Pothuajse, kontrollo drejtshkrimin</string>
+    <string name="lesson_complete">Mësimi u përfundua!</string>
+    <string name="review_complete">Përsëritja u përfundua!</string>
+    <string name="out_of_hearts">Nuk ka më zemra!</string>
+    <string name="achievements">Arritjet</string>
+    <string name="daily_goal">Qëllimi ditor</string>
+    <string name="continue_action">Vazhdo</string>
+    <string name="check_action">Kontrollo</string>
+    <string name="back_to_lessons">Kthehu te mësimet</string>
+    <string name="start_learning">Nis mësimin</string>
+    <string name="examples">Shembuj</string>
+    <string name="practice_more">Praktiko më shumë për të forcuar kujtesën.</string>
+    <string name="exit_lesson">Dil nga mësimi</string>
+    <string name="daily_review">Përsëritja e ditës</string>
+    <string name="start_review">Nis përsëritjen</string>
+    <string name="search_words">Kërko fjalë...</string>
+    <string name="set_daily_goal">Caktoni qëllimin ditor</string>
+    <string name="goal_met">Qëllimi ditor u arrit</string>
+    <string name="locked_hint">Përfundoni të gjitha mësimet e mësipërme për ta zhbllokuar</string>
+    <string name="tagline">Mëso shqip. Ndjeje shqipen.</string>
+    <string name="next_up">Më pas: %1$s</string>
+    <string name="xp_of">%1$d/%2$d XP</string>
+    <string name="lessons_of">%1$d/%2$d mësime</string>
+    <string name="minutes_and_xp">%1$d min/ditë · %2$d XP</string>
+    <string name="ach_streak_3_title">Tri ditë rresht</string>
+    <string name="ach_streak_3_detail">Studioni tri ditë rresht.</string>
+    <string name="ach_streak_7_title">Një javë e plotë</string>
+    <string name="ach_streak_7_detail">Studioni shtatë ditë rresht.</string>
+    <string name="ach_streak_30_title">Një muaj shqip</string>
+    <string name="ach_streak_30_detail">Studioni tridhjetë ditë rresht.</string>
+    <string name="ach_streak_100_title">Njëqind ditë</string>
+    <string name="ach_streak_100_detail">Studioni njëqind ditë rresht.</string>
+    <string name="ach_lessons_1_title">Hapat e parë</string>
+    <string name="ach_lessons_1_detail">Përfundoni mësimin e parë.</string>
+    <string name="ach_lessons_10_title">Dhjetë mësime</string>
+    <string name="ach_lessons_10_detail">Përfundoni dhjetë mësime.</string>
+    <string name="ach_lessons_50_title">Në gjysmë të rrugës</string>
+    <string name="ach_lessons_50_detail">Përfundoni pesëdhjetë mësime.</string>
+    <string name="ach_xp_500_title">Pesëqind XP</string>
+    <string name="ach_xp_500_detail">Fitoni 500 XP gjithsej.</string>
+    <string name="ach_xp_2500_title">Përpjekje serioze</string>
+    <string name="ach_xp_2500_detail">Fitoni 2.500 XP gjithsej.</string>
+    <string name="ach_seen_100_title">Njëqind fjalë</string>
+    <string name="ach_seen_100_detail">Njihuni me 100 fjalë të ndryshme shqipe.</string>
+    <string name="ach_mastered_25_title">Njëzet e pesë të mbajtura</string>
+    <string name="ach_mastered_25_detail">Çojini 25 fjalë në intervalin afatgjatë të përsëritjes.</string>
+    <string name="ach_mastered_100_title">Njëqind të mbajtura</string>
+    <string name="ach_mastered_100_detail">Çojini 100 fjalë në intervalin afatgjatë të përsëritjes.</string>
+</resources>

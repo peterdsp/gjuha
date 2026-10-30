@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -42,7 +43,7 @@ fun WordsScreen(content: ContentRepository, progress: ProgressRepository) {
                 value = query,
                 onValueChange = { query = it },
                 singleLine = true,
-                label = { Text("Search your words") },
+                label = { Text(stringResource(R.string.search_words)) },
                 modifier = Modifier.fillMaxWidth().padding(16.dp),
             )
         }

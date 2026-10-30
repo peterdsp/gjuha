@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -46,14 +47,14 @@ fun OnboardingScreen(initial: LearningGoal, onFinished: (LearningGoal) -> Unit) 
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            "Let's learn Albanian together.",
+            stringResource(R.string.tagline),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
 
         Spacer(Modifier.height(40.dp))
         Text(
-            "How much time each day?",
+            stringResource(R.string.set_daily_goal),
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
         )
@@ -81,7 +82,7 @@ fun OnboardingScreen(initial: LearningGoal, onFinished: (LearningGoal) -> Unit) 
             onClick = { onFinished(selected) },
             modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
         ) {
-            Text("Start learning", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+Text(stringResource(R.string.start_learning), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
         }
         Spacer(Modifier.height(32.dp))
     }
@@ -111,7 +112,7 @@ private fun GoalRow(goal: LearningGoal, isSelected: Boolean, onSelect: () -> Uni
                     color = if (isSelected) GjuhaColors.OnAccent else MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
-                    "${goal.minutesPerDay} min a day  ·  ${goal.dailyXpGoal} XP",
+                    stringResource(R.string.minutes_and_xp, goal.minutesPerDay, goal.dailyXpGoal),
                     fontSize = 13.sp,
                     color = if (isSelected) {
                         GjuhaColors.OnAccent

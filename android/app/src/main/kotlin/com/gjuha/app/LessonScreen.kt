@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -203,7 +204,7 @@ private data class Feedback(
 @Composable
 private fun LessonHeader(progress: Float, hearts: Int?, combo: Int, onQuit: () -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        TextButton(onClick = onQuit) { Text("Close") }
+        TextButton(onClick = onQuit) { Text(stringResource(R.string.exit_lesson)) }
         LinearProgressIndicator(
             progress = { progress },
             modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
@@ -216,7 +217,7 @@ private fun LessonHeader(progress: Float, hearts: Int?, combo: Int, onQuit: () -
             Text("❤".repeat(hearts.coerceAtLeast(0)))
         } else {
             // A review shows what it is instead of a heart count it does not keep.
-            Text("Review", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.daily_review), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -275,7 +276,7 @@ private fun TypedAnswer(exercise: Exercise, enabled: Boolean, onAnswer: (String)
             enabled = enabled && typed.isNotBlank(),
             modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
         ) {
-            Text("Check")
+            Text(stringResource(R.string.check_action))
         }
     }
 }
@@ -316,7 +317,7 @@ private fun ArrangeAnswer(exercise: Exercise, enabled: Boolean, onAnswer: (Strin
             enabled = enabled && placed.isNotEmpty(),
             modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
         ) {
-            Text("Check")
+            Text(stringResource(R.string.check_action))
         }
     }
 }
@@ -381,8 +382,8 @@ private fun MatchAnswer(exercise: Exercise, enabled: Boolean, onAnswer: (String)
 @Composable
 private fun FeedbackBanner(feedback: Feedback) {
     val (container, title) = when (feedback.grade) {
-        AnswerGrade.CORRECT -> GjuhaColors.Success to "Correct!"
-        AnswerGrade.NEAR_MISS -> GjuhaColors.Streak to "Almost, check the spelling"
+        AnswerGrade.CORRECT -> GjuhaColors.Success to stringResource(R.string.correct)
+        AnswerGrade.NEAR_MISS -> GjuhaColors.Streak to stringResource(R.string.near_miss)
         AnswerGrade.INCORRECT -> GjuhaColors.Error to "Not quite..."
     }
     Card(colors = CardDefaults.cardColors(containerColor = container)) {
@@ -420,7 +421,7 @@ private fun LessonComplete(
         Text("⭐", fontSize = 56.sp)
         Spacer(Modifier.height(16.dp))
         Text(
-            if (isReview) "Review complete!" else "Lesson complete!",
+            stringResource(if (isReview) R.string.review_complete else R.string.lesson_complete),
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
         )
@@ -430,16 +431,16 @@ private fun LessonComplete(
             // Omitted rather than shown as zero when nothing was graded, so the
             // screen never states an accuracy that was not measured.
             accuracy?.let {
-                SummaryTile("Accuracy", "${(it * 100).toInt()}%")
+                SummaryTile(stringResource(R.string.accuracy), "${(it * 100).toInt()}%")
             }
-            SummaryTile("Questions", answered.toString())
-            if (bestCombo >= 2) SummaryTile("Best streak", "${bestCombo}x")
+            SummaryTile(stringResource(R.string.questions), answered.toString())
+            if (bestCombo >= 2) SummaryTile(stringResource(R.string.best_streak), "${bestCombo}x")
         }
         Spacer(Modifier.height(32.dp))
         Button(
             onClick = onContinue,
             modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
-        ) { Text("Continue") }
+        ) { Text(stringResource(R.string.continue_action)) }
     }
 }
 
@@ -465,16 +466,16 @@ private fun OutOfHearts(onQuit: () -> Unit) {
     ) {
         Text("💔", fontSize = 56.sp)
         Spacer(Modifier.height(16.dp))
-        Text("Out of hearts", fontSize = 22.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.out_of_hearts), fontSize = 22.sp, fontWeight = FontWeight.Bold)
         Text(
-            "Practice more to strengthen your memory.",
+            stringResource(R.string.practice_more),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(24.dp))
         // No XP is banked. A lesson that was not finished earns nothing, so a
         // count can never be inflated by starting one repeatedly.
-        Button(onClick = onQuit) { Text("Back to lessons") }
+        Button(onClick = onQuit) { Text(stringResource(R.string.back_to_lessons)) }
     }
 }
 

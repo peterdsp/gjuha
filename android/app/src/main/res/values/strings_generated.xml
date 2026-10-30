@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Generated from the iOS String Catalog by Scripts/sync_android_strings.py.
+  Do not hand edit: the English is deliberately identical to the iOS key so
+  both apps show the same copy and one native review covers both.
+-->
+<resources>
+    <string name="tab_learn">Learn</string>
+    <string name="tab_words">Words</string>
+    <string name="tab_grammar">Grammar</string>
+    <string name="tab_profile">Profile</string>
+    <string name="today">Today</string>
+    <string name="day_streak">Day streak</string>
+    <string name="total_xp">Total XP</string>
+    <string name="words_seen">Words seen</string>
+    <string name="lessons_done">Lessons Done</string>
+    <string name="in_review">In review</string>
+    <string name="mastered">Mastered</string>
+    <string name="accuracy">Accuracy</string>
+    <string name="questions">Questions</string>
+    <string name="best_streak">Best streak</string>
+    <string name="correct">Correct!</string>
+    <string name="near_miss">Almost, check the spelling</string>
+    <string name="lesson_complete">Lesson complete!</string>
+    <string name="review_complete">Review complete!</string>
+    <string name="out_of_hearts">Out of hearts!</string>
+    <string name="achievements">Achievements</string>
+    <string name="daily_goal">Daily Goal</string>
+    <string name="continue_action">Continue</string>
+    <string name="check_action">Check</string>
+    <string name="back_to_lessons">Back to lessons</string>
+    <string name="start_learning">Start learning</string>
+    <string name="examples">Examples</string>
+    <string name="practice_more">Practice more to strengthen your memory.</string>
+    <string name="exit_lesson">Exit lesson</string>
+    <string name="daily_review">Daily review</string>
+    <string name="start_review">Start Review</string>
+    <string name="search_words">Search words...</string>
+    <string name="set_daily_goal">Set your daily goal</string>
+    <string name="goal_met">Daily goal met</string>
+    <string name="locked_hint">Complete all lessons above to unlock</string>
+    <string name="tagline">Learn Albanian. Feel Albanian.</string>
+    <string name="next_up">Next: %1$s</string>
+    <string name="xp_of">%1$d/%2$d XP</string>
+    <string name="lessons_of">%1$d/%2$d lessons</string>
+    <string name="minutes_and_xp">%1$d min/day · %2$d XP</string>
+    <string name="ach_streak_3_title">Three in a row</string>
+    <string name="ach_streak_3_detail">Study three days in a row.</string>
+    <string name="ach_streak_7_title">A full week</string>
+    <string name="ach_streak_7_detail">Study seven days in a row.</string>
+    <string name="ach_streak_30_title">A month of Albanian</string>
+    <string name="ach_streak_30_detail">Study thirty days in a row.</string>
+    <string name="ach_streak_100_title">One hundred days</string>
+    <string name="ach_streak_100_detail">Study one hundred days in a row.</string>
+    <string name="ach_lessons_1_title">First steps</string>
+    <string name="ach_lessons_1_detail">Finish your first lesson.</string>
+    <string name="ach_lessons_10_title">Ten lessons in</string>
+    <string name="ach_lessons_10_detail">Finish ten lessons.</string>
+    <string name="ach_lessons_50_title">Halfway to fluent</string>
+    <string name="ach_lessons_50_detail">Finish fifty lessons.</string>
+    <string name="ach_xp_500_title">Five hundred XP</string>
+    <string name="ach_xp_500_detail">Earn 500 XP in total.</string>
+    <string name="ach_xp_2500_title">Serious effort</string>
+    <string name="ach_xp_2500_detail">Earn 2,500 XP in total.</string>
+    <string name="ach_seen_100_title">A hundred words</string>
+    <string name="ach_seen_100_detail">Meet 100 different Albanian words.</string>
+    <string name="ach_mastered_25_title">Twenty-five kept</string>
+    <string name="ach_mastered_25_detail">Carry 25 words to the long-term review interval.</string>
+    <string name="ach_mastered_100_title">One hundred kept</string>
+    <string name="ach_mastered_100_detail">Carry 100 words to the long-term review interval.</string>
+</resources>

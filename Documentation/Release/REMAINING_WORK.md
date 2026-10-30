@@ -119,6 +119,19 @@ the larger remaining half by volume, though the smaller by risk: the rules that
 are hard to get right and expensive to get wrong are the ones already ported and
 under test.
 
+**Localization.** The Android resources are generated from the iOS String
+Catalog by `Scripts/sync_android_strings.py`, so both apps show the same copy
+and one native review covers both. CI fails if they drift. The same
+`needs_review` caveat applies: the Albanian is machine-assisted and unread by a
+native speaker.
+
+**A shared limitation, true on both platforms.** The exercise prompts
+("What does 'X' mean?", "Type in Albanian") are built by interpolation inside
+the exercise engine rather than taken from a catalog, so they ship in English
+even when the interface is Albanian. `check_localization.py` cannot see them,
+because they never reach the compiler's extracted strings. Fixing it means
+giving the engine a string provider on both sides.
+
 **One known divergence, deliberately not papered over.** `LessonVocabulary`
 derives a lesson's words from the seed, while iOS keeps an explicit 120 entry
 table in `ExerciseEngine`. These are different rules, so the tests assert only

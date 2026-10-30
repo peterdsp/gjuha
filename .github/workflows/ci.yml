@@ -178,6 +178,15 @@ jobs:
           fi
           echo "No em-dash found."
 
+      - name: Android strings match the iOS catalog
+        run: |
+          set -euo pipefail
+          # Both apps show the same copy and share one native review, so the
+          # Android resources are generated from the iOS String Catalog rather
+          # than translated twice. This fails if they have drifted, which would
+          # mean a correction made on iOS never reached Android.
+          python3 Scripts/sync_android_strings.py --check
+
       - name: Bundled seed content decodes and its references resolve
         run: |
           set -euo pipefail

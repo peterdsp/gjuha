@@ -15,6 +15,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -135,7 +136,7 @@ private fun GjuhaApp(content: ContentRepository, progress: ProgressRepository) {
                     NavigationBarItem(
                         selected = screen == tab,
                         onClick = { screen = tab },
-                        label = { Text(tab.title) },
+                        label = { Text(stringResource(tab.title)) },
                         icon = { Text(tab.glyph, fontSize = 18.sp) },
                     )
                 }
@@ -162,12 +163,12 @@ private fun GjuhaApp(content: ContentRepository, progress: ProgressRepository) {
 
 // MARK: - Learn
 
-private val Screen.title: String
+private val Screen.title: Int
     get() = when (this) {
-        Screen.LEARN -> "Learn"
-        Screen.WORDS -> "Words"
-        Screen.GRAMMAR -> "Grammar"
-        Screen.PROFILE -> "Profile"
+        Screen.LEARN -> R.string.tab_learn
+        Screen.WORDS -> R.string.tab_words
+        Screen.GRAMMAR -> R.string.tab_grammar
+        Screen.PROFILE -> R.string.tab_profile
     }
 
 private val Screen.glyph: String
@@ -215,7 +216,7 @@ private fun LearnScreen(
                         Spacer(Modifier.height(4.dp))
                         val done = lessons.count { l -> l.id in completed }
                         Text(
-                            "$done/${lessons.size} lessons",
+                            stringResource(R.string.lessons_of, done, lessons.size),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 13.sp,
                         )
@@ -256,7 +257,7 @@ private fun ReviewCard(dueCount: Int, onStart: () -> Unit) {
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(
-                    "Review",
+                    stringResource(R.string.daily_review),
                     fontWeight = FontWeight.Bold,
                     color = GjuhaColors.OnAccent,
                 )
@@ -281,9 +282,9 @@ private fun HeaderCard(stats: UserStats) {
         ) {
             Metric("🔥", stats.currentStreak.toString(), streakStrong())
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Today", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.today), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(
-                    "${stats.xpToday}/${stats.dailyGoalXp} XP",
+                    stringResource(R.string.xp_of, stats.xpToday, stats.dailyGoalXp),
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
                 )
@@ -364,7 +365,7 @@ private fun ProfileScreen(
         item {
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(16.dp)) {
-                    Text("Today", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Text(stringResource(R.string.today), fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     Spacer(Modifier.height(8.dp))
                     LinearProgressIndicator(
                         progress = { stats.dailyGoalProgress.toFloat() },
@@ -373,7 +374,7 @@ private fun ProfileScreen(
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        "${stats.xpToday}/${stats.dailyGoalXp} XP",
+                        stringResource(R.string.xp_of, stats.xpToday, stats.dailyGoalXp),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 13.sp,
                     )
@@ -386,27 +387,27 @@ private fun ProfileScreen(
         // them is the overstatement this app exists to avoid.
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                StatTile("Day streak", stats.currentStreak, Modifier.weight(1f))
-                StatTile("Total XP", stats.totalXp, Modifier.weight(1f))
+                StatTile(stringResource(R.string.day_streak), stats.currentStreak, Modifier.weight(1f))
+                StatTile(stringResource(R.string.total_xp), stats.totalXp, Modifier.weight(1f))
             }
         }
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                StatTile("Words seen", stats.wordsSeen, Modifier.weight(1f))
-                StatTile("Lessons done", stats.lessonsCompleted, Modifier.weight(1f))
+                StatTile(stringResource(R.string.words_seen), stats.wordsSeen, Modifier.weight(1f))
+                StatTile(stringResource(R.string.lessons_done), stats.lessonsCompleted, Modifier.weight(1f))
             }
         }
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                StatTile("In review", stats.wordsPracticed, Modifier.weight(1f))
-                StatTile("Mastered", stats.wordsMastered, Modifier.weight(1f))
+                StatTile(stringResource(R.string.in_review), stats.wordsPracticed, Modifier.weight(1f))
+                StatTile(stringResource(R.string.mastered), stats.wordsMastered, Modifier.weight(1f))
             }
         }
 
         // The goal is changeable, because onboarding promised it would be.
         item {
             Text(
-                "Daily goal",
+                stringResource(R.string.daily_goal),
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
                 modifier = Modifier.padding(top = 8.dp),
@@ -429,14 +430,16 @@ private fun ProfileScreen(
                         ) {
                             RadioButton(selected = option == goal, onClick = null)
                             Spacer(Modifier.width(12.dp))
+                            // One string, because the minutes and the XP are
+                            // the same fact said two ways and a translator
+                            // needs them together to order them naturally.
                             Text(
-                                "${option.minutesPerDay} min a day",
+                                stringResource(
+                                    R.string.minutes_and_xp,
+                                    option.minutesPerDay,
+                                    option.dailyXpGoal,
+                                ),
                                 modifier = Modifier.weight(1f),
-                            )
-                            Text(
-                                "${option.dailyXpGoal} XP",
-                                fontSize = 13.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     }
@@ -446,7 +449,7 @@ private fun ProfileScreen(
 
         item {
             Text(
-                "Achievements  ${unlocked.size}/${AchievementCatalog.all.size}",
+                "${stringResource(R.string.achievements)}  ${unlocked.size}/${AchievementCatalog.all.size}",
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
                 modifier = Modifier.padding(top = 8.dp),
@@ -460,13 +463,15 @@ private fun ProfileScreen(
                     Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) {
                         Text(
-                            achievement.title,
+                            AchievementStrings.title(achievement)
+                                ?.let { stringResource(it) } ?: achievement.title,
                             fontWeight = FontWeight.SemiBold,
                             color = if (isUnlocked) MaterialTheme.colorScheme.onSurface
                             else MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Text(
-                            achievement.detail,
+                            AchievementStrings.detail(achievement)
+                                ?.let { stringResource(it) } ?: achievement.detail,
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )

@@ -8,6 +8,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -67,6 +69,10 @@ private fun GjuhaApp(content: ContentRepository, progress: ProgressRepository) {
     var openLesson by remember { mutableStateOf<SeedLesson?>(null) }
     var inReview by remember { mutableStateOf(false) }
     var onboarded by remember { mutableStateOf(progress.hasCompletedOnboarding) }
+    val mapState = rememberLazyListState()
+    // Positioned once per launch. Doing it on every visit would fight a learner
+    // who deliberately scrolled somewhere else.
+    var mapPositioned by remember { mutableStateOf(false) }
     // Bumped whenever progress changes, so the screens re-read their figures.
     var revision by remember { mutableIntStateOf(0) }
 
@@ -164,6 +170,9 @@ private fun GjuhaApp(content: ContentRepository, progress: ProgressRepository) {
                     stats = stats,
                     completed = completed,
                     dueCount = dueCount,
+                    listState = mapState,
+                    hasPositioned = mapPositioned,
+                    onPositioned = { mapPositioned = true },
                     onStartReview = { inReview = true },
                     onOpen = { openLesson = it },
                 )
@@ -199,6 +208,9 @@ private fun LearnScreen(
     stats: UserStats,
     completed: Set<String>,
     dueCount: Int,
+    listState: LazyListState,
+    hasPositioned: Boolean,
+    onPositioned: () -> Unit,
     onStartReview: () -> Unit,
     onOpen: (SeedLesson) -> Unit,
 ) {
@@ -208,7 +220,52 @@ private fun LearnScreen(
     val units = remember { content.units.sortedBy { it.unit } }
     val lessonsByUnit = remember(units) { units.associateWith { content.lessons(it) } }
 
+    // Where the learner actually is: the first lesson they can take and have
+    // not finished. Null once the whole course is done.
+    val currentLessonId = remember(completed, units) {
+        units.asSequence()
+            .flatMap { lessonsByUnit[it].orEmpty().asSequence() }
+            .firstOrNull { lesson ->
+                lesson.id !in completed &&
+                    lesson.unlock.requiresLessonIds.all { it in completed }
+            }
+            ?.id
+    }
+
+    // Its row index, counted through the same structure the list is built from,
+    // so the two cannot disagree about what sits where.
+    val currentIndex = remember(currentLessonId, dueCount, units) {
+        if (currentLessonId == null) {
+            -1
+        } else {
+            var index = 1 + if (dueCount > 0) 1 else 0
+            var found = -1
+            loop@ for (unit in units) {
+                index++
+                for (lesson in lessonsByUnit[unit].orEmpty()) {
+                    if (lesson.id == currentLessonId) {
+                        found = index
+                        break@loop
+                    }
+                    index++
+                }
+            }
+            found
+        }
+    }
+
+    // Opening a hundred and twenty lessons at the top means scrolling past
+    // everything already done. This only became a problem when the map started
+    // showing the whole course rather than the first unit.
+    LaunchedEffect(currentIndex) {
+        if (!hasPositioned && currentIndex > 0) {
+            listState.scrollToItem(currentIndex)
+            onPositioned()
+        }
+    }
+
     LazyColumn(
+        state = listState,
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),

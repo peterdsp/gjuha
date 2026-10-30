@@ -99,10 +99,22 @@ final class GjuhaUITests: XCTestCase {
 
     /// Scrolls an off-screen control into view. Profile in particular is longer
     /// than one screen, so the reset control sits below the fold.
-    private func scrollIntoView(_ element: XCUIElement, maxSwipes: Int = 8) {
+    private func scrollIntoView(_ element: XCUIElement, maxSwipes: Int = 24) {
         let scrollView = XCUIApplication().scrollViews.firstMatch
         let scroller: XCUIElement = scrollView.exists ? scrollView : XCUIApplication()
+
+        // Stops on whichever comes first: the element is reachable, or the
+        // screen stopped moving because there is nothing left to scroll.
+        //
+        // A fixed number of swipes was enough at the default text size and not
+        // at the largest one, where everything above the target is two or three
+        // times taller. That failed as "the element never appeared", which
+        // reads like a missing view rather than a scroll that gave up early.
+        var previous = ""
         for _ in 0..<maxSwipes where !canBeTapped(element) {
+            let current = scroller.debugDescription
+            if current == previous { return }
+            previous = current
             scroller.swipeUp()
             // Let the swipe settle, so the next check reads a laid out frame
             // rather than one mid animation.

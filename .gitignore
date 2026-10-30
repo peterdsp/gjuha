@@ -103,3 +103,6 @@ android/build/
 android/*/build/
 android/local.properties
 AndroidScreenshots/
+android/keystore.properties
+*.jks
+*.keystore

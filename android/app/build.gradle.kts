@@ -1,8 +1,24 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     kotlin("android")
     id("org.jetbrains.kotlin.plugin.compose")
 }
+
+/**
+ * Release signing, read from a file that is never committed.
+ *
+ * `android/keystore.properties` holds the key details and is gitignored, as is
+ * the keystore itself. Absent, the release build is simply unsigned rather
+ * than failing, so CI and anyone without the key can still build and verify
+ * the app. Only the person holding the key can produce something installable.
+ */
+val keystoreProperties = Properties().apply {
+    val file = rootProject.file("keystore.properties")
+    if (file.exists()) file.inputStream().use(::load)
+}
+val hasSigningKey = keystoreProperties.getProperty("storeFile") != null
 
 android {
     namespace = "com.gjuha.app"
@@ -16,8 +32,34 @@ android {
         versionName = "1.0.0"
     }
 
+    signingConfigs {
+        if (hasSigningKey) {
+            create("release") {
+                storeFile = rootProject.file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            // Shrinking is on, so the rules in proguard-rules.pro are load
+            // bearing rather than decorative. The learning domain is driven by
+            // reflection through kotlinx-serialization, which R8 cannot see.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+            if (hasSigningKey) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+        }
+        debug {
+            // Kept off for debug so a crash points at real code.
             isMinifyEnabled = false
         }
     }

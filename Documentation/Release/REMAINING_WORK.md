@@ -6,8 +6,9 @@ answer instead of being spread across four documents.
 
 Status of the tree as this was written: build clean with no warnings, 149 unit
 tests in 19 suites and 8 UI tests passing on an iPhone and on a 13" iPad at the
-iOS 26 deployment floor, 65 Kotlin tests for the Android domain, localization
-and seed checks clean, every measured colour pair at or above 4.5:1.
+iOS 26 deployment floor, 100 Kotlin tests for Android, localization and seed
+checks clean, every measured colour pair at or above 4.5:1. CI runs all of it,
+both platforms, on every push.
 
 The sections are ordered by who is blocked. Nothing in section 1 can be
 unblocked by writing code, and within it the hard blockers are separated from the
@@ -99,25 +100,38 @@ Not a release gate for the iOS app, and recorded here because "the same app on
 both platforms" is the stated goal and it is now underway rather than
 hypothetical.
 
-**What exists.** `android/core` is a plain Kotlin library holding the whole
-learning domain, ported with parity tests asserting the same facts the Swift
-suite does: answer grading including the rule that Albanian diacritics are
-required, the SM-2 scheduler with its ease bounds and its 21 day mastery
-threshold, the daily XP goal and its read-time rollover, the achievement
-catalogue with ids matching iOS exactly because they are persisted, and the
-exercise engine including the distractor rules that keep a question answerable.
-65 Kotlin tests, run with `./gradlew :core:test` under OpenJDK 21.
+**The app runs, and does what the iOS app does.** `android/core` is a plain
+Kotlin library holding the learning domain, ported with parity tests asserting
+the same facts the Swift suite does: answer grading including the rule that
+Albanian diacritics are required, the SM-2 scheduler with its ease bounds and
+its 21 day mastery threshold, the daily XP goal and its read-time rollover, the
+achievement catalogue with ids matching iOS exactly because they are persisted,
+and the exercise engine including the distractor rules that keep a question
+answerable. 100 Kotlin tests, run with `./gradlew :core:test` under OpenJDK 21,
+and in CI on every push.
 
-**Content is not duplicated.** The Kotlin tests read the same seed under
-`Gjuha/Data/Seed/` that the iOS app ships, and assert the figures
-`validate_seed.py` prints. The Android app will copy that seed into assets
-rather than keep a second copy, so a word cannot say one thing on iPhone and
-another on Android.
+`android/app` is a Compose app on top of it: onboarding with the daily goal,
+the lesson map, a lesson session, the spaced repetition review loop, the words
+and grammar screens, the profile with its honest vocabulary ladder, a settings
+control for the goal, and a Glance home screen widget.
 
-**What does not exist yet.** The Android app module and its Compose UI. That is
-the larger remaining half by volume, though the smaller by risk: the rules that
-are hard to get right and expensive to get wrong are the ones already ported and
-under test.
+**Content is not duplicated.** A Gradle task copies `Gjuha/Data/Seed/` into the
+Android assets at build time and fails loudly if it is missing, so there is one
+file to edit and a word cannot say one thing on iPhone and another on Android.
+The Kotlin tests read that same seed and assert the figures `validate_seed.py`
+prints.
+
+**What does not exist yet.** A screenshot pass, a signed release build, and a
+Play Store listing. None of that is a code problem.
+
+**What was checked by running it, not by reading it.** Playing the opening
+lesson on an emulator produces the same +97 XP at 100% accuracy that the same
+lesson produces on iOS. The near miss rule names the missing diacritics on
+device. A review runs all its due words with no hearts and reschedules each one
+as it is answered, banking XP without completing a lesson. Killing the app part
+way through a lesson and reopening it returns the same questions with their
+options in the same order. A schedule written in the previous storage format
+still loads after an upgrade.
 
 **Localization.** The Android resources are generated from the iOS String
 Catalog by `Scripts/sync_android_strings.py`, so both apps show the same copy
@@ -138,6 +152,10 @@ table in `ExerciseEngine`. These are different rules, so the tests assert only
 what is true of both: every lesson gets words, none are orphaned, the mapping is
 stable. Making them identical means moving the iOS table into the seed, which is
 the right next step.
+
+**Two differences that are not divergence.** Android has no cultural or dialect
+content and no Siri equivalent. Both are iOS features held behind the same
+native review gate as the Albanian strings, so there is nothing to port yet.
 
 ---
 

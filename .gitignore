@@ -96,3 +96,9 @@ content/generated/
 # Generated App Store screenshots. Regenerate with Scripts/capture_screenshots.sh
 # rather than committing ~14 MB of PNGs that any checkout can rebuild.
 AppStoreScreenshots/
+
+# Android build outputs
+android/.gradle/
+android/build/
+android/*/build/
+android/local.properties

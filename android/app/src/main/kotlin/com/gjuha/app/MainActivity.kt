@@ -98,12 +98,12 @@ private fun GjuhaApp(content: ContentRepository, progress: ProgressRepository) {
             progress = progress,
             onFinished = { xp ->
                 // Banks XP and counts the day, but completes no lesson and
-                // unlocks nothing: the words were rescheduled as they were
-                // answered.
+                // advances nothing in the course: the words were rescheduled
+                // as they were answered.
                 progress.recordReviewActivity(xp)
-                progress.recordUnlocks()
+                val unlocked = progress.recordUnlocks()
                 revision++
-                inReview = false
+                unlocked.mapNotNull { AchievementCatalog.achievement(it) }
             },
             onQuit = {
                 // Outcomes were recorded per answer, so leaving early keeps
@@ -122,9 +122,9 @@ private fun GjuhaApp(content: ContentRepository, progress: ProgressRepository) {
             content = content,
             onFinished = { xp, wordIds ->
                 progress.completeLesson(lesson.id, xp, wordIds)
-                progress.recordUnlocks()
+                val unlocked = progress.recordUnlocks()
                 revision++
-                openLesson = null
+                unlocked.mapNotNull { AchievementCatalog.achievement(it) }
             },
             onQuit = { openLesson = null },
         )

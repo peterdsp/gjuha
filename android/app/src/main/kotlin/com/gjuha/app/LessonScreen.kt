@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gjuha.core.Achievement
 import com.gjuha.core.AnswerGrade
 import com.gjuha.core.AnswerNormalizer
 import com.gjuha.core.Exercise
@@ -45,7 +46,7 @@ import kotlinx.coroutines.delay
 fun LessonScreen(
     lesson: SeedLesson,
     content: ContentRepository,
-    onFinished: (xpEarned: Int, wordIds: List<String>) -> Unit,
+    onFinished: (xpEarned: Int, wordIds: List<String>) -> List<Achievement>,
     onQuit: () -> Unit,
 ) {
     val lessonWords = remember(lesson.id) { content.wordsFor(lesson) }
@@ -81,7 +82,7 @@ fun LessonScreen(
 fun ReviewScreen(
     content: ContentRepository,
     progress: ProgressRepository,
-    onFinished: (xpEarned: Int) -> Unit,
+    onFinished: (xpEarned: Int) -> List<Achievement>,
     onQuit: () -> Unit,
 ) {
     val session = remember {
@@ -107,10 +108,14 @@ private fun LessonSession(
     exercises: List<Exercise>,
     wordIdByIndex: Map<Int, String>,
     onReviewOutcome: ((String, ReviewGrade) -> Unit)?,
-    onFinished: (xpEarned: Int) -> Unit,
+    onFinished: (xpEarned: Int) -> List<Achievement>,
     onQuit: () -> Unit,
 ) {
     val isReview = onReviewOutcome != null
+    // Recorded once, when the session ends rather than when the learner taps
+    // Continue, so what was earned can be shown on the screen that announces
+    // it. Guarded because a recomposition must not bank the XP twice.
+    var earned by remember { mutableStateOf<List<Achievement>?>(null) }
 
     var index by remember { mutableIntStateOf(0) }
     var hearts by remember { mutableIntStateOf(3) }
@@ -140,14 +145,20 @@ private fun LessonSession(
     when {
         exercises.isEmpty() -> EmptyLesson(onQuit)
         failed -> OutOfHearts(onQuit)
-        finished -> LessonComplete(
-            xp = xp,
-            accuracy = if (answered == 0) null else correctCount.toDouble() / answered,
-            answered = answered,
-            bestCombo = bestCombo,
-            isReview = isReview,
-            onContinue = { onFinished(xp) },
-        )
+        finished -> {
+            LaunchedEffect(Unit) {
+                if (earned == null) earned = onFinished(xp)
+            }
+            LessonComplete(
+                xp = xp,
+                accuracy = if (answered == 0) null else correctCount.toDouble() / answered,
+                answered = answered,
+                bestCombo = bestCombo,
+                isReview = isReview,
+                unlocked = earned.orEmpty(),
+                onContinue = onQuit,
+            )
+        }
         else -> {
             val exercise = exercises[index]
             Column(Modifier.fillMaxSize().padding(16.dp)) {
@@ -467,6 +478,7 @@ private fun LessonComplete(
     answered: Int,
     bestCombo: Int,
     isReview: Boolean,
+    unlocked: List<Achievement>,
     onContinue: () -> Unit,
 ) {
     Column(
@@ -492,6 +504,40 @@ private fun LessonComplete(
             SummaryTile(stringResource(R.string.questions), answered.toString())
             if (bestCombo >= 2) SummaryTile(stringResource(R.string.best_streak), "${bestCombo}x")
         }
+        // A badge earned here is announced here. Otherwise the only way to
+        // find out is to happen to open the profile later, by which point it
+        // is no longer connected to what earned it.
+        if (unlocked.isNotEmpty()) {
+            Spacer(Modifier.height(24.dp))
+            for (achievement in unlocked) {
+                Card(
+                    Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                    colors = CardDefaults.cardColors(containerColor = GjuhaColors.Success),
+                ) {
+                    Row(
+                        Modifier.fillMaxWidth().padding(14.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text("\uD83C\uDFC5", fontSize = 22.sp)
+                        Spacer(Modifier.width(12.dp))
+                        Column {
+                            Text(
+                                stringResource(R.string.achievement_unlocked),
+                                fontSize = 12.sp,
+                                color = GjuhaColors.OnAccent,
+                            )
+                            Text(
+                                AchievementStrings.title(achievement)
+                                    ?.let { stringResource(it) } ?: achievement.title,
+                                fontWeight = FontWeight.Bold,
+                                color = GjuhaColors.OnAccent,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
         Spacer(Modifier.height(32.dp))
         Button(
             onClick = onContinue,

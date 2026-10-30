@@ -46,6 +46,7 @@
     <string name="minutes_and_xp">%1$d min/day · %2$d XP</string>
     <string name="a11y_matched">matched</string>
     <string name="a11y_not_matched">not matched</string>
+    <string name="achievement_unlocked">New achievement</string>
     <string name="a11y_hearts_remaining">Hearts remaining</string>
     <string name="a11y_lesson_progress">Lesson progress</string>
     <string name="a11y_unlocked">Unlocked</string>

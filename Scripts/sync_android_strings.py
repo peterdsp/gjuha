@@ -76,6 +76,7 @@ MAPPING = [
     # same thing on both platforms, in both languages.
     ("a11y_matched", "matched", "matched"),
     ("a11y_not_matched", "not matched", "not matched"),
+    ("achievement_unlocked", "New achievement", "New achievement"),
     ("a11y_hearts_remaining", "Hearts remaining", "Hearts remaining"),
     ("a11y_lesson_progress", "Lesson progress", "Lesson progress"),
     ("a11y_unlocked", "Unlocked", "Unlocked"),

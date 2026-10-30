@@ -343,10 +343,24 @@ private struct ExerciseView: View {
 
     var body: some View {
         VStack(spacing: 24) {
+            // The question is the screen. It is the most read text in the app
+            // and the place a learner meets the diacritics, so it is set as a
+            // statement rather than as a caption above the answers: left
+            // aligned on the same margin the options use, tracking pulled in
+            // the way display type wants, and leading tightened so two lines
+            // read as one block.
+            //
+            // Tracking is applied here and not in the font token because it is
+            // a display treatment: the same face at body size is left at its
+            // natural tracking, where an Albanian word carrying two diacritics
+            // needs the room.
             Text(exercise.prompt)
                 .font(.gjuha.exercisePrompt)
+                .gjuhaDisplayTracking(-0.8)
+                .lineSpacing(-2)
                 .foregroundStyle(Color.gjuha.textPrimary)
-                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .multilineTextAlignment(.leading)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, 24)
                 .padding(.top, 32)

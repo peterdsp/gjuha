@@ -16,35 +16,48 @@ import androidx.compose.ui.graphics.Color
  * surface measures 1.76:1, which is why [XpStrong] exists at all.
  */
 object GjuhaColors {
-    // Fills, each measured to carry white at 4.5:1 or better.
-    val Accent = Color(0xFFD63129)
-    val AccentDark = Color(0xFFD6322B)
-    val Streak = Color(0xFFC44905)
-    val Success = Color(0xFF16824A)
-    val Error = Color(0xFFD12320)
+    // Generated from Gjuha/Resources/Palette.xcassets by
+    // Scripts/sync_android_colors.py. Do not hand edit.
+    //
+    // Colour has one source, the iOS catalog, because that is where the
+    // contrast of every rendered pair is measured. These were previously typed
+    // in by hand, which is a second source waiting to drift with nothing to
+    // report it.
+    //
+    // The role split carries over: a fill carries OnAccent or OnWarning, and a
+    // *Strong member is for text or an icon drawn on a surface. Gold as text on
+    // a white surface measures 1.76:1, which is why XPStrong exists at all.
 
-    // On-surface members, for text and icons.
-    val AccentStrong = Color(0xFFB8221C)
-    val AccentStrongDark = Color(0xFFFF746B)
-    val StreakStrong = Color(0xFFAA4300)
-    val StreakStrongDark = Color(0xFFFFA654)
-    val XpStrong = Color(0xFF926300)
-    val XpStrongDark = Color(0xFFFFD666)
-    val SuccessStrong = Color(0xFF0E7440)
-    val SuccessStrongDark = Color(0xFF66DE99)
-
-    // Surfaces.
-    val Background = Color(0xFFF5F4F3)
-    val BackgroundDark = Color(0xFF101012)
-    val Surface = Color(0xFFFFFFFF)
-    val SurfaceDark = Color(0xFF1E1E22)
-    val TextPrimary = Color(0xFF1A1A1E)
-    val TextPrimaryDark = Color(0xFFF3F3F5)
-    val TextSecondary = Color(0xFF66666B)
-    val TextSecondaryDark = Color(0xFF94949A)
-
+    val Accent = Color(0xFFB4211A)
+    val AccentDark = Color(0xFFBA261E)
+    val AccentStrong = Color(0xFF9D1712)
+    val AccentStrongDark = Color(0xFFFF7A6E)
+    val Streak = Color(0xFFBE4E0F)
+    val StreakDark = Color(0xFFBE4E0F)
+    val StreakStrong = Color(0xFFA54706)
+    val StreakStrongDark = Color(0xFFFFA253)
+    val Xp = Color(0xFFFAB01A)
+    val XpDark = Color(0xFFFFC02D)
+    val XpStrong = Color(0xFF8C5D00)
+    val XpStrongDark = Color(0xFFFFD066)
+    val Success = Color(0xFF127048)
+    val SuccessDark = Color(0xFF127048)
+    val SuccessStrong = Color(0xFF0D6640)
+    val SuccessStrongDark = Color(0xFF66D794)
+    val Error = Color(0xFFD63A21)
+    val ErrorDark = Color(0xFFD63A21)
+    val Background = Color(0xFFF7F5F1)
+    val BackgroundDark = Color(0xFF0F0E0D)
+    val Surface = Color(0xFFFFFEFC)
+    val SurfaceDark = Color(0xFF1C1A18)
+    val TextPrimary = Color(0xFF171513)
+    val TextPrimaryDark = Color(0xFFF5F3F0)
+    val TextSecondary = Color(0xFF635F5A)
+    val TextSecondaryDark = Color(0xFF98948F)
     val OnAccent = Color(0xFFFFFFFF)
-    val OnWarning = Color(0xFF1A1A1E)
+    val OnAccentDark = Color(0xFFFFFFFF)
+    val OnWarning = Color(0xFF171513)
+    val OnWarningDark = Color(0xFF171513)
 }
 
 private val LightScheme = lightColorScheme(

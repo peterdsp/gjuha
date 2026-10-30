@@ -15,8 +15,14 @@ extension Font {
 /// to the closest system text style, which sets the scaling curve.
 struct GjuhaFonts {
     // Display (hero screens, onboarding)
-    var displayLarge: Font { Self.scaled(48, .black, .rounded, relativeTo: .largeTitle) }
-    var displayMedium: Font { Self.scaled(36, .bold, .rounded, relativeTo: .largeTitle) }
+    //
+    // The art direction is the alphabet: the marks Albanian adds to the Latin
+    // one, and the nine digraphs that are single letters. So display type is
+    // set large enough for an `e` with a diaeresis to be a shape rather than a
+    // speck, and heavy enough that the mark has weight of its own.
+    var displayHero: Font { Self.scaled(64, .black, .rounded, relativeTo: .largeTitle) }
+    var displayLarge: Font { Self.scaled(52, .black, .rounded, relativeTo: .largeTitle) }
+    var displayMedium: Font { Self.scaled(38, .bold, .rounded, relativeTo: .largeTitle) }
 
     // Headings
     var headingLarge: Font { Self.scaled(28, .bold, .rounded, relativeTo: .title1) }
@@ -36,7 +42,11 @@ struct GjuhaFonts {
     var captionBold: Font { Self.scaled(12, .semibold, .default, relativeTo: .caption1) }
 
     // Exercise prompt (prominent)
-    var exercisePrompt: Font { Self.scaled(26, .semibold, .rounded, relativeTo: .title1) }
+    //
+    // The question is the most read text in the app, and it is where a learner
+    // meets the diacritics. It is set a step larger than a heading rather than
+    // a step smaller.
+    var exercisePrompt: Font { Self.scaled(30, .semibold, .rounded, relativeTo: .title1) }
 
     // Keyboard / answer option
     var answerOption: Font { Self.scaled(18, .medium, .rounded, relativeTo: .body) }
@@ -54,5 +64,18 @@ struct GjuhaFonts {
         let uiFont = UIFont(descriptor: descriptor, size: size)
         let scaled = UIFontMetrics(forTextStyle: textStyle).scaledFont(for: uiFont)
         return Font(scaled)
+    }
+}
+
+// MARK: - Display tracking
+
+extension View {
+    /// Tightens tracking for display type only.
+    ///
+    /// Large type sets loose, so the biggest sizes are pulled in. Body text is
+    /// left at its natural tracking: tightening it costs legibility and gains
+    /// nothing, and an Albanian word carrying two diacritics needs the room.
+    func gjuhaDisplayTracking(_ amount: CGFloat = -1.5) -> some View {
+        tracking(amount)
     }
 }

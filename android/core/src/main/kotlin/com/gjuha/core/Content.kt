@@ -63,6 +63,25 @@ data class SeedUnit(
  * know, and a stricter Android parser would turn a harmless additive change to
  * the seed into a crash on one platform only.
  */
+/**
+ * A grammar guide.
+ *
+ * [conjugationTable] is a grid of rows with the header first, stored as plain
+ * strings because the seed carries it that way and because a table that tries
+ * to be typed per part of speech stops fitting the next one.
+ */
+@Serializable
+data class SeedGrammar(
+    val id: String,
+    val title: String,
+    val subtitle: String = "",
+    val category: String = "",
+    val cefrLevel: String = "",
+    val explanation: String = "",
+    val examples: List<String> = emptyList(),
+    val conjugationTable: List<List<String>> = emptyList(),
+)
+
 object SeedContent {
 
     private val json = Json {
@@ -75,6 +94,8 @@ object SeedContent {
     fun lessons(raw: String): List<SeedLesson> = json.decodeFromString(raw)
 
     fun units(raw: String): List<SeedUnit> = json.decodeFromString(raw)
+
+    fun grammar(raw: String): List<SeedGrammar> = json.decodeFromString(raw)
 }
 
 /**

@@ -9,6 +9,7 @@ import com.gjuha.core.ReviewGrade
 import com.gjuha.core.ReviewItemState
 import com.gjuha.core.ReviewScheduler
 import com.gjuha.core.SeedContent
+import com.gjuha.core.SeedGrammar
 import com.gjuha.core.SeedLesson
 import com.gjuha.core.SeedUnit
 import com.gjuha.core.SeedWord
@@ -30,6 +31,7 @@ class ContentRepository(private val context: Context) {
     val words: List<SeedWord> by lazy { SeedContent.words(asset("Vocabulary/a1_vocabulary.json")) }
     val lessons: List<SeedLesson> by lazy { SeedContent.lessons(asset("lessons.json")) }
     val units: List<SeedUnit> by lazy { SeedContent.units(asset("units.json")) }
+    val grammar: List<SeedGrammar> by lazy { SeedContent.grammar(asset("Grammar/a1_grammar.json")) }
 
     fun wordsFor(lesson: SeedLesson): List<SeedWord> =
         LessonVocabulary.wordIds(lesson, words).mapNotNull { id -> words.firstOrNull { it.id == id } }
@@ -189,7 +191,10 @@ class ProgressRepository(context: Context) {
         )
     }
 
-    private fun wordsSeen(): Int = prefs.getStringSet("wordsSeen", emptySet()).orEmpty().size
+    private fun wordsSeen(): Int = seenWordIds().size
+
+    /** Ids of words the finished lessons have covered. */
+    fun seenWordIds(): Set<String> = prefs.getStringSet("wordsSeen", emptySet()).orEmpty()
 
     /**
      * Records a finished lesson: banks its XP once, counts the day for the

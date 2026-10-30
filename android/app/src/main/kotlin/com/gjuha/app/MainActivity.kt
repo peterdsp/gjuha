@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gjuha.core.AchievementCatalog
+import com.gjuha.core.LearningGoal
 import com.gjuha.core.Exercise
 import com.gjuha.core.ExerciseEngine
 import com.gjuha.core.ExerciseType
@@ -51,7 +52,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private enum class Screen { LEARN, PROFILE }
+private enum class Screen { LEARN, WORDS, GRAMMAR, PROFILE }
 
 @Composable
 private fun GjuhaApp(content: ContentRepository, progress: ProgressRepository) {
@@ -118,18 +119,16 @@ private fun GjuhaApp(content: ContentRepository, progress: ProgressRepository) {
     Scaffold(
         bottomBar = {
             NavigationBar {
-                NavigationBarItem(
-                    selected = screen == Screen.LEARN,
-                    onClick = { screen = Screen.LEARN },
-                    label = { Text("Learn") },
-                    icon = { Text("⚡", fontSize = 18.sp) },
-                )
-                NavigationBarItem(
-                    selected = screen == Screen.PROFILE,
-                    onClick = { screen = Screen.PROFILE },
-                    label = { Text("Profile") },
-                    icon = { Text("👤", fontSize = 18.sp) },
-                )
+                // The same four destinations as iOS, in the same order, so the
+                // two apps are not navigated differently.
+                for (tab in Screen.entries) {
+                    NavigationBarItem(
+                        selected = screen == tab,
+                        onClick = { screen = tab },
+                        label = { Text(tab.title) },
+                        icon = { Text(tab.glyph, fontSize = 18.sp) },
+                    )
+                }
             }
         },
     ) { padding ->
@@ -143,13 +142,31 @@ private fun GjuhaApp(content: ContentRepository, progress: ProgressRepository) {
                     onStartReview = { inReview = true },
                     onOpen = { openLesson = it },
                 )
-                Screen.PROFILE -> ProfileScreen(progress, stats)
+                Screen.WORDS -> WordsScreen(content, progress)
+                Screen.GRAMMAR -> GrammarScreen(content)
+                Screen.PROFILE -> ProfileScreen(progress, stats) { revision++ }
             }
         }
     }
 }
 
 // MARK: - Learn
+
+private val Screen.title: String
+    get() = when (this) {
+        Screen.LEARN -> "Learn"
+        Screen.WORDS -> "Words"
+        Screen.GRAMMAR -> "Grammar"
+        Screen.PROFILE -> "Profile"
+    }
+
+private val Screen.glyph: String
+    get() = when (this) {
+        Screen.LEARN -> "⚡"
+        Screen.WORDS -> "📖"
+        Screen.GRAMMAR -> "📚"
+        Screen.PROFILE -> "👤"
+    }
 
 @Composable
 private fun LearnScreen(
@@ -321,8 +338,13 @@ private fun LessonRow(lesson: SeedLesson, isDone: Boolean, isLocked: Boolean, on
 // MARK: - Profile
 
 @Composable
-private fun ProfileScreen(progress: ProgressRepository, stats: UserStats) {
+private fun ProfileScreen(
+    progress: ProgressRepository,
+    stats: UserStats,
+    onChanged: () -> Unit,
+) {
     val unlocked = remember(stats) { progress.unlockedAchievementIds() }
+    var goal by remember(stats) { mutableStateOf(progress.goal) }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -368,6 +390,47 @@ private fun ProfileScreen(progress: ProgressRepository, stats: UserStats) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 StatTile("In review", stats.wordsPracticed, Modifier.weight(1f))
                 StatTile("Mastered", stats.wordsMastered, Modifier.weight(1f))
+            }
+        }
+
+        // The goal is changeable, because onboarding promised it would be.
+        item {
+            Text(
+                "Daily goal",
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                modifier = Modifier.padding(top = 8.dp),
+            )
+        }
+        item {
+            Card(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(8.dp)) {
+                    for (option in LearningGoal.entries) {
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    progress.goal = option
+                                    goal = option
+                                    onChanged()
+                                }
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            RadioButton(selected = option == goal, onClick = null)
+                            Spacer(Modifier.width(12.dp))
+                            Text(
+                                "${option.minutesPerDay} min a day",
+                                modifier = Modifier.weight(1f),
+                            )
+                            Text(
+                                "${option.dailyXpGoal} XP",
+                                fontSize = 13.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                }
             }
         }
 

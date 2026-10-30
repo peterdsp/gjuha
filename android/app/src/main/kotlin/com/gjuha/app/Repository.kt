@@ -8,6 +8,7 @@ import com.gjuha.core.LearningGoal
 import com.gjuha.core.LessonSessionSnapshot
 import com.gjuha.core.LessonVocabulary
 import com.gjuha.core.ReviewGrade
+import com.gjuha.core.ReviewItemCodec
 import com.gjuha.core.ReviewItemState
 import com.gjuha.core.ReviewScheduler
 import com.gjuha.core.SeedContent
@@ -92,36 +93,11 @@ class ProgressRepository(context: Context) {
     private val streak: Int get() = prefs.getInt(Keys.STREAK, 0)
 
     /** Word ids that have entered the review schedule, with their state. */
-    private fun reviewItems(): List<ReviewItemState> {
-        val raw = prefs.getStringSet(Keys.REVIEW, emptySet()).orEmpty()
-        return raw.mapNotNull { encoded ->
-            // id|interval|ease|reps|lapses|due|introduced
-            val p = encoded.split('|')
-            if (p.size != 7) return@mapNotNull null
-            runCatching {
-                ReviewItemState(
-                    wordId = p[0],
-                    intervalDays = p[1].toInt(),
-                    ease = p[2].toDouble(),
-                    reps = p[3].toInt(),
-                    lapses = p[4].toInt(),
-                    dueDate = LocalDate.parse(p[5]),
-                    introducedAt = LocalDate.parse(p[6]),
-                )
-            }.getOrNull()
-        }
-    }
+    private fun reviewItems(): List<ReviewItemState> =
+        ReviewItemCodec.decodeAll(prefs.getStringSet(Keys.REVIEW, emptySet()).orEmpty())
 
     private fun writeReviewItems(items: List<ReviewItemState>) {
-        prefs.edit().putStringSet(
-            Keys.REVIEW,
-            items.map {
-                listOf(
-                    it.wordId, it.intervalDays, it.ease, it.reps,
-                    it.lapses, it.dueDate, it.introducedAt,
-                ).joinToString("|")
-            }.toSet(),
-        ).apply()
+        prefs.edit().putStringSet(Keys.REVIEW, ReviewItemCodec.encodeAll(items)).apply()
     }
 
     fun dueCount(today: LocalDate = LocalDate.now()): Int = dueWordIds(today).size

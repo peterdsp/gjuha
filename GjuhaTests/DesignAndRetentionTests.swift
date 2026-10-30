@@ -1086,3 +1086,87 @@ struct MascotLoopTests {
         #expect(UIImage(named: "MascotIcon") != nil, "MascotIcon is missing from the asset catalog")
     }
 }
+
+// MARK: - Test-reset completeness
+
+/// Guards the hook that gives every UI test a clean first launch.
+///
+/// It used to name each key by hand, with a comment claiming the list was
+/// complete. The claim went stale: the daily XP keys and the achievement ledger
+/// were added later and never reached it, so a UI test "starting from a known
+/// first-launch position" actually started with the previous run's XP and
+/// badges. The symptom was a Profile screen reporting 97 XP earned today, zero
+/// lessons completed, and an unlocked achievement, all at once.
+///
+/// These assert the property that matters, that nothing a learner can
+/// accumulate survives the reset, rather than re-listing the keys here. A list
+/// in a test goes stale exactly like a list in the source.
+struct TestResetCompletenessTests {
+
+    /// Every store the reset delegates to must clear what it owns, so a
+    /// first-launch UI test cannot inherit anything.
+    @Test
+    func everyLearnerOwnedStoreClearsItself() {
+        let suiteName = "gjuha.test.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let progress = ProgressStore(defaults: defaults)
+        let achievements = AchievementStore(defaults: defaults)
+
+        // Accumulate the things a learner accumulates.
+        progress.markLessonCompleted(seedId: "u1-l1", xpEarned: 97)
+        achievements.recordUnlocks(for: UserStats(
+            currentStreak: 1, totalXP: 97, wordsSeen: 10, lessonsCompleted: 1
+        ))
+
+        #expect(progress.totalXP == 97)
+        #expect(progress.xpEarnedToday == 97)
+        #expect(progress.lessonsCompleted == 1)
+        #expect(!achievements.unlockedIDs.isEmpty)
+
+        progress.resetLearningProgress()
+        achievements.reset()
+
+        // The exact contradiction the stale list produced: XP earned today with
+        // no lesson behind it, and a badge with no progress behind it.
+        #expect(progress.xpEarnedToday == 0, "today's XP survived the reset")
+        #expect(progress.totalXP == 0)
+        #expect(progress.lessonsCompleted == 0)
+        #expect(progress.currentStreak == 0)
+        #expect(achievements.unlockedIDs.isEmpty, "the achievement ledger survived the reset")
+        #expect(achievements.uncelebrated.isEmpty)
+    }
+
+    /// Stats rebuilt after a reset must be internally consistent: no figure may
+    /// imply work that another figure denies.
+    @Test
+    func statsAfterAResetCannotContradictThemselves() {
+        let suiteName = "gjuha.test.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let progress = ProgressStore(defaults: defaults)
+        progress.markLessonCompleted(seedId: "u1-l1", xpEarned: 97)
+        progress.resetLearningProgress()
+
+        let stats = UserStats(
+            currentStreak: progress.currentStreak,
+            totalXP: progress.totalXP,
+            wordsSeen: 0,
+            lessonsCompleted: progress.lessonsCompleted,
+            xpToday: progress.xpEarnedToday,
+            dailyGoalXP: LearningGoal.regular.dailyXPGoal
+        )
+
+        #expect(
+            stats.xpToday <= stats.totalXP,
+            "XP earned today cannot exceed XP earned ever"
+        )
+        #expect(
+            !(stats.xpToday > 0 && stats.lessonsCompleted == 0),
+            "XP today with no completed lesson is the contradiction this guards"
+        )
+        #expect(!stats.hasMetDailyGoal)
+    }
+}

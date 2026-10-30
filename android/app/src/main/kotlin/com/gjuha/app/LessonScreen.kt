@@ -208,11 +208,26 @@ private fun TypedAnswer(exercise: Exercise, enabled: Boolean, onAnswer: (String)
 private fun ArrangeAnswer(exercise: Exercise, enabled: Boolean, onAnswer: (String) -> Unit) {
     val placed = remember(exercise.prompt) { mutableStateListOf<Int>() }
     Column {
-        Text(
-            placed.joinToString(" ") { exercise.orderedOptions[it] }.ifEmpty { " " },
-            fontSize = 18.sp,
-            modifier = Modifier.fillMaxWidth(),
-        )
+        // The assembled sentence is built from the same tappable tokens, so a
+        // mistake is taken back by tapping the word rather than restarting the
+        // question. Without this the only way out of a wrong tap is a wrong
+        // answer, which would cost a heart for a slip rather than for not
+        // knowing the sentence.
+        if (placed.isEmpty()) {
+            Text(
+                "Tap the words in order",
+                fontSize = 15.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        } else {
+            FlowTokens(
+                tokens = placed.toList(),
+                label = { exercise.orderedOptions[it] },
+                enabled = enabled,
+            ) { placed.remove(it) }
+        }
+        Spacer(Modifier.height(16.dp))
+        HorizontalDivider()
         Spacer(Modifier.height(16.dp))
         FlowTokens(
             tokens = exercise.orderedOptions.indices.filterNot { it in placed },

@@ -183,8 +183,45 @@ def render(catalog, albanian_side):
     return "\n".join(lines) + "\n"
 
 
+ACHIEVEMENTS = ROOT / "android/core/src/main/kotlin/com/gjuha/core/Achievement.kt"
+
+
+def achievement_ids():
+    """Ids declared in the shared catalogue, in declaration order."""
+    source = ACHIEVEMENTS.read_text()
+    return re.findall(r'Achievement\("([^"]+)"', source)
+
+
+def resource_stem(achievement_id):
+    """streak.3 -> ach_streak_3, so a mapping can be found from an id."""
+    return "ach_" + achievement_id.replace(".", "_")
+
+
+def check_achievements(names):
+    """Every milestone must have a localized title and detail.
+
+    Adding one to the catalogue and forgetting its strings is silent: the row
+    falls back to the core's English and only an Albanian speaker would notice,
+    which is exactly the mixed-language screen this whole file exists to avoid.
+    """
+    missing = []
+    for achievement_id in achievement_ids():
+        stem = resource_stem(achievement_id)
+        for suffix in ("title", "detail"):
+            if f"{stem}_{suffix}" not in names:
+                missing.append(f"{stem}_{suffix}")
+    return missing
+
+
 def main():
     catalog = json.loads(CATALOG.read_text())["strings"]
+
+    names = {name for name, _, _ in MAPPING}
+    unmapped = check_achievements(names)
+    if unmapped:
+        print("Achievements with no localized name: " + ", ".join(unmapped))
+        print("Add them to MAPPING and to AchievementStrings.kt.")
+        return 1
 
     untranslated = [k for _, _, k in MAPPING if not albanian(catalog, k)]
     if untranslated:

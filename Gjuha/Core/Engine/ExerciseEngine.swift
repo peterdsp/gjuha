@@ -554,7 +554,7 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
         let distractors = pickDistractors(for: word, from: pool, count: 3, useEnglish: true)
         return Exercise(
             type: .multipleChoiceTranslate,
-            prompt: "What does '\(word.albanian)' mean?",
+            prompt: String(localized: "What does '\(word.albanian)' mean?"),
             correctAnswer: word.english,
             distractors: distractors,
             explanation: Self.explanation(for: word),
@@ -566,7 +566,7 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
         let distractors = pickDistractors(for: word, from: pool, count: 3, useEnglish: false)
         return Exercise(
             type: .multipleChoiceTranslate,
-            prompt: "How do you say '\(word.english)' in Albanian?",
+            prompt: String(localized: "How do you say '\(word.english)' in Albanian?"),
             correctAnswer: word.albanian,
             distractors: distractors,
             explanation: Self.explanation(for: word),
@@ -580,18 +580,18 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
         if toAlbanian {
             return Exercise(
                 type: .translateTextInput,
-                prompt: "Translate: '\(word.english)'",
+                prompt: String(localized: "Translate: '\(word.english)'"),
                 correctAnswer: word.albanian,
-                hint: "Type in Albanian",
+                hint: String(localized: "Type in Albanian"),
                 explanation: Self.explanation(for: word),
                 xpValue: 15
             )
         } else {
             return Exercise(
                 type: .translateTextInput,
-                prompt: "Translate: '\(word.albanian)'",
+                prompt: String(localized: "Translate: '\(word.albanian)'"),
                 correctAnswer: word.english,
-                hint: "Type in English",
+                hint: String(localized: "Type in English"),
                 explanation: Self.explanation(for: word),
                 xpValue: 15
             )
@@ -618,7 +618,7 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
         let distractors = pickDistractors(for: word, from: pool, count: 3, useEnglish: false)
         return Exercise(
             type: .fillInBlank,
-            prompt: "\(cloze.blanked) (\(cloze.translation))",
+            prompt: String(localized: "\(cloze.blanked) (\(cloze.translation))"),
             correctAnswer: word.albanian,
             distractors: distractors,
             explanation: Self.explanation(for: word, extra: "Full sentence: \(cloze.sentence) (\(cloze.translation))."),
@@ -654,9 +654,9 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
         guard shuffled != tokens else { return nil } // e.g. all tokens identical
         return Exercise(
             type: .arrangeWords,
-            prompt: "Arrange the words to say: \"\(translation)\"",
+            prompt: String(localized: "Arrange the words to say: \"\(translation)\""),
             correctAnswer: correct,
-            hint: "Tap the words in order",
+            hint: String(localized: "Tap the words in order"),
             explanation: Self.explanation(for: word, extra: "Correct order: \(correct)."),
             xpValue: 15,
             orderedOptions: shuffled
@@ -681,7 +681,7 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
         guard pairs.count >= 3 else { return nil }
         return Exercise(
             type: .wordMatch,
-            prompt: "Match each word to its meaning",
+            prompt: String(localized: "Match each word to its meaning"),
             correctAnswer: Exercise.matchAnswer(from: pairs),
             explanation: "Matching builds fast recognition of new words before you produce them.",
             xpValue: 12,
@@ -696,7 +696,7 @@ final class ExerciseEngine: ExerciseEngineProtocol, @unchecked Sendable {
         let distractors = pickDistractors(for: word, from: pool, count: 3, useEnglish: false)
         return Exercise(
             type: .tapWhatYouHear,
-            prompt: "Tap what you hear",
+            prompt: String(localized: "Tap what you hear"),
             correctAnswer: word.albanian,
             distractors: distractors,
             explanation: Self.explanation(for: word),

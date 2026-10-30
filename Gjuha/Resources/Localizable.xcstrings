@@ -1,6 +1,23 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "%@ (%@)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ (%@)"
+          }
+        },
+        "sq": {
+          "stringUnit": {
+            "state": "new",
+            "value": ""
+          }
+        }
+      }
+    },
     "%lld XP earned": {
       "comment": "Spoken to VoiceOver after a correct answer.",
       "localizations": {
@@ -477,6 +494,23 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Përgjigjja: %@"
+          }
+        }
+      }
+    },
+    "Arrange the words to say: \"%@\"": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arrange the words to say: \"%@\""
+          }
+        },
+        "sq": {
+          "stringUnit": {
+            "state": "new",
+            "value": ""
           }
         }
       }
@@ -1075,6 +1109,23 @@
         }
       }
     },
+    "How do you say '%@' in Albanian?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How do you say '%@' in Albanian?"
+          }
+        },
+        "sq": {
+          "stringUnit": {
+            "state": "new",
+            "value": ""
+          }
+        }
+      }
+    },
     "In native-speaker review": {
       "localizations": {
         "sq": {
@@ -1208,6 +1259,23 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Të zotëruara"
+          }
+        }
+      }
+    },
+    "Match each word to its meaning": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Match each word to its meaning"
+          }
+        },
+        "sq": {
+          "stringUnit": {
+            "state": "new",
+            "value": ""
           }
         }
       }
@@ -1934,6 +2002,40 @@
         }
       }
     },
+    "Tap the words in order": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap the words in order"
+          }
+        },
+        "sq": {
+          "stringUnit": {
+            "state": "new",
+            "value": ""
+          }
+        }
+      }
+    },
+    "Tap what you hear": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap what you hear"
+          }
+        },
+        "sq": {
+          "stringUnit": {
+            "state": "new",
+            "value": ""
+          }
+        }
+      }
+    },
     "Ten lessons in": {
       "comment": "Achievement title: ten lessons finished.",
       "localizations": {
@@ -2038,6 +2140,23 @@
         }
       }
     },
+    "Translate: '%@'": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Translate: '%@'"
+          }
+        },
+        "sq": {
+          "stringUnit": {
+            "state": "new",
+            "value": ""
+          }
+        }
+      }
+    },
     "Travel": {
       "localizations": {
         "sq": {
@@ -2075,6 +2194,40 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Njëzet e pesë të mbajtura"
+          }
+        }
+      }
+    },
+    "Type in Albanian": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Type in Albanian"
+          }
+        },
+        "sq": {
+          "stringUnit": {
+            "state": "new",
+            "value": ""
+          }
+        }
+      }
+    },
+    "Type in English": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Type in English"
+          }
+        },
+        "sq": {
+          "stringUnit": {
+            "state": "new",
+            "value": ""
           }
         }
       }
@@ -2146,6 +2299,23 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Mirë se vini në Gjuha"
+          }
+        }
+      }
+    },
+    "What does '%@' mean?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What does '%@' mean?"
+          }
+        },
+        "sq": {
+          "stringUnit": {
+            "state": "new",
+            "value": ""
           }
         }
       }

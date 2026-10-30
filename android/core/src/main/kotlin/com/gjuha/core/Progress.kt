@@ -90,3 +90,24 @@ data class DailyXp(val amount: Int = 0, val day: LocalDate? = null) {
         return DailyXp(earnedOn(today) + xp, today)
     }
 }
+
+/**
+ * How a day of study moves the streak.
+ *
+ * The rule is small and easy to get subtly wrong, and it was written out twice
+ * in the Android repository, once for finishing a lesson and once for finishing
+ * a review. Two copies of a rule are two chances for it to drift, and neither
+ * copy could be tested without a device.
+ *
+ * - Studying again on the same day changes nothing. A streak counts days, not
+ *   sessions, so two lessons on one day is still one day.
+ * - The next calendar day advances it.
+ * - Any gap restarts at one, not zero: the day being recorded is itself a day
+ *   of study.
+ */
+fun advanceStreak(current: Int, lastActivity: LocalDate?, today: LocalDate): Int = when {
+    lastActivity == null -> 1
+    lastActivity == today -> current
+    lastActivity.plusDays(1) == today -> current + 1
+    else -> 1
+}

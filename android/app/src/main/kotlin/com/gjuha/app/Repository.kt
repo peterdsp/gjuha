@@ -2,6 +2,7 @@ package com.gjuha.app
 
 import android.content.Context
 import com.gjuha.core.AchievementCatalog
+import com.gjuha.core.advanceStreak
 import com.gjuha.core.DailyXp
 import com.gjuha.core.LearningGoal
 import com.gjuha.core.LessonVocabulary
@@ -163,13 +164,7 @@ class ProgressRepository(context: Context) {
         editor.putString(Keys.XP_TODAY_DAY, today.toString())
 
         val last = prefs.getString(Keys.LAST_ACTIVITY, null)?.let(LocalDate::parse)
-        val newStreak = when {
-            last == null -> 1
-            last == today -> streak
-            last.plusDays(1) == today -> streak + 1
-            else -> 1
-        }
-        editor.putInt(Keys.STREAK, newStreak)
+        editor.putInt(Keys.STREAK, advanceStreak(streak, last, today))
         editor.putString(Keys.LAST_ACTIVITY, today.toString())
         editor.apply()
     }
@@ -220,16 +215,8 @@ class ProgressRepository(context: Context) {
             prefs.getStringSet("wordsSeen", emptySet()).orEmpty() + wordIds,
         )
 
-        // Streak: same rule as iOS. Same day does nothing, the next day
-        // advances, a gap restarts at one.
         val last = prefs.getString(Keys.LAST_ACTIVITY, null)?.let(LocalDate::parse)
-        val newStreak = when {
-            last == null -> 1
-            last == today -> streak
-            last.plusDays(1) == today -> streak + 1
-            else -> 1
-        }
-        editor.putInt(Keys.STREAK, newStreak)
+        editor.putInt(Keys.STREAK, advanceStreak(streak, last, today))
         editor.putString(Keys.LAST_ACTIVITY, today.toString())
         editor.apply()
 

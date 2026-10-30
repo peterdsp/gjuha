@@ -50,31 +50,9 @@ fi
 echo "capturing on $DEVICE_NAME ($udid)"
 xcrun simctl boot "$udid" 2>/dev/null || true
 
-# The capture plays a real lesson so Home shows real progress rather than a row
-# of zeroes. To answer correctly it needs the same vocabulary the app ships, so
-# the lexicon is built from the seed here and handed to the test rather than
-# duplicated in test source, where it would drift the first time a word changed.
-LEXICON="$(python3 - <<'PYEOF'
-import json, pathlib
-words = json.loads(pathlib.Path("Gjuha/Data/Seed/Vocabulary/a1_vocabulary.json").read_text())
-items = words if isinstance(words, list) else (words.get("words") or words.get("entries"))
-print(json.dumps([
-    {
-        "a": w["albanian"],
-        "e": w["english"],
-        "s": w.get("exampleSentence") or "",
-        "t": w.get("exampleTranslation") or "",
-    }
-    for w in items
-], ensure_ascii=False, separators=(",", ":")))
-PYEOF
-)"
-
 # TEST_RUNNER_ prefixed variables reach the test runner process; a plain one
 # stays with xcodebuild and the capture skips itself.
-TEST_RUNNER_GJUHA_CAPTURE=1 \
-TEST_RUNNER_GJUHA_LEXICON="$LEXICON" \
-xcodebuild test \
+TEST_RUNNER_GJUHA_CAPTURE=1 xcodebuild test \
   -project Gjuha.xcodeproj \
   -scheme Gjuha \
   -destination "id=$udid" \

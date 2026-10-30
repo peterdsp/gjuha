@@ -202,8 +202,11 @@ private fun LearnScreen(
     onStartReview: () -> Unit,
     onOpen: (SeedLesson) -> Unit,
 ) {
-    val unit = remember { content.units.minByOrNull { it.unit } }
-    val lessons = remember(unit) { unit?.let { content.lessons(it) }.orEmpty() }
+    // Every unit, not just the first. The seed ships twelve of them and a
+    // hundred and twenty lessons; showing one left a learner who finished it
+    // at a dead end with the rest of the course unreachable.
+    val units = remember { content.units.sortedBy { it.unit } }
+    val lessonsByUnit = remember(units) { units.associateWith { content.lessons(it) } }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -218,17 +221,19 @@ private fun LearnScreen(
             item { ReviewCard(dueCount, onStartReview) }
         }
 
-        item {
-            unit?.let {
+        for (unit in units) {
+            val lessons = lessonsByUnit[unit].orEmpty()
+            val done = lessons.count { it.id in completed }
+
+            item(key = "unit-${unit.unit}") {
                 Card(Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(16.dp)) {
                         Text(
-                            "Unit ${it.unit} - ${it.title}",
+                            "Unit ${unit.unit} - ${unit.title}",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                         )
                         Spacer(Modifier.height(4.dp))
-                        val done = lessons.count { l -> l.id in completed }
                         Text(
                             stringResource(R.string.lessons_of, done, lessons.size),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -240,18 +245,24 @@ private fun LearnScreen(
                                 if (lessons.isEmpty()) 0f else done.toFloat() / lessons.size
                             },
                             modifier = Modifier.fillMaxWidth(),
+                            color = if (done == lessons.size && lessons.isNotEmpty()) {
+                                successStrong()
+                            } else {
+                                accentStrong()
+                            },
                         )
                     }
                 }
             }
-        }
 
-        items(lessons, key = { it.id }) { lesson ->
-            val isDone = lesson.id in completed
-            // A lesson opens once everything it requires is finished. The rule
-            // comes from the seed, not from a hardcoded index.
-            val isLocked = lesson.unlock.requiresLessonIds.any { it !in completed }
-            LessonRow(lesson, isDone, isLocked) { if (!isLocked) onOpen(lesson) }
+            items(lessons, key = { it.id }) { lesson ->
+                val isDone = lesson.id in completed
+                // A lesson opens once everything it requires is finished. The
+                // rule comes from the seed, not from a hardcoded index, so it
+                // carries across unit boundaries without any extra handling.
+                val isLocked = lesson.unlock.requiresLessonIds.any { it !in completed }
+                LessonRow(lesson, isDone, isLocked) { if (!isLocked) onOpen(lesson) }
+            }
         }
     }
 }

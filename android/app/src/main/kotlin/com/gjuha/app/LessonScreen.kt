@@ -287,7 +287,7 @@ private fun LessonHeader(progress: Float, hearts: Int?, combo: Int, onQuit: () -
 private fun ExerciseBody(exercise: Exercise, enabled: Boolean, onAnswer: (String) -> Unit) {
     Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
         Text(
-            exercise.prompt,
+            localizedPrompt(exercise),
             fontSize = 22.sp,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
@@ -328,7 +328,7 @@ private fun TypedAnswer(exercise: Exercise, enabled: Boolean, onAnswer: (String)
             onValueChange = { typed = it },
             enabled = enabled,
             singleLine = true,
-            label = { Text(exercise.hint ?: "Your answer") },
+            label = { Text(localizedHint(exercise) ?: stringResource(R.string.your_answer)) },
             modifier = Modifier.fillMaxWidth(),
         )
         Spacer(Modifier.height(12.dp))
@@ -353,7 +353,7 @@ private fun ArrangeAnswer(exercise: Exercise, enabled: Boolean, onAnswer: (Strin
         // knowing the sentence.
         if (placed.isEmpty()) {
             Text(
-                "Tap the words in order",
+                stringResource(R.string.hint_tap_in_order),
                 fontSize = 15.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

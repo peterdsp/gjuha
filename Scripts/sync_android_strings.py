@@ -24,6 +24,13 @@ import sys
 import xml.sax.saxutils as sx
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+
+# An iOS key of AWAITING means the string has no Albanian anywhere yet. It is
+# written to values/ and left out of values-sq/, so Android falls back to the
+# English for that one string rather than showing a blank. These are the
+# strings a native reviewer still has to write, and the count is printed so
+# that number is never zero by accident.
+AWAITING = None
 CATALOG = ROOT / "Gjuha/Resources/Localizable.xcstrings"
 BASE = ROOT / "android/app/src/main/res/values/strings_generated.xml"
 ALB = ROOT / "android/app/src/main/res/values-sq/strings_generated.xml"
@@ -77,6 +84,22 @@ MAPPING = [
     ("a11y_matched", "matched", "matched"),
     ("a11y_not_matched", "not matched", "not matched"),
     ("achievement_unlocked", "New achievement", "New achievement"),
+
+    # The exercise prompts. These were built by interpolation inside the engine
+    # on both platforms, so they could not be translated at all: the sentence
+    # was welded to the word it was about. They are resources now, and the
+    # Albanian is a reviewer's to write.
+    ("your_answer", "Your answer", AWAITING),
+    ("prompt_meaning_of", "What does '%1$s' mean?", AWAITING),
+    ("prompt_say_in_albanian", "How do you say '%1$s' in Albanian?", AWAITING),
+    ("prompt_translate", "Translate: '%1$s'", AWAITING),
+    ("prompt_arrange", "Arrange the words to say: \"%1$s\"", AWAITING),
+    ("prompt_fill_blank", "%1$s (%2$s)", AWAITING),
+    ("prompt_match_pairs", "Match each word to its meaning", AWAITING),
+    ("prompt_tap_what_you_hear", "Tap what you hear", AWAITING),
+    ("hint_type_in_albanian", "Type in Albanian", AWAITING),
+    ("hint_type_in_english", "Type in English", AWAITING),
+    ("hint_tap_in_order", "Tap the words in order", AWAITING),
     ("a11y_hearts_remaining", "Hearts remaining", "Hearts remaining"),
     ("a11y_lesson_progress", "Lesson progress", "Lesson progress"),
     ("a11y_unlocked", "Unlocked", "Unlocked"),
@@ -132,6 +155,8 @@ HEADER = """<?xml version="1.0" encoding="utf-8"?>
 
 
 def albanian(catalog, key):
+    if key is AWAITING:
+        return None
     unit = catalog.get(key, {}).get("localizations", {}).get("sq", {}).get("stringUnit", {})
     return unit.get("value")
 
@@ -226,10 +251,16 @@ def main():
         print("Add them to MAPPING and to AchievementStrings.kt.")
         return 1
 
-    untranslated = [k for _, _, k in MAPPING if not albanian(catalog, k)]
+    # A key that names a catalog entry with no Albanian is a mistake. A key of
+    # AWAITING is a deliberate, counted gap.
+    untranslated = [
+        k for _, _, k in MAPPING if k is not AWAITING and not albanian(catalog, k)
+    ]
     if untranslated:
         print("No Albanian in the catalog for: " + ", ".join(repr(k) for k in untranslated))
         return 1
+
+    awaiting = [name for name, _, k in MAPPING if k is AWAITING]
 
     # The two renderings must take the same arguments in the same order, or one
     # locale formats correctly and the other throws.
@@ -256,12 +287,18 @@ def main():
                 print("  " + str(p.relative_to(ROOT)))
             return 1
         print(f"Android strings match the iOS catalog ({len(MAPPING)} strings).")
+        if awaiting:
+            print(f"{len(awaiting)} still await Albanian and fall back to English: "
+                  + ", ".join(awaiting))
         return 0
 
     for path, text in wanted.items():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text)
     print(f"Wrote {len(MAPPING)} strings, Albanian reused from the iOS catalog.")
+    if awaiting:
+        print(f"{len(awaiting)} still await Albanian and fall back to English: "
+              + ", ".join(awaiting))
     return 0
 
 

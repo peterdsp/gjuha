@@ -34,6 +34,43 @@ enum class ExerciseType {
     }
 }
 
+
+/**
+ * What a question is asking, separate from the English words used to ask it.
+ *
+ * The engine still produces an English prompt, because the tests and the
+ * screenshot solver read it and because it is the right fallback. But a
+ * prompt built by interpolation cannot be translated: the sentence is welded
+ * to the word it is about. Carrying the shape and the argument alongside lets
+ * the interface say the same thing in whatever language it is running in.
+ *
+ * [argument] is the word or sentence the question is about, and is never
+ * translated: it is the material being taught.
+ */
+@Serializable
+data class PromptSpec(
+    val kind: Kind,
+    val argument: String = "",
+    /**
+     * A second subject, where a question has one. Only the blank-filling
+     * question does: it shows the sentence with the gap and the English of
+     * that sentence, and dropping either leaves the question unanswerable.
+     */
+    val secondary: String = "",
+) {
+    @Serializable
+    enum class Kind {
+        MEANING_OF,
+        SAY_IN_ALBANIAN,
+        TRANSLATE_TO_ALBANIAN,
+        TRANSLATE_TO_ENGLISH,
+        ARRANGE_WORDS,
+        FILL_THE_BLANK,
+        MATCH_PAIRS,
+        TAP_WHAT_YOU_HEAR,
+    }
+}
+
 /** One Albanian/English pair in a matching exercise. */
 @Serializable
 data class MatchPair(val albanian: String, val english: String)
@@ -58,6 +95,12 @@ data class Exercise(
     val xpValue: Int,
     val pairs: List<MatchPair> = emptyList(),
     val orderedOptions: List<String> = emptyList(),
+    /**
+     * The question's shape and subject, so the interface can ask it in the
+     * learner's language. Null for anything built before this existed, which
+     * falls back to [prompt].
+     */
+    val promptSpec: PromptSpec? = null,
 )
 
 /**
@@ -174,6 +217,7 @@ class ExerciseEngine(
         return Exercise(
             type = ExerciseType.MULTIPLE_CHOICE_TRANSLATE,
             prompt = "What does '${word.albanian}' mean?",
+            promptSpec = PromptSpec(PromptSpec.Kind.MEANING_OF, word.albanian),
             correctAnswer = word.english,
             distractors = distractors,
             explanation = explanation(word),
@@ -187,6 +231,7 @@ class ExerciseEngine(
         return Exercise(
             type = ExerciseType.MULTIPLE_CHOICE_TRANSLATE,
             prompt = "How do you say '${word.english}' in Albanian?",
+            promptSpec = PromptSpec(PromptSpec.Kind.SAY_IN_ALBANIAN, word.english),
             correctAnswer = word.albanian,
             distractors = distractors,
             explanation = explanation(word),
@@ -200,6 +245,7 @@ class ExerciseEngine(
         Exercise(
             type = ExerciseType.TRANSLATE_TEXT_INPUT,
             prompt = "Translate: '${word.english}'",
+            promptSpec = PromptSpec(PromptSpec.Kind.TRANSLATE_TO_ALBANIAN, word.english),
             correctAnswer = word.albanian,
             hint = "Type in Albanian",
             explanation = explanation(word),
@@ -209,6 +255,7 @@ class ExerciseEngine(
         Exercise(
             type = ExerciseType.TRANSLATE_TEXT_INPUT,
             prompt = "Translate: '${word.albanian}'",
+            promptSpec = PromptSpec(PromptSpec.Kind.TRANSLATE_TO_ENGLISH, word.albanian),
             correctAnswer = word.english,
             hint = "Type in English",
             explanation = explanation(word),
@@ -238,6 +285,7 @@ class ExerciseEngine(
         return Exercise(
             type = ExerciseType.ARRANGE_WORDS,
             prompt = "Arrange the words to say: \"$translation\"",
+            promptSpec = PromptSpec(PromptSpec.Kind.ARRANGE_WORDS, translation),
             correctAnswer = correct,
             hint = "Tap the words in order",
             explanation = explanation(word, extra = "Correct order: $correct."),
@@ -256,6 +304,11 @@ class ExerciseEngine(
         return Exercise(
             type = ExerciseType.FILL_IN_BLANK,
             prompt = "${sentence.replace(word.albanian, "___", ignoreCase = true)} ($translation)",
+            promptSpec = PromptSpec(
+                PromptSpec.Kind.FILL_THE_BLANK,
+                sentence.replace(word.albanian, "___", ignoreCase = true),
+                translation,
+            ),
             correctAnswer = word.albanian,
             distractors = distractors,
             explanation = explanation(word, extra = "Full sentence: $sentence ($translation)."),
@@ -283,6 +336,7 @@ class ExerciseEngine(
         return Exercise(
             type = ExerciseType.WORD_MATCH,
             prompt = "Match each word to its meaning",
+            promptSpec = PromptSpec(PromptSpec.Kind.MATCH_PAIRS),
             correctAnswer = pairs.joinToString("|") { "${it.albanian}=${it.english}" },
             explanation = "Matching builds fast recognition of new words before you produce them.",
             xpValue = 12,
@@ -301,6 +355,7 @@ class ExerciseEngine(
         return Exercise(
             type = ExerciseType.TAP_WHAT_YOU_HEAR,
             prompt = "Tap what you hear",
+            promptSpec = PromptSpec(PromptSpec.Kind.TAP_WHAT_YOU_HEAR),
             correctAnswer = word.albanian,
             distractors = distractors,
             explanation = explanation(word),

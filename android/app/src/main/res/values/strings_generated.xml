@@ -47,6 +47,17 @@
     <string name="a11y_matched">matched</string>
     <string name="a11y_not_matched">not matched</string>
     <string name="achievement_unlocked">New achievement</string>
+    <string name="your_answer">Your answer</string>
+    <string name="prompt_meaning_of">What does \'%1$s\' mean?</string>
+    <string name="prompt_say_in_albanian">How do you say \'%1$s\' in Albanian?</string>
+    <string name="prompt_translate">Translate: \'%1$s\'</string>
+    <string name="prompt_arrange">Arrange the words to say: "%1$s"</string>
+    <string name="prompt_fill_blank">%1$s (%2$s)</string>
+    <string name="prompt_match_pairs">Match each word to its meaning</string>
+    <string name="prompt_tap_what_you_hear">Tap what you hear</string>
+    <string name="hint_type_in_albanian">Type in Albanian</string>
+    <string name="hint_type_in_english">Type in English</string>
+    <string name="hint_tap_in_order">Tap the words in order</string>
     <string name="a11y_hearts_remaining">Hearts remaining</string>
     <string name="a11y_lesson_progress">Lesson progress</string>
     <string name="a11y_unlocked">Unlocked</string>

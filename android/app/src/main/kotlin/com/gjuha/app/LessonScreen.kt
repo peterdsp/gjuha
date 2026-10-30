@@ -12,6 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -358,6 +359,18 @@ private fun FlowTokens(
 private fun MatchAnswer(exercise: Exercise, enabled: Boolean, onAnswer: (String) -> Unit) {
     val matched = remember(exercise.prompt) { mutableStateListOf<String>() }
     var selected by remember(exercise.prompt) { mutableStateOf<String?>(null) }
+    // The tile that was just connected wrongly, so it can say so. iOS flashes
+    // the same way: matching is a recognition drill, so a wrong connection
+    // keeps the board and lets the learner retry rather than costing a heart,
+    // but it still has to be visible or the tap looks like it did nothing.
+    var wrongFlash by remember(exercise.prompt) { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(wrongFlash) {
+        if (wrongFlash != null) {
+            delay(400)
+            wrongFlash = null
+        }
+    }
 
     LaunchedEffect(matched.size) {
         if (matched.size == exercise.pairs.size && exercise.pairs.isNotEmpty()) {
@@ -365,25 +378,57 @@ private fun MatchAnswer(exercise: Exercise, enabled: Boolean, onAnswer: (String)
         }
     }
 
+    val matchedLabel = stringResource(R.string.a11y_matched)
+    val unmatchedLabel = stringResource(R.string.a11y_not_matched)
+
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             exercise.pairs.forEach { pair ->
+                val isMatched = pair.albanian in matched
                 OutlinedButton(
                     onClick = { selected = pair.albanian },
-                    enabled = enabled && pair.albanian !in matched,
-                    modifier = Modifier.fillMaxWidth(),
+                    enabled = enabled && !isMatched,
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = if (selected == pair.albanian) {
+                            GjuhaColors.Accent
+                        } else {
+                            MaterialTheme.colorScheme.onSurface
+                        },
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .semantics {
+                            stateDescription = if (isMatched) matchedLabel else unmatchedLabel
+                        },
                 ) { Text(pair.albanian) }
             }
         }
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             exercise.pairs.forEach { pair ->
+                val isMatched = pair.albanian in matched
+                val isWrong = wrongFlash == pair.english
                 OutlinedButton(
                     onClick = {
-                        if (selected == pair.albanian) matched.add(pair.albanian)
+                        when {
+                            selected == null -> Unit
+                            selected == pair.albanian -> matched.add(pair.albanian)
+                            else -> wrongFlash = pair.english
+                        }
                         selected = null
                     },
-                    enabled = enabled && pair.albanian !in matched,
-                    modifier = Modifier.fillMaxWidth(),
+                    enabled = enabled && !isMatched,
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = if (isWrong) {
+                            GjuhaColors.Error
+                        } else {
+                            MaterialTheme.colorScheme.onSurface
+                        },
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .semantics {
+                            stateDescription = if (isMatched) matchedLabel else unmatchedLabel
+                        },
                 ) { Text(pair.english) }
             }
         }

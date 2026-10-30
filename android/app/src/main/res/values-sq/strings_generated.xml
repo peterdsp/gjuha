@@ -44,6 +44,8 @@
     <string name="xp_of">%1$d/%2$d XP</string>
     <string name="lessons_of">%1$d/%2$d mësime</string>
     <string name="minutes_and_xp">%1$d min/ditë · %2$d XP</string>
+    <string name="a11y_matched">përputhur</string>
+    <string name="a11y_not_matched">e papërputhur</string>
     <string name="a11y_hearts_remaining">Zemra të mbetura</string>
     <string name="a11y_lesson_progress">Ecuria e mësimit</string>
     <string name="a11y_unlocked">E zhbllokuar</string>

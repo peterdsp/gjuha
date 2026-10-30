@@ -20,6 +20,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
+import com.gjuha.app.widget.WidgetPublisher
 import com.gjuha.core.AchievementCatalog
 import com.gjuha.core.LearningGoal
 import com.gjuha.core.Exercise
@@ -62,6 +64,14 @@ private fun GjuhaApp(content: ContentRepository, progress: ProgressRepository) {
     var onboarded by remember { mutableStateOf(progress.hasCompletedOnboarding) }
     // Bumped whenever progress changes, so the screens re-read their figures.
     var revision by remember { mutableIntStateOf(0) }
+
+    // The widget renders a projection rather than computing anything, so it is
+    // republished on every change to learner state. Keyed on the same revision
+    // the screens use, so the widget cannot disagree with the Profile.
+    val context = LocalContext.current
+    LaunchedEffect(revision, onboarded) {
+        if (onboarded) WidgetPublisher.publish(context, content, progress)
+    }
 
     if (!onboarded) {
         OnboardingScreen(initial = progress.goal) { chosen ->

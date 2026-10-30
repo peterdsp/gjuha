@@ -86,6 +86,11 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+    // Glance is the Compose-shaped way to build an app widget, and the nearest
+    // Android equivalent of WidgetKit.
+    implementation("androidx.glance:glance-appwidget:1.1.1")
+    implementation("androidx.glance:glance-material3:1.1.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
 
     debugImplementation("androidx.compose.ui:ui-tooling")

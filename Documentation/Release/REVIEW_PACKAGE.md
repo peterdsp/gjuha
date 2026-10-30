@@ -100,7 +100,25 @@ What is and is not in scope:
   Translating the disclaimer while the explanation stays English would be worse
   than leaving both.
 
-Reviewer actions:
+Reviewer actions. There are two routes, and the second needs no developer
+tools:
+
+**Route A, a spreadsheet.** `Documentation/Release/albanian-review.csv` holds
+every pending string with its English, its current Albanian draft, and a note
+where there is no draft at all. It opens in Numbers, Excel or Google Sheets.
+The reviewer edits the `albanian` column and writes `ok` in `approved` for each
+line they are happy with, then sends it back. Nothing is marked reviewed
+without that word, so a half finished pass cannot look complete, and a line
+approved with an empty translation is refused rather than written.
+
+    python3 Scripts/review_strings.py export    # refresh the CSV first
+    python3 Scripts/review_strings.py import    # fold the answers back in
+
+The committed CSV is a snapshot. Export again before sending it to anyone, so
+it matches the code they will be reviewing. After importing, re-run
+`Scripts/sync_android_strings.py` so Android picks up the corrections.
+
+**Route B, Xcode.**
 
 1. Open `Gjuha/Resources/Localizable.xcstrings` in Xcode, select Albanian, and
    filter to "Needs Review". Then clear the filter and look for the entries with

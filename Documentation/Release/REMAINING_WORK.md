@@ -4,12 +4,13 @@ Everything not done, in one place, with who can actually do it. Written after th
 design and retention passes so that "what is left before 1.0" has a single
 answer instead of being spread across four documents.
 
-Status of the tree as this was written: build clean with no warnings, 142 unit
-tests in 18 suites and 8 UI tests passing on an iPhone and on a 13" iPad at the
-iOS 26 deployment floor, localization and seed checks clean, every measured
-colour pair at or above 4.5:1.
+Status of the tree as this was written: build clean with no warnings, 149 unit
+tests in 19 suites and 8 UI tests passing on an iPhone and on a 13" iPad at the
+iOS 26 deployment floor, 100 Kotlin tests for Android, localization and seed
+checks clean, every measured colour pair at or above 4.5:1. CI runs all of it,
+both platforms, on every push.
 
-The three sections are ordered by who is blocked. Nothing in section 1 can be
+The sections are ordered by who is blocked. Nothing in section 1 can be
 unblocked by writing code, and within it the hard blockers are separated from the
 quality gates, because only the first group actually stops a submission.
 
@@ -20,20 +21,21 @@ quality gates, because only the first group actually stops a submission.
 Nothing here can be unblocked by writing code. Two kinds, and the distinction
 matters: the first three stop a submission, the last two do not.
 
-### Hard blockers: App Store Connect will not accept a submission without these
+### Hard blockers: all three are now closed
+
+App Store Connect will not accept a submission without these. They are listed
+because they were the gate, and so the record shows what closed them.
 
 | Item | What it needs | Who |
 |---|---|---|
-| **Privacy policy URL** | **Written and ready.** `docs/privacy.html`, every claim checked against the code. Goes live at `https://peterdsp.github.io/gjuha/privacy.html` once PR #10 is merged; GitHub Pages is already configured to serve `main` from `/docs`. | Merge PR #10 |
-| **Support URL** | **Written and ready.** `docs/support.html`, live at `https://peterdsp.github.io/gjuha/support.html` on the same merge. | Merge PR #10 |
-| **Screenshots** | **Generated.** `bash Scripts/capture_screenshots.sh` writes six real 1320 x 2868 captures to `AppStoreScreenshots/`, which satisfies the requirement. What is left is a judgement call: they show a fresh account, so every counter reads zero. Study on the simulator first and re-run if you want populated figures. | Done, review optional |
+| **Privacy policy URL** | **Done and live** at `https://gjuha.peterdsp.dev/privacy.html`, HTTP 200 over a valid certificate. Every claim was checked against the code. | Closed |
+| **Support URL** | **Done and live** at `https://gjuha.peterdsp.dev/support.html`. | Closed |
+| **Screenshots** | **Done and populated.** `bash Scripts/capture_screenshots.sh` plays the opening lesson and writes seven 1320 x 2868 captures. Nothing is seeded: the exercises are solved from the shipped vocabulary and answered through the real interface, so the 97 XP, the 100% accuracy and the First steps badge were earned. Every figure agrees across Home, Profile and the completion screen. | Closed |
 
-All three are now prepared rather than pending. The privacy and support pages
-need PR #10 merged to go live, and the screenshots exist on disk. For the
-branded `gjuha.peterdsp.dev` domain instead of `peterdsp.github.io`, one
-Cloudflare DNS record is needed (a `CNAME` for `gjuha` pointing at
-`peterdsp.github.io`) plus a `CNAME` file in `docs/`. The `github.io` URLs are
-valid App Store Connect URLs without it.
+**All three hard blockers are closed.** The pages are live on the branded
+domain, and the screenshots are generated and populated. Nothing now stands
+between this tree and an App Store submission except the two quality gates
+below, both of which need a person rather than code.
 
 ### Quality gates: App Review would pass the app without them
 
@@ -42,7 +44,7 @@ without them carries a real risk that no automated check can see.
 
 | Item | What it needs | Why it is here |
 |---|---|---|
-| **Albanian interface strings** | A native speaker reads the 226 strings (205 app, 21 widget) and clears the `needs_review` state. | App Review will not catch this. But for an app whose premise is teaching Albanian, shipping Albanian chrome that no Albanian speaker has read is a credibility risk. The achievement titles matter most: "Halfway to fluent" and "Three in a row" are idioms that translate badly word for word. |
+| **Albanian interface strings** | A native speaker reads the 223 strings (203 app, 20 widget) and clears the `needs_review` state. | App Review will not catch this. But for an app whose premise is teaching Albanian, shipping Albanian chrome that no Albanian speaker has read is a credibility risk. The achievement titles matter most: "Halfway to fluent" and "Three in a row" are idioms that translate badly word for word. |
 | **Device pass** | The checklist in `APP_STORE_SUBMISSION.md` section 8: widgets in every family, the four Siri phrases, a VoiceOver drive-through, Increase Contrast, Reduce Transparency, and the Albanian locale. | Widgets, Siri and VoiceOver have never run on hardware; only the data paths beneath them are unit tested. "The deep link is correct" is not "tapping the widget opens the right screen." |
 
 ---
@@ -92,7 +94,72 @@ promise.
 
 ---
 
-## 3. Product roadmap, not release work
+## 3. Android
+
+Not a release gate for the iOS app, and recorded here because "the same app on
+both platforms" is the stated goal and it is now underway rather than
+hypothetical.
+
+**The app runs, and does what the iOS app does.** `android/core` is a plain
+Kotlin library holding the learning domain, ported with parity tests asserting
+the same facts the Swift suite does: answer grading including the rule that
+Albanian diacritics are required, the SM-2 scheduler with its ease bounds and
+its 21 day mastery threshold, the daily XP goal and its read-time rollover, the
+achievement catalogue with ids matching iOS exactly because they are persisted,
+and the exercise engine including the distractor rules that keep a question
+answerable. 100 Kotlin tests, run with `./gradlew :core:test` under OpenJDK 21,
+and in CI on every push.
+
+`android/app` is a Compose app on top of it: onboarding with the daily goal,
+the lesson map, a lesson session, the spaced repetition review loop, the words
+and grammar screens, the profile with its honest vocabulary ladder, a settings
+control for the goal, and a Glance home screen widget.
+
+**Content is not duplicated.** A Gradle task copies `Gjuha/Data/Seed/` into the
+Android assets at build time and fails loudly if it is missing, so there is one
+file to edit and a word cannot say one thing on iPhone and another on Android.
+The Kotlin tests read that same seed and assert the figures `validate_seed.py`
+prints.
+
+**What does not exist yet.** A screenshot pass, a signed release build, and a
+Play Store listing. None of that is a code problem.
+
+**What was checked by running it, not by reading it.** Playing the opening
+lesson on an emulator produces the same +97 XP at 100% accuracy that the same
+lesson produces on iOS. The near miss rule names the missing diacritics on
+device. A review runs all its due words with no hearts and reschedules each one
+as it is answered, banking XP without completing a lesson. Killing the app part
+way through a lesson and reopening it returns the same questions with their
+options in the same order. A schedule written in the previous storage format
+still loads after an upgrade.
+
+**Localization.** The Android resources are generated from the iOS String
+Catalog by `Scripts/sync_android_strings.py`, so both apps show the same copy
+and one native review covers both. CI fails if they drift. The same
+`needs_review` caveat applies: the Albanian is machine-assisted and unread by a
+native speaker.
+
+**A shared limitation, true on both platforms.** The exercise prompts
+("What does 'X' mean?", "Type in Albanian") are built by interpolation inside
+the exercise engine rather than taken from a catalog, so they ship in English
+even when the interface is Albanian. `check_localization.py` cannot see them,
+because they never reach the compiler's extracted strings. Fixing it means
+giving the engine a string provider on both sides.
+
+**One known divergence, deliberately not papered over.** `LessonVocabulary`
+derives a lesson's words from the seed, while iOS keeps an explicit 120 entry
+table in `ExerciseEngine`. These are different rules, so the tests assert only
+what is true of both: every lesson gets words, none are orphaned, the mapping is
+stable. Making them identical means moving the iOS table into the seed, which is
+the right next step.
+
+**Two differences that are not divergence.** Android has no cultural or dialect
+content and no Siri equivalent. Both are iOS features held behind the same
+native review gate as the Albanian strings, so there is nothing to port yet.
+
+---
+
+## 4. Product roadmap, not release work
 
 From the README roadmap, unchanged by these passes.
 
@@ -120,8 +187,8 @@ Two smaller ideas worth recording while they are fresh:
 
 ## What has been closed
 
-Three hard blockers, two quality gates. For contrast, the items that were open
-before these passes and are not any more: the daily goal loop had no surface at all; achievements did not
+Zero hard blockers remaining, two quality gates. For contrast, the items that
+were open before these passes and are not any more: the daily goal loop had no surface at all; achievements did not
 exist; there was no Reduce Transparency answer anywhere; the palette had no
 increased-contrast variants; the tab bar was custom and lost each tab's state; the
 splash was held on a fixed timer; the app had never been run on iPad and four of

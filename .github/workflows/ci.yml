@@ -116,6 +116,47 @@ jobs:
             -only-testing:GjuhaUITests \
             $EXTRA_FLAGS
 
+  android:
+    name: Android build and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    # Runs on Linux rather than macOS: the domain module is plain Kotlin on the
+    # JVM and the app only needs the Android SDK to assemble, so there is no
+    # reason to spend a macOS runner on it.
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Validate the Gradle wrapper
+        # The wrapper jar is executable code committed to the repo, so its
+        # checksum is checked against the published ones before it is run.
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: Domain tests
+        working-directory: android
+        run: ./gradlew :core:test --no-daemon --console=plain
+
+      - name: Build the app
+        working-directory: android
+        # Also exercises the task that copies the iOS seed into assets, which
+        # fails loudly if the content moves, so a seed relocation cannot pass CI
+        # and break the Android build silently.
+        run: ./gradlew :app:assembleDebug --no-daemon --console=plain
+
+      - name: Publish the test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-test-results
+          path: android/core/build/reports/tests/test
+          if-no-files-found: ignore
+
   house-rules:
     name: House rules
     runs-on: ubuntu-latest
@@ -136,6 +177,15 @@ jobs:
             exit 1
           fi
           echo "No em-dash found."
+
+      - name: Android strings match the iOS catalog
+        run: |
+          set -euo pipefail
+          # Both apps show the same copy and share one native review, so the
+          # Android resources are generated from the iOS String Catalog rather
+          # than translated twice. This fails if they have drifted, which would
+          # mean a correction made on iOS never reached Android.
+          python3 Scripts/sync_android_strings.py --check
 
       - name: Bundled seed content decodes and its references resolve
         run: |

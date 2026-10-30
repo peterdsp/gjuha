@@ -17,10 +17,12 @@ untranslated, and is an error. A key in the catalog but no longer in the code is
 dead weight, reported as a warning rather than an error, because a string can
 legitimately be extracted from only one build configuration.
 
-It also reports how many Albanian entries are still `needs_review`, which is the
-native-speaker gate described in Documentation/Release/REVIEW_PACKAGE.md. That
-count is informational: it never fails the build, because shipping with it
-non-zero is a recorded, deliberate decision, not an accident.
+It also reports how many Albanian entries still need a native speaker, counting
+both `needs_review` (a machine-assisted translation nobody has read) and `new`
+(a key with no translation at all). That is the gate described in
+Documentation/Release/REVIEW_PACKAGE.md. The count is informational: it never
+fails the build, because shipping with it non-zero is a recorded, deliberate
+decision, not an accident.
 
 Requires a prior build. Run:
     xcodebuild build -project Gjuha.xcodeproj -scheme Gjuha \\
@@ -88,7 +90,12 @@ def catalog_keys(path: Path) -> tuple[set[str], int]:
             for sub in (loc.get("substitutions") or {}).values():
                 sub_plural = ((sub.get("variations") or {}).get("plural") or {})
                 units += [v.get("stringUnit") for v in sub_plural.values()]
-            if any(u and u.get("state") == "needs_review" for u in units):
+            # "needs_review" is a machine-assisted translation nobody has read.
+            # "new" is a string with no translation at all, which Xcode marks
+            # when a key is added. Both are work for the same reviewer, so both
+            # are counted: reporting only the first understates the job, and
+            # the number is the whole point of reporting it.
+            if any(u and u.get("state") in ("needs_review", "new") for u in units):
                 needs_review += 1
                 break
     return set(strings), needs_review

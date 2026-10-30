@@ -59,16 +59,32 @@ is already built to accept.
 
 ## 4. Albanian interface strings (`Localizable.xcstrings`, locale `sq`)
 
-New in the 1.0 release pass. Gjuha's interface is now driven by String Catalogs
-with English as the source language and Albanian (`sq`) as a locale: 158 strings
-in the app catalog (`Gjuha/Resources/Localizable.xcstrings`) and 17 in the widget
-catalog (`GjuhaWidgets/Localizable.xcstrings`), 170 distinct strings in total.
+Gjuha's interface is driven by String Catalogs with English as the source
+language and Albanian (`sq`) as a locale: 213 strings in the app catalog
+(`Gjuha/Resources/Localizable.xcstrings`) and 20 in the widget catalog
+(`GjuhaWidgets/Localizable.xcstrings`).
 
-How the gate works here: every Albanian entry is written with
-`"state": "needs_review"`, which is the String Catalog's own flag for "translated
-but not checked". Xcode's catalog editor shows these with a review marker, and
-filtering to "Needs Review" lists exactly the set below. Marking an entry
-`translated` is the sign-off action.
+**208 app strings and 19 widget strings await this review.** Run
+`python3 Scripts/check_localization.py` for the current count at any time; it
+prints the number and never lets it drift.
+
+There are two kinds, and they need different handling in Xcode:
+
+- **`needs_review`**, the majority. A machine-assisted Albanian translation
+  exists and nobody has read it. Xcode's catalog editor marks these, and
+  filtering to "Needs Review" lists them.
+- **`new`, currently 10 strings.** No Albanian exists at all; the app falls back
+  to English for these. **Filtering to "Needs Review" does not show them**, so
+  they are easy to finish the pass without ever seeing. In Xcode they appear
+  with the Albanian cell empty. They are listed by name in step 5 below.
+
+Marking an entry `translated` is the sign-off action for both kinds.
+
+**This review covers Android as well.** The Android resources are generated from
+this catalog by `Scripts/sync_android_strings.py`, with the English deliberately
+identical so the Albanian transfers verbatim. There is no second set to read,
+and CI fails if the two drift apart. A correction made here reaches Android by
+re-running that script.
 
 What is and is not in scope:
 
@@ -84,10 +100,29 @@ What is and is not in scope:
   Translating the disclaimer while the explanation stays English would be worse
   than leaving both.
 
-Reviewer actions:
+Reviewer actions. There are two routes, and the second needs no developer
+tools:
+
+**Route A, a spreadsheet.** `Documentation/Release/albanian-review.csv` holds
+every pending string with its English, its current Albanian draft, and a note
+where there is no draft at all. It opens in Numbers, Excel or Google Sheets.
+The reviewer edits the `albanian` column and writes `ok` in `approved` for each
+line they are happy with, then sends it back. Nothing is marked reviewed
+without that word, so a half finished pass cannot look complete, and a line
+approved with an empty translation is refused rather than written.
+
+    python3 Scripts/review_strings.py export    # refresh the CSV first
+    python3 Scripts/review_strings.py import    # fold the answers back in
+
+The committed CSV is a snapshot. Export again before sending it to anyone, so
+it matches the code they will be reviewing. After importing, re-run
+`Scripts/sync_android_strings.py` so Android picks up the corrections.
+
+**Route B, Xcode.**
 
 1. Open `Gjuha/Resources/Localizable.xcstrings` in Xcode, select Albanian, and
-   filter to "Needs Review".
+   filter to "Needs Review". Then clear the filter and look for the entries with
+   an empty Albanian cell, which that filter hides. Both sets need doing.
 2. For each string, confirm or correct the Albanian, then mark it translated.
    Register matters: the app addresses an adult learner. The existing strings mix
    the second person singular and plural inconsistently in places (for example
@@ -107,7 +142,30 @@ Reviewer actions:
      `${applicationName}` token or the phrase is dropped by the system index.
    - `Mirë se vini` is intentionally Albanian in the English build and is marked
      "should not translate".
-5. Plural categories: Albanian uses `one` and `other`. Several entries currently
+5. The 10 strings with no Albanian at all. These are the exercise prompts and
+   their hints, and they matter more than the rest of the chrome: they are the
+   questions themselves, so a learner reads them on every exercise. They were
+   previously built by string interpolation inside the exercise engine and so
+   could not be translated at all; they are catalog keys now.
+
+   | Key | What the learner sees |
+   |---|---|
+   | `What does '%@' mean?` | `%@` is the Albanian word, never translated |
+   | `How do you say '%@' in Albanian?` | `%@` is the English word |
+   | `Translate: '%@'` | Used in both directions, so the Albanian must read naturally for either |
+   | `Arrange the words to say: "%@"` | `%@` is an English sentence |
+   | `%@ (%@)` | A sentence with a gap, then what it means. Keep both parts |
+   | `Match each word to its meaning` | Instruction above a matching grid |
+   | `Tap what you hear` | Listening exercise, no audio ships yet |
+   | `Type in Albanian` | Field hint |
+   | `Type in English` | Field hint |
+   | `Tap the words in order` | Hint under the word order exercise |
+
+   Register matters most here, because these are read constantly. The imperative
+   is natural in Albanian for instructions, but the choice between singular and
+   plural address should match whatever is chosen in step 2.
+
+6. Plural categories: Albanian uses `one` and `other`. Several entries currently
    carry identical `one` and `other` forms because the noun is invariant
    (`fjalë`, `ditë`). Confirm that is right for each.
 

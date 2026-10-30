@@ -44,6 +44,14 @@
     <string name="xp_of">%1$d/%2$d XP</string>
     <string name="lessons_of">%1$d/%2$d mësime</string>
     <string name="minutes_and_xp">%1$d min/ditë · %2$d XP</string>
+    <string name="a11y_hearts_remaining">Zemra të mbetura</string>
+    <string name="a11y_lesson_progress">Ecuria e mësimit</string>
+    <string name="a11y_unlocked">E zhbllokuar</string>
+    <string name="a11y_progress">Ecuria</string>
+    <string name="a11y_start_review">Nis një sesion përsëritjeje të shpërndarë</string>
+    <string name="a11y_word_add">Fjala %1$s, trokit për ta shtuar</string>
+    <string name="a11y_word_remove">Fjala e vendosur %1$s, trokit për ta hequr</string>
+    <string name="a11y_locked_hint">Përfundoni të gjitha mësimet e mësipërme për ta zhbllokuar</string>
     <string name="ach_streak_3_title">Tri ditë rresht</string>
     <string name="ach_streak_3_detail">Studioni tri ditë rresht.</string>
     <string name="ach_streak_7_title">Një javë e plotë</string>

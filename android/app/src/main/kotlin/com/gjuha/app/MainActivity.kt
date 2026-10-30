@@ -16,6 +16,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -137,7 +141,16 @@ private fun GjuhaApp(content: ContentRepository, progress: ProgressRepository) {
                         selected = screen == tab,
                         onClick = { screen = tab },
                         label = { Text(stringResource(tab.title)) },
-                        icon = { Text(tab.glyph, fontSize = 18.sp) },
+                        icon = {
+                            Text(
+                                tab.glyph,
+                                fontSize = 18.sp,
+                                // Decorative: the label already names the tab,
+                                // so a screen reader saying "high voltage" here
+                                // would only add noise.
+                                modifier = Modifier.clearAndSetSemantics {},
+                            )
+                        },
                     )
                 }
             }
@@ -244,9 +257,12 @@ private fun LearnScreen(
 
 @Composable
 private fun ReviewCard(dueCount: Int, onStart: () -> Unit) {
+    val announcement = stringResource(R.string.a11y_start_review)
     Card(
         onClick = onStart,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .semantics(mergeDescendants = true) { contentDescription = announcement },
         colors = CardDefaults.cardColors(containerColor = GjuhaColors.Success),
     ) {
         Row(
@@ -280,7 +296,7 @@ private fun HeaderCard(stats: UserStats) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Metric("🔥", stats.currentStreak.toString(), streakStrong())
+            Metric("🔥", stats.currentStreak.toString(), streakStrong(), stringResource(R.string.day_streak))
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(stringResource(R.string.today), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(
@@ -295,15 +311,28 @@ private fun HeaderCard(stats: UserStats) {
                     color = if (stats.hasMetDailyGoal) successStrong() else accentStrong(),
                 )
             }
-            Metric("⭐", stats.totalXp.toString(), xpStrong())
+            Metric("⭐", stats.totalXp.toString(), xpStrong(), stringResource(R.string.total_xp))
         }
     }
 }
 
 @Composable
-private fun Metric(glyph: String, value: String, tint: androidx.compose.ui.graphics.Color) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(glyph, fontSize = 16.sp)
+private fun Metric(
+    glyph: String,
+    value: String,
+    tint: androidx.compose.ui.graphics.Color,
+    label: String,
+) {
+    // Announced as one phrase, because "fire, 2" is not a fact.
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.semantics(mergeDescendants = true) {
+            contentDescription = "$label: $value"
+        },
+    ) {
+        // The parent row already announces "label: value", so the glyph is
+        // cleared rather than left to merge in as a second reading of it.
+        Text(glyph, fontSize = 16.sp, modifier = Modifier.clearAndSetSemantics {})
         Spacer(Modifier.width(4.dp))
         Text(value, color = tint, fontWeight = FontWeight.Bold)
     }
@@ -311,8 +340,16 @@ private fun Metric(glyph: String, value: String, tint: androidx.compose.ui.graph
 
 @Composable
 private fun LessonRow(lesson: SeedLesson, isDone: Boolean, isLocked: Boolean, onClick: () -> Unit) {
+    val state = stringResource(
+        if (isLocked) R.string.a11y_locked_hint else R.string.a11y_unlocked
+    )
     Card(
-        Modifier.fillMaxWidth().clickable(enabled = !isLocked, onClick = onClick),
+        Modifier
+            .fillMaxWidth()
+            .clickable(enabled = !isLocked, onClick = onClick)
+            // Merged so the row is one announcement, with the lock or tick
+            // spoken as a state rather than as an emoji.
+            .semantics(mergeDescendants = true) { stateDescription = state },
     ) {
         Row(
             Modifier.fillMaxWidth().padding(16.dp),
@@ -331,6 +368,9 @@ private fun LessonRow(lesson: SeedLesson, isDone: Boolean, isLocked: Boolean, on
                 Text(
                     if (isDone) "✓" else if (isLocked) "🔒" else "▶",
                     color = if (isLocked) MaterialTheme.colorScheme.onSurfaceVariant else GjuhaColors.OnAccent,
+                    // Decorative: the row announces its state, so a
+                    // screen reader reading "lock" here would say it twice.
+                    modifier = Modifier.clearAndSetSemantics {},
                 )
             }
             Spacer(Modifier.width(12.dp))

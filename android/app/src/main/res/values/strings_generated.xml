@@ -44,6 +44,14 @@
     <string name="xp_of">%1$d/%2$d XP</string>
     <string name="lessons_of">%1$d/%2$d lessons</string>
     <string name="minutes_and_xp">%1$d min/day · %2$d XP</string>
+    <string name="a11y_hearts_remaining">Hearts remaining</string>
+    <string name="a11y_lesson_progress">Lesson progress</string>
+    <string name="a11y_unlocked">Unlocked</string>
+    <string name="a11y_progress">Progress</string>
+    <string name="a11y_start_review">Starts a spaced repetition review session</string>
+    <string name="a11y_word_add">Word %1$s, tap to add</string>
+    <string name="a11y_word_remove">Placed word %1$s, tap to remove</string>
+    <string name="a11y_locked_hint">Complete all lessons above to unlock</string>
     <string name="ach_streak_3_title">Three in a row</string>
     <string name="ach_streak_3_detail">Study three days in a row.</string>
     <string name="ach_streak_7_title">A full week</string>

@@ -9,6 +9,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -214,7 +217,15 @@ private fun LessonHeader(progress: Float, hearts: Int?, combo: Int, onQuit: () -
             Spacer(Modifier.width(8.dp))
         }
         if (hearts != null) {
-            Text("❤".repeat(hearts.coerceAtLeast(0)))
+            val heartLabel = stringResource(R.string.a11y_hearts_remaining)
+            Text(
+                "❤".repeat(hearts.coerceAtLeast(0)),
+                // Three heart emoji read aloud is three words and no
+                // number, so the count is announced instead.
+                modifier = Modifier.semantics {
+                    contentDescription = "$heartLabel: $hearts"
+                },
+            )
         } else {
             // A review shows what it is instead of a heart count it does not keep.
             Text(stringResource(R.string.daily_review), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)

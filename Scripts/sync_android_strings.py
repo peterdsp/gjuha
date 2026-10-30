@@ -72,6 +72,20 @@ MAPPING = [
     ("lessons_of", "%1$d/%2$d lessons", "%lld/%lld lessons"),
     ("minutes_and_xp", "%1$d min/day · %2$d XP", "%lld min/day · %lld XP"),
 
+    # Accessibility announcements. Reused from iOS so a screen reader says the
+    # same thing on both platforms, in both languages.
+    ("a11y_hearts_remaining", "Hearts remaining", "Hearts remaining"),
+    ("a11y_lesson_progress", "Lesson progress", "Lesson progress"),
+    ("a11y_unlocked", "Unlocked", "Unlocked"),
+    ("a11y_progress", "Progress", "Progress"),
+    ("a11y_start_review", "Starts a spaced repetition review session",
+     "Starts a spaced repetition review session"),
+    ("a11y_word_add", "Word %1$s, tap to add", "Word %@, tap to add"),
+    ("a11y_word_remove", "Placed word %1$s, tap to remove",
+     "Placed word %@, tap to remove"),
+    ("a11y_locked_hint", "Complete all lessons above to unlock",
+     "Complete all lessons above to unlock"),
+
     # Achievements. Keyed by the stable id rather than by the English, because
     # the id is what is persisted in the unlock ledger and the only thing that
     # must never change.

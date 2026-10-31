@@ -86,9 +86,18 @@ COLORS: dict[str, tuple] = {
     # appearances, on real captions ("Complete all lessons above to unlock").
     "TextPrimary":      ((0.090, 0.082, 0.075), (0.961, 0.953, 0.941),
                          (0.000, 0.000, 0.000), (1.000, 1.000, 1.000)),
-    "TextSecondary":    ((0.388, 0.373, 0.353), (0.596, 0.580, 0.561),
+    # Dark secondary was 0.596 and measured 5.75:1 against the Surface token,
+    # which passed. It measured 4.25:1 against what a card actually renders,
+    # which does not. A card is Surface with the elevation material on top, so
+    # it comes out at (51,50,49) rather than the token's (28,26,24), and every
+    # pair measured here is measured against the token. Raised until it clears
+    # the floor against the rendered card, sampled from a screenshot.
+    "TextSecondary":    ((0.388, 0.373, 0.353), (0.624, 0.608, 0.588),
                          (0.243, 0.231, 0.216), (0.733, 0.718, 0.698)),
-    "TextTertiary":     ((0.420, 0.404, 0.384), (0.569, 0.553, 0.533),
+    # Dark tertiary was 0.569: 5.26:1 against the Surface token and 3.88:1
+    # against a rendered card, which is where it is actually drawn. Raised on
+    # the same evidence as secondary above.
+    "TextTertiary":     ((0.420, 0.404, 0.384), (0.624, 0.608, 0.584),
                          (0.318, 0.306, 0.290), (0.714, 0.698, 0.678)),
 
     # --- State: fill (carries OnAccent), then the on-surface member -------
@@ -156,6 +165,20 @@ APPEARANCES = [
 ]
 
 APPEARANCE_NAMES = ["light", "dark", "light+HC", "dark+HC"]
+
+# A card is not its Surface token. The card views draw Surface and then put an
+# elevation material on top, so in dark appearance a card renders about
+# (51,50,49) where the token is (28,26,24). Measuring text against the token
+# therefore flatters it: secondary text read 5.75:1 against the token and
+# 4.25:1 against the card a screenshot actually showed.
+#
+# This is the rendered value, sampled from a capture, so the pairs below can be
+# checked against what the app draws rather than only against what the palette
+# declares. If the card material changes, re-sample it.
+RENDERED_CARD = {
+    "light": (0.922, 0.918, 0.906),
+    "dark": (0.200, 0.196, 0.192),
+}
 
 # Pairs the app actually renders. Index 0/2 are light appearances, 1/3 dark.
 # Everything here is text or an icon that must stay legible, so all of it is
@@ -249,6 +272,21 @@ def report_contrast() -> int:
                 failures += 1
             cells.append(f"{ratio:>9.2f}{flag}")
         print(f"{fg_name + ' on ' + bg_name:<34} " + "".join(cells))
+
+    # The same text against a card as it actually renders, which is Surface
+    # plus the elevation material rather than Surface alone.
+    print("\nAgainst a card as it renders, not as the Surface token declares:")
+    for fg_name in ("TextPrimary", "TextSecondary", "TextTertiary"):
+        cells = []
+        for index in range(4):
+            card = RENDERED_CARD["dark" if index in (1, 3) else "light"]
+            ratio = contrast_ratio(COLORS[fg_name][index], card)
+            flag = "" if ratio >= TEXT_FLOOR else "!"
+            if flag:
+                failures += 1
+            cells.append(f"{ratio:>9.2f}{flag}")
+        print(f"{fg_name + ' on a card':<34} " + "".join(cells))
+
     return failures
 
 

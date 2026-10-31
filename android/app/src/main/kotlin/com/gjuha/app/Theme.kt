@@ -56,7 +56,7 @@ object GjuhaColors {
     val TextPrimary = Color(0xFF171513)
     val TextPrimaryDark = Color(0xFFF5F3F0)
     val TextSecondary = Color(0xFF635F5A)
-    val TextSecondaryDark = Color(0xFF98948F)
+    val TextSecondaryDark = Color(0xFF9F9B96)
     val OnAccent = Color(0xFFFFFFFF)
     val OnAccentDark = Color(0xFFFFFFFF)
     val OnWarning = Color(0xFF171513)

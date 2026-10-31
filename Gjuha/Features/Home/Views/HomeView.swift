@@ -315,7 +315,7 @@ private struct DailyGoalRing: View {
                         .foregroundStyle(Color.gjuha.successStrong)
                 } else {
                     Text(stats.xpToday, format: .number)
-                        .font(.gjuha.symbol(12, .bold, rounded: true))
+                        .font(.gjuha.captionBold)
                         .foregroundStyle(Color.gjuha.textPrimary)
                         .minimumScaleFactor(0.7)
                         .lineLimit(1)
@@ -677,7 +677,7 @@ private struct CourseNodeView: View {
                         Image(systemName: "star.fill")
                             .font(.gjuha.symbol(9, .regular))
                         Text(lesson.bestXP, format: .number)
-                            .font(.gjuha.symbol(10, .semibold))
+                            .font(.gjuha.caption)
                     }
                     .foregroundStyle(Color.gjuha.xpStrong)
                 }

@@ -299,12 +299,17 @@ private struct LaunchExperienceView: View {
                 .frame(width: 250, height: 250)
 
                 VStack(spacing: 6) {
+                    // The launch wordmark. A display token, not the glyph
+                    // helper: the helper exists so an icon tracks the text
+                    // beside it, and using it for text hides what the type
+                    // actually is.
                     Text("Gjuha")
-                        .font(.gjuha.symbol(44, .black, rounded: true))
+                        .font(.gjuha.displayMedium)
+                        .gjuhaDisplayTracking(-1.2)
                         .foregroundStyle(.white)
 
                     Text("Learn Albanian. Feel Albanian.")
-                        .font(.gjuha.symbol(17, .semibold, rounded: true))
+                        .font(.gjuha.headingSmall)
                         .foregroundStyle(.white.opacity(0.94))
                 }
 

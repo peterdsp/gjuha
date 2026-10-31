@@ -65,7 +65,7 @@ private struct SnippetStat: View {
                 .font(.system(.title3, design: .rounded, weight: .bold))
                 .foregroundStyle(Color.gjuha.textPrimary)
             Text(caption)
-                .font(.gjuha.symbol(11, .medium, rounded: true))
+                .font(.gjuha.caption)
                 .foregroundStyle(Color.gjuha.textSecondary)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)

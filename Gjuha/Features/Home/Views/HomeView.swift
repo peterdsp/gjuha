@@ -296,13 +296,13 @@ private struct DailyGoalRing: View {
 
                 Circle()
                     .trim(from: 0, to: shown)
+                    // Flat, not a gradient. The old ring blended the accent
+                    // into the streak colour, which made one object carry two
+                    // brand colours and left the meaning of each weaker. The
+                    // met state gradiented from success to success, which is
+                    // a gradient reached for out of habit.
                     .stroke(
-                        AngularGradient(
-                            colors: isMet
-                                ? [Color.gjuha.success, Color.gjuha.success]
-                                : [Color.gjuha.accent, Color.gjuha.streak],
-                            center: .center
-                        ),
+                        isMet ? Color.gjuha.success : Color.gjuha.accent,
                         style: StrokeStyle(lineWidth: 5, lineCap: .round)
                     )
                     // Start the arc at twelve o'clock, where a progress ring is
@@ -502,11 +502,7 @@ private struct UnitHeaderCard: View {
                             .frame(height: 8)
                         Capsule(style: .continuous)
                             .fill(
-                                LinearGradient(
-                                    colors: [Color.gjuha.accent, Color.gjuha.streak],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
+                                Color.gjuha.accent
                             )
                             .frame(width: geo.size.width * progress, height: 8)
                     }
@@ -704,23 +700,18 @@ private struct CourseNodeView: View {
     }
 
     private var backgroundColor: some ShapeStyle {
+        // Flat fills. The node is the one place on this screen where the brand
+        // colour is spent on something a learner acts on, so it is spent whole
+        // rather than faded into a second colour.
+        //
+        // It is also better for the white glyph sitting on it: the accent
+        // carries white at 6.62:1, while the streak end of the old gradient
+        // measured 4.90:1, so the contrast varied across the same circle.
         if lesson.isCompleted {
-            return AnyShapeStyle(
-                LinearGradient(
-                    colors: [Color.gjuha.success, Color.gjuha.success.opacity(0.8)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
+            return AnyShapeStyle(Color.gjuha.success)
         }
         if isNext {
-            return AnyShapeStyle(
-                LinearGradient(
-                    colors: [Color.gjuha.accent, Color.gjuha.streak.opacity(0.9)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
+            return AnyShapeStyle(Color.gjuha.accent)
         }
         if lesson.isLocked {
             return AnyShapeStyle(Color.gjuha.surfaceSecondary.opacity(0.5))

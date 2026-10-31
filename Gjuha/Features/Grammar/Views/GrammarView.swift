@@ -168,9 +168,11 @@ private struct GrammarTopicDetailView: View {
                             .foregroundStyle(Color.gjuha.textPrimary)
 
                         ForEach(topic.examples, id: \.self) { example in
-                            Text(example)
-                                .font(.gjuha.bodyRegular)
-                                .foregroundStyle(Color.gjuha.textSecondary)
+                            // Written "Unë jam student. - I am a student."
+                            // The Albanian sentence is the example; the English
+                            // is there so the learner can check it. They were
+                            // the same weight and the same grey.
+                            GrammarExample(text: example)
                                 .padding(12)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .gjuhaCardSurface(cornerRadius: 12, prominence: .nested)
@@ -298,9 +300,11 @@ private struct ConjugationTableView: View {
             ForEach(Array(table.enumerated()), id: \.offset) { rowIdx, row in
                 HStack(spacing: 0) {
                     ForEach(Array(row.enumerated()), id: \.offset) { colIdx, cell in
-                        Text(cell)
-                            .font(rowIdx == 0 ? .gjuha.labelBold : .gjuha.bodyRegular)
-                            .foregroundStyle(rowIdx == 0 ? Color.gjuha.textPrimary : Color.gjuha.textSecondary)
+                        // A body cell is written "jam - I am": the Albanian
+                        // form and then what it means. Rendered as one string
+                        // the two carried the same weight, so the conjugation
+                        // being taught read no louder than its gloss.
+                        ConjugationCell(cell: cell, isHeader: rowIdx == 0)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(8)
                             .background(rowIdx == 0 ? Color.gjuha.surfaceSecondary : Color.gjuha.surface)
@@ -310,5 +314,60 @@ private struct ConjugationTableView: View {
             }
         }
         .gjuhaCardSurface(cornerRadius: 12, prominence: .nested)
+    }
+}
+
+/// One cell of a conjugation table.
+///
+/// The seed writes a body cell as "jam - I am". The Albanian form is the thing
+/// being taught, so it takes the primary weight and colour and the gloss sits
+/// behind it, the same way a vocabulary row treats a word and its meaning. A
+/// cell with no gloss, and every header cell, is rendered whole.
+private struct ConjugationCell: View {
+    let cell: String
+    let isHeader: Bool
+
+    private var parts: (form: String, gloss: String?) {
+        guard !isHeader, let range = cell.range(of: " - ") else { return (cell, nil) }
+        return (String(cell[..<range.lowerBound]), String(cell[range.upperBound...]))
+    }
+
+    var body: some View {
+        let split = parts
+        VStack(alignment: .leading, spacing: 1) {
+            Text(split.form)
+                .font(isHeader ? .gjuha.labelBold : .gjuha.bodyMedium)
+                .foregroundStyle(Color.gjuha.textPrimary)
+            if let gloss = split.gloss {
+                Text(gloss)
+                    .font(.gjuha.caption)
+                    .foregroundStyle(Color.gjuha.textSecondary)
+            }
+        }
+    }
+}
+
+/// One worked example under a grammar guide.
+///
+/// The seed writes these as "Albanian. - English.". The Albanian is the
+/// example and the English is the check on it, so they are not set alike.
+private struct GrammarExample: View {
+    let text: String
+
+    var body: some View {
+        let parts = text.range(of: " - ").map {
+            (String(text[..<$0.lowerBound]), String(text[$0.upperBound...]))
+        }
+        VStack(alignment: .leading, spacing: 2) {
+            Text(parts?.0 ?? text)
+                .font(.gjuha.bodyMedium)
+                .foregroundStyle(Color.gjuha.textPrimary)
+            if let english = parts?.1 {
+                Text(english)
+                    .font(.gjuha.caption)
+                    .foregroundStyle(Color.gjuha.textSecondary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

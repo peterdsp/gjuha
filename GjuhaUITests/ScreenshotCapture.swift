@@ -59,16 +59,31 @@ final class ScreenshotCapture: XCTestCase {
         settle()
         capture(named: "04-Grammar-guides")
 
+        // Into a guide, because the conjugation table is behind a push and the
+        // list above it shows none of what the screen is actually for.
+        let guideRow = app.buttons
+            .matching(NSPredicate(format: "label CONTAINS %@", "to be"))
+            .firstMatch
+        if guideRow.waitForExistence(timeout: 8) {
+            tap(guideRow, "The first grammar guide")
+            settle()
+            capture(named: "05-Grammar-conjugation")
+            if app.navigationBars.buttons.firstMatch.waitForExistence(timeout: 5) {
+                app.navigationBars.buttons.firstMatch.tap()
+                settle()
+            }
+        }
+
         tap(tabElement("Profile", in: app), "Profile tab")
         settle()
-        capture(named: "05-Profile-honest-progress")
+        capture(named: "06-Profile-honest-progress")
 
         // Profile runs past one screen. One swipe lands on the achievement grid;
         // two carried straight past it to the settings blocks, which are not
         // what this capture is for.
         app.scrollViews.firstMatch.swipeUp()
         settle()
-        capture(named: "06-Profile-achievements")
+        capture(named: "07-Profile-achievements")
     }
 
     // MARK: - Capturing

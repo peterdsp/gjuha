@@ -44,8 +44,10 @@ display system. It currently shows on two screens.
 - [x] Onboarding: the welcome is the hero statement, carrying its two
       e-diaereses at hero size
 - [x] Lesson completion: the XP figure is the display element
-- [ ] Grammar: the Albanian in a conjugation table set above its gloss, the
-      way the vocabulary row now is
+- [x] Grammar: the Albanian in a conjugation table and in every worked
+      example set above its gloss, the way the vocabulary row now is. The
+      screenshot capture now walks into a guide, because the list above it
+      showed none of what the screen is for
 - [ ] Culture and dialect screens: same treatment where Albanian is shown
 
 ## 3. Widgets

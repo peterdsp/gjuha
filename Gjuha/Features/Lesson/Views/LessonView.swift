@@ -899,8 +899,13 @@ private struct LessonCompletedView: View {
                         .foregroundStyle(Color.gjuha.textPrimary)
                         .multilineTextAlignment(.center)
 
+                    // The figure the learner came for, set as the display
+                    // element of the screen rather than a step above the
+                    // heading. Tracking is pulled in the way the rest of the
+                    // display type is.
                     Text("+\(xp) XP")
-                        .font(.gjuha.displayMedium)
+                        .font(.gjuha.displayLarge)
+                        .gjuhaDisplayTracking(-1.2)
                         .foregroundStyle(Color.gjuha.accentStrong)
                         .opacity(showDetail ? 1 : 0)
                         .offset(y: showDetail ? 0 : 20)

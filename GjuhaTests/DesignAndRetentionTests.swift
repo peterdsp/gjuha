@@ -1086,3 +1086,72 @@ struct MascotLoopTests {
         #expect(UIImage(named: "MascotIcon") != nil, "MascotIcon is missing from the asset catalog")
     }
 }
+
+// MARK: - Dynamic Type
+
+/// Whether type and glyphs actually grow with the system text size.
+///
+/// The app set every SF Symbol at a fixed point size, so at the larger
+/// accessibility sizes the words grew and the status glyph, the chevron and
+/// the review icon stayed where they were. That is invisible in a screenshot
+/// taken at the default size, which is how it survived.
+@Suite("Dynamic Type")
+struct GjuhaDynamicTypeTests {
+
+    /// A glyph at a fixed point size is the bug this guards against.
+    @Test("A symbol grows with the text size")
+    func symbolGrows() {
+        let metrics = UIFontMetrics(forTextStyle: .title2)
+        let base = UIFont.systemFont(ofSize: 26, weight: .semibold)
+
+        let normal = metrics.scaledFont(
+            for: base,
+            compatibleWith: UITraitCollection(preferredContentSizeCategory: .large)
+        )
+        let largest = metrics.scaledFont(
+            for: base,
+            maximumPointSize: 26 * 1.7,
+            compatibleWith: UITraitCollection(
+                preferredContentSizeCategory: .accessibilityExtraExtraExtraLarge
+            )
+        )
+
+        #expect(largest.pointSize > normal.pointSize,
+                "A 26 point glyph must grow at the largest text size, got \(largest.pointSize)")
+    }
+
+    /// The ceiling exists so a hero does not reach roughly 200 points and
+    /// overflow the layout holding it. It must still allow real growth.
+    @Test("Display type is capped but still grows")
+    func displayIsCappedAndStillGrows() {
+        let metrics = UIFontMetrics(forTextStyle: .largeTitle)
+        let base = UIFont.systemFont(ofSize: 64, weight: .black)
+        let largest = UITraitCollection(
+            preferredContentSizeCategory: .accessibilityExtraExtraExtraLarge
+        )
+
+        let uncapped = metrics.scaledFont(for: base, compatibleWith: largest)
+        let capped = metrics.scaledFont(for: base, maximumPointSize: 96, compatibleWith: largest)
+
+        #expect(capped.pointSize > 64, "the cap must still allow growth")
+        #expect(capped.pointSize <= 96, "the cap must hold")
+        #expect(uncapped.pointSize > capped.pointSize,
+                "uncapped display type would be larger, which is the problem the cap solves")
+    }
+
+    /// Body text keeps scaling without a ceiling. That is the accessibility
+    /// promise and must not be traded for tidy layout.
+    @Test("Body text is not capped")
+    func bodyIsNotCapped() {
+        let metrics = UIFontMetrics(forTextStyle: .body)
+        let base = UIFont.systemFont(ofSize: 16, weight: .regular)
+        let largest = metrics.scaledFont(
+            for: base,
+            compatibleWith: UITraitCollection(
+                preferredContentSizeCategory: .accessibilityExtraExtraExtraLarge
+            )
+        )
+        #expect(largest.pointSize > 30,
+                "body text must scale freely, got \(largest.pointSize)")
+    }
+}

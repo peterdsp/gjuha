@@ -118,8 +118,18 @@ private struct WelcomeStepView: View {
             .frame(height: 210)
 
             VStack(spacing: 16) {
+                // The one hero moment, and the only place the brand colour is
+                // spent on something that is not an action. branding.md allows
+                // exactly this: "To express your brand through color, consider
+                // moving it into the content layer." A welcome headline is the
+                // content layer, and this is the defining moment.
+                //
+                // Set at the hero size with tracking pulled in, because the
+                // phrase carries two e-diaereses and they are the whole idea
+                // of the art direction. At this size they are shapes.
                 Text("Mirë se vini")
-                    .font(.gjuha.displayLarge)
+                    .font(.gjuha.displayHero)
+                    .gjuhaDisplayTracking(-1.5)
                     .foregroundStyle(Color.gjuha.accentStrong)
                     .opacity(reveal ? 1 : 0)
                     .offset(y: reveal ? 0 : 8)

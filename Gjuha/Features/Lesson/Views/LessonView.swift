@@ -131,7 +131,7 @@ private struct AnswerFeedbackBanner: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 12) {
                 Image(systemName: iconName)
-                    .font(.system(size: 28, weight: .bold))
+                    .font(.gjuha.symbol(28, .bold))
                     .foregroundStyle(bannerForeground)
                     .scaleEffect(scale)
                     .accessibilityHidden(true)
@@ -343,10 +343,24 @@ private struct ExerciseView: View {
 
     var body: some View {
         VStack(spacing: 24) {
+            // The question is the screen. It is the most read text in the app
+            // and the place a learner meets the diacritics, so it is set as a
+            // statement rather than as a caption above the answers: left
+            // aligned on the same margin the options use, tracking pulled in
+            // the way display type wants, and leading tightened so two lines
+            // read as one block.
+            //
+            // Tracking is applied here and not in the font token because it is
+            // a display treatment: the same face at body size is left at its
+            // natural tracking, where an Albanian word carrying two diacritics
+            // needs the room.
             Text(exercise.prompt)
                 .font(.gjuha.exercisePrompt)
+                .gjuhaDisplayTracking(-0.8)
+                .lineSpacing(-2)
                 .foregroundStyle(Color.gjuha.textPrimary)
-                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .multilineTextAlignment(.leading)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, 24)
                 .padding(.top, 32)
@@ -444,7 +458,7 @@ private struct MultipleChoiceAnswers: View {
                         .overlay(alignment: .topTrailing) {
                             if let symbol = statusSymbol(for: option) {
                                 Image(systemName: symbol.name)
-                                    .font(.system(size: 18, weight: .bold))
+                                    .font(.gjuha.symbol(18, .bold))
                                     .foregroundStyle(symbol.color)
                                     .padding(6)
                                     .accessibilityHidden(true)
@@ -825,7 +839,7 @@ private struct ListeningAnswer: View {
         VStack(spacing: 24) {
             Button(action: onPlay) {
                 Image(systemName: "speaker.wave.3.fill")
-                    .font(.system(size: 34, weight: .bold))
+                    .font(.gjuha.symbol(34, .bold))
                     .foregroundStyle(Color.gjuha.onAccent)
                     .frame(width: 96, height: 96)
                     .background(
@@ -885,8 +899,13 @@ private struct LessonCompletedView: View {
                         .foregroundStyle(Color.gjuha.textPrimary)
                         .multilineTextAlignment(.center)
 
+                    // The figure the learner came for, set as the display
+                    // element of the screen rather than a step above the
+                    // heading. Tracking is pulled in the way the rest of the
+                    // display type is.
                     Text("+\(xp) XP")
-                        .font(.gjuha.displayMedium)
+                        .font(.gjuha.displayLarge)
+                        .gjuhaDisplayTracking(-1.2)
                         .foregroundStyle(Color.gjuha.accentStrong)
                         .opacity(showDetail ? 1 : 0)
                         .offset(y: showDetail ? 0 : 20)
@@ -961,7 +980,7 @@ private struct LessonCompletedView: View {
             }
 
             Image(systemName: "star.fill")
-                .font(.system(size: 72))
+                .font(.gjuha.symbol(72, .regular))
                 .foregroundStyle(Color.gjuha.xpStrong)
                 .scaleEffect(starScale)
         }
@@ -1038,7 +1057,7 @@ private struct SessionStatTile: View {
     var body: some View {
         VStack(spacing: .gjuha.hairline) {
             Image(systemName: icon)
-                .font(.system(size: 18, weight: .semibold))
+                .font(.gjuha.symbol(18, .semibold))
                 .foregroundStyle(tint)
             Text(value)
                 .font(.gjuha.headingMedium)
@@ -1063,7 +1082,7 @@ private struct DailyGoalMetBanner: View {
     var body: some View {
         HStack(spacing: .gjuha.snug) {
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 24, weight: .bold))
+                .font(.gjuha.symbol(24, .bold))
                 .foregroundStyle(Color.gjuha.onAccent)
 
             VStack(alignment: .leading, spacing: 2) {
@@ -1104,7 +1123,7 @@ private struct UnlockedAchievementsCard: View {
             ForEach(achievements) { achievement in
                 HStack(spacing: .gjuha.snug) {
                     Image(systemName: achievement.symbolName)
-                        .font(.system(size: 20, weight: .semibold))
+                        .font(.gjuha.symbol(20, .semibold))
                         .foregroundStyle(Color.gjuha.onWarning)
                         .frame(width: 40, height: 40)
                         .background(Color.gjuha.xp)
@@ -1142,7 +1161,7 @@ private struct LessonFailedView: View {
         VStack(spacing: 32) {
             Spacer()
             Image(systemName: "heart.slash.fill")
-                .font(.system(size: 72))
+                .font(.gjuha.symbol(72, .regular))
                 .foregroundStyle(Color.gjuha.errorStrong)
                 .scaleEffect(heartScale)
 

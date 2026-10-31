@@ -15,8 +15,22 @@ extension Font {
 /// to the closest system text style, which sets the scaling curve.
 struct GjuhaFonts {
     // Display (hero screens, onboarding)
-    var displayLarge: Font { Self.scaled(48, .black, .rounded, relativeTo: .largeTitle) }
-    var displayMedium: Font { Self.scaled(36, .bold, .rounded, relativeTo: .largeTitle) }
+    //
+    // The art direction is the alphabet: the marks Albanian adds to the Latin
+    // one, and the nine digraphs that are single letters. So display type is
+    // set large enough for an `e` with a diaeresis to be a shape rather than a
+    // speck, and heavy enough that the mark has weight of its own.
+    //
+    // Display type is capped. Everything else scales without a ceiling, which
+    // is the accessibility promise and must not change. But a token that
+    // already starts at 52 or 64 points does not need the full multiplier at
+    // the largest accessibility sizes: unbounded, a 64 point hero reaches
+    // roughly 200 points and overflows any layout holding it. The caps below
+    // still let it grow by about half again, which is a real increase for
+    // someone who needs it, and keep the screen usable.
+    var displayHero: Font { Self.scaled(64, .black, .rounded, relativeTo: .largeTitle, cappedAt: 96) }
+    var displayLarge: Font { Self.scaled(52, .black, .rounded, relativeTo: .largeTitle, cappedAt: 80) }
+    var displayMedium: Font { Self.scaled(38, .bold, .rounded, relativeTo: .largeTitle, cappedAt: 62) }
 
     // Headings
     var headingLarge: Font { Self.scaled(28, .bold, .rounded, relativeTo: .title1) }
@@ -36,10 +50,49 @@ struct GjuhaFonts {
     var captionBold: Font { Self.scaled(12, .semibold, .default, relativeTo: .caption1) }
 
     // Exercise prompt (prominent)
-    var exercisePrompt: Font { Self.scaled(26, .semibold, .rounded, relativeTo: .title1) }
+    //
+    // The question is the most read text in the app, and it is where a learner
+    // meets the diacritics. It is set a step larger than a heading rather than
+    // a step smaller.
+    var exercisePrompt: Font { Self.scaled(30, .semibold, .rounded, relativeTo: .title1, cappedAt: 54) }
 
     // Keyboard / answer option
     var answerOption: Font { Self.scaled(18, .medium, .rounded, relativeTo: .body) }
+
+    /// A symbol or glyph that grows with the text beside it.
+    ///
+    /// SF Symbols set with a fixed point size do not respond to Dynamic Type,
+    /// so at the larger accessibility sizes the words grow and the status
+    /// glyph, the chevron and the review icon stay where they were. Apple's
+    /// typography guidance is explicit that meaningful glyphs scale with the
+    /// text; a glyph that carries state or an affordance is meaningful.
+    ///
+    /// The anchor is chosen from the design size so each glyph keeps the
+    /// scaling curve of text its own size, and the ceiling is roughly 1.7x,
+    /// which keeps a 26 point icon from becoming a 70 point one.
+    func symbol(
+        _ size: CGFloat,
+        _ weight: UIFont.Weight = .semibold,
+        rounded: Bool = false
+    ) -> Font {
+        let style: UIFont.TextStyle
+        switch size {
+        case ..<13: style = .caption1
+        case ..<15: style = .footnote
+        case ..<17: style = .subheadline
+        case ..<20: style = .body
+        case ..<24: style = .title3
+        case ..<30: style = .title2
+        default: style = .title1
+        }
+        return Self.scaled(
+            size,
+            weight,
+            rounded ? .rounded : .default,
+            relativeTo: style,
+            cappedAt: size * 1.7
+        )
+    }
 
     /// Builds a Dynamic Type aware `Font` that starts at `size` and scales with
     /// the given text style. Preserves weight and (rounded/default) design.
@@ -47,12 +100,30 @@ struct GjuhaFonts {
         _ size: CGFloat,
         _ weight: UIFont.Weight,
         _ design: UIFontDescriptor.SystemDesign,
-        relativeTo textStyle: UIFont.TextStyle
+        relativeTo textStyle: UIFont.TextStyle,
+        cappedAt maximum: CGFloat? = nil
     ) -> Font {
         let base = UIFont.systemFont(ofSize: size, weight: weight)
         let descriptor = base.fontDescriptor.withDesign(design) ?? base.fontDescriptor
         let uiFont = UIFont(descriptor: descriptor, size: size)
-        let scaled = UIFontMetrics(forTextStyle: textStyle).scaledFont(for: uiFont)
+        let metrics = UIFontMetrics(forTextStyle: textStyle)
+        // A ceiling only where one was asked for. Body and label tokens pass
+        // none and keep scaling without limit.
+        let scaled = maximum.map { metrics.scaledFont(for: uiFont, maximumPointSize: $0) }
+            ?? metrics.scaledFont(for: uiFont)
         return Font(scaled)
+    }
+}
+
+// MARK: - Display tracking
+
+extension View {
+    /// Tightens tracking for display type only.
+    ///
+    /// Large type sets loose, so the biggest sizes are pulled in. Body text is
+    /// left at its natural tracking: tightening it costs legibility and gains
+    /// nothing, and an Albanian word carrying two diacritics needs the room.
+    func gjuhaDisplayTracking(_ amount: CGFloat = -1.5) -> some View {
+        tracking(amount)
     }
 }

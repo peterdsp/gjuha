@@ -147,18 +147,22 @@ private struct RootTabView: View {
             Tab("Learn", systemImage: "bolt.fill", value: AppFeature.State.RootTab.home) {
                 HomeView(store: store.scope(state: \.home, action: \.home))
             }
+            .accessibilityIdentifier("tab.learn")
 
             Tab("Words", systemImage: "text.book.closed.fill", value: AppFeature.State.RootTab.vocabulary) {
                 VocabularyView(store: store.scope(state: \.vocabulary, action: \.vocabulary))
             }
+            .accessibilityIdentifier("tab.words")
 
             Tab("Grammar", systemImage: "book.pages.fill", value: AppFeature.State.RootTab.grammar) {
                 GrammarView(store: store.scope(state: \.grammar, action: \.grammar))
             }
+            .accessibilityIdentifier("tab.grammar")
 
             Tab("Profile", systemImage: "person.crop.circle.fill", value: AppFeature.State.RootTab.profile) {
                 ProfileView(store: store.scope(state: \.profile, action: \.profile))
             }
+            .accessibilityIdentifier("tab.profile")
         }
         // iPad is a listed device family for this app, and a four-destination
         // learning course reads better in a sidebar on a 13" screen than as a
@@ -299,12 +303,17 @@ private struct LaunchExperienceView: View {
                 .frame(width: 250, height: 250)
 
                 VStack(spacing: 6) {
+                    // The launch wordmark. A display token, not the glyph
+                    // helper: the helper exists so an icon tracks the text
+                    // beside it, and using it for text hides what the type
+                    // actually is.
                     Text("Gjuha")
-                        .font(.system(size: 44, weight: .black, design: .rounded))
+                        .font(.gjuha.displayMedium)
+                        .gjuhaDisplayTracking(-1.2)
                         .foregroundStyle(.white)
 
                     Text("Learn Albanian. Feel Albanian.")
-                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        .font(.gjuha.headingSmall)
                         .foregroundStyle(.white.opacity(0.94))
                 }
 
@@ -350,7 +359,7 @@ private struct SparkleGlyph: View {
 
     var body: some View {
         Image(systemName: "sparkle")
-            .font(.system(size: size, weight: .heavy))
+            .font(.gjuha.symbol(size, .heavy))
             .foregroundStyle(Color.gjuha.warning)
             .shadow(color: .white.opacity(0.4), radius: 4)
             .opacity(opacity)

@@ -296,13 +296,13 @@ private struct DailyGoalRing: View {
 
                 Circle()
                     .trim(from: 0, to: shown)
+                    // Flat, not a gradient. The old ring blended the accent
+                    // into the streak colour, which made one object carry two
+                    // brand colours and left the meaning of each weaker. The
+                    // met state gradiented from success to success, which is
+                    // a gradient reached for out of habit.
                     .stroke(
-                        AngularGradient(
-                            colors: isMet
-                                ? [Color.gjuha.success, Color.gjuha.success]
-                                : [Color.gjuha.accent, Color.gjuha.streak],
-                            center: .center
-                        ),
+                        isMet ? Color.gjuha.success : Color.gjuha.accent,
                         style: StrokeStyle(lineWidth: 5, lineCap: .round)
                     )
                     // Start the arc at twelve o'clock, where a progress ring is
@@ -311,11 +311,11 @@ private struct DailyGoalRing: View {
 
                 if isMet {
                     Image(systemName: "checkmark")
-                        .font(.system(size: 13, weight: .heavy))
+                        .font(.gjuha.symbol(13, .heavy))
                         .foregroundStyle(Color.gjuha.successStrong)
                 } else {
                     Text(stats.xpToday, format: .number)
-                        .font(.system(size: 12, weight: .bold, design: .rounded))
+                        .font(.gjuha.captionBold)
                         .foregroundStyle(Color.gjuha.textPrimary)
                         .minimumScaleFactor(0.7)
                         .lineLimit(1)
@@ -371,7 +371,7 @@ private struct DailyReviewCard: View {
         Button(action: action) {
             HStack(spacing: 14) {
                 Image(systemName: "arrow.triangle.2.circlepath")
-                    .font(.system(size: 26, weight: .semibold))
+                    .font(.gjuha.symbol(26, .semibold))
                     .foregroundStyle(Color.gjuha.accentStrong)
 
                 VStack(alignment: .leading, spacing: 4) {
@@ -387,7 +387,7 @@ private struct DailyReviewCard: View {
                 Spacer(minLength: 8)
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 15, weight: .bold))
+                    .font(.gjuha.symbol(15, .bold))
                     .foregroundStyle(Color.gjuha.textTertiary)
             }
             .padding(16)
@@ -411,7 +411,7 @@ private struct ExploreCultureCard: View {
         Button(action: action) {
             HStack(spacing: 14) {
                 Image(systemName: "globe.europe.africa.fill")
-                    .font(.system(size: 26, weight: .semibold))
+                    .font(.gjuha.symbol(26, .semibold))
                     .foregroundStyle(Color.gjuha.accentStrong)
 
                 VStack(alignment: .leading, spacing: 4) {
@@ -427,7 +427,7 @@ private struct ExploreCultureCard: View {
                 Spacer(minLength: 8)
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 15, weight: .bold))
+                    .font(.gjuha.symbol(15, .bold))
                     .foregroundStyle(Color.gjuha.textTertiary)
             }
             .padding(16)
@@ -483,9 +483,16 @@ private struct UnitHeaderCard: View {
                         .font(.gjuha.captionBold)
                         .foregroundStyle(Color.gjuha.textPrimary)
                     Spacer()
+                    // The brand colour is spent on the action and on status,
+                    // not on a neutral figure. A unit at 0% rendered in the
+                    // accent reads as a warning about the learner rather than
+                    // as a fact about the unit, and every extra place the
+                    // accent appears makes it mean less where it matters.
                     Text("\(Int(progress * 100))%")
                         .font(.gjuha.captionBold)
-                        .foregroundStyle(Color.gjuha.accentStrong)
+                        .foregroundStyle(
+                            progress > 0 ? Color.gjuha.accentStrong : Color.gjuha.textSecondary
+                        )
                 }
 
                 GeometryReader { geo in
@@ -495,11 +502,7 @@ private struct UnitHeaderCard: View {
                             .frame(height: 8)
                         Capsule(style: .continuous)
                             .fill(
-                                LinearGradient(
-                                    colors: [Color.gjuha.accent, Color.gjuha.streak],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
+                                Color.gjuha.accent
                             )
                             .frame(width: geo.size.width * progress, height: 8)
                     }
@@ -646,15 +649,15 @@ private struct CourseNodeView: View {
                     // Icon
                     if lesson.isLocked {
                         Image(systemName: "lock.fill")
-                            .font(.system(size: 22, weight: .semibold))
+                            .font(.gjuha.symbol(22, .semibold))
                             .foregroundStyle(Color.gjuha.textTertiary)
                     } else if lesson.isCompleted {
                         Image(systemName: "checkmark")
-                            .font(.system(size: 24, weight: .bold))
+                            .font(.gjuha.symbol(24, .bold))
                             .foregroundStyle(Color.gjuha.onAccent)
                     } else {
                         Image(systemName: lesson.iconName)
-                            .font(.system(size: isNext ? 26 : 22, weight: .semibold))
+                            .font(.gjuha.symbol(isNext ? 26 : 22, .semibold))
                             .foregroundStyle(isNext ? Color.gjuha.onAccent : Color.gjuha.textPrimary)
                     }
                 }
@@ -672,9 +675,9 @@ private struct CourseNodeView: View {
                 if lesson.isCompleted && lesson.bestXP > 0 {
                     HStack(spacing: 2) {
                         Image(systemName: "star.fill")
-                            .font(.system(size: 9))
+                            .font(.gjuha.symbol(9, .regular))
                         Text(lesson.bestXP, format: .number)
-                            .font(.system(size: 10, weight: .semibold))
+                            .font(.gjuha.caption)
                     }
                     .foregroundStyle(Color.gjuha.xpStrong)
                 }
@@ -697,23 +700,18 @@ private struct CourseNodeView: View {
     }
 
     private var backgroundColor: some ShapeStyle {
+        // Flat fills. The node is the one place on this screen where the brand
+        // colour is spent on something a learner acts on, so it is spent whole
+        // rather than faded into a second colour.
+        //
+        // It is also better for the white glyph sitting on it: the accent
+        // carries white at 6.62:1, while the streak end of the old gradient
+        // measured 4.90:1, so the contrast varied across the same circle.
         if lesson.isCompleted {
-            return AnyShapeStyle(
-                LinearGradient(
-                    colors: [Color.gjuha.success, Color.gjuha.success.opacity(0.8)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
+            return AnyShapeStyle(Color.gjuha.success)
         }
         if isNext {
-            return AnyShapeStyle(
-                LinearGradient(
-                    colors: [Color.gjuha.accent, Color.gjuha.streak.opacity(0.9)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
+            return AnyShapeStyle(Color.gjuha.accent)
         }
         if lesson.isLocked {
             return AnyShapeStyle(Color.gjuha.surfaceSecondary.opacity(0.5))
@@ -738,7 +736,7 @@ private struct NextUnitPreview: View {
         VStack(spacing: 8) {
             HStack(spacing: 8) {
                 Image(systemName: "lock.fill")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.gjuha.symbol(14, .semibold))
                     .foregroundStyle(Color.gjuha.textTertiary)
                 Text("Next: \(unit.title)")
                     .font(.gjuha.labelBold)
@@ -769,7 +767,7 @@ private struct HomeMetricChip: View {
     var body: some View {
         HStack(spacing: 5) {
             Image(systemName: icon)
-                .font(.system(size: 11, weight: .semibold))
+                .font(.gjuha.symbol(11, .semibold))
             Text(text)
                 .font(.gjuha.captionBold)
                 .lineLimit(1)

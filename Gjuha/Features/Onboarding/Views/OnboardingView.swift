@@ -118,8 +118,18 @@ private struct WelcomeStepView: View {
             .frame(height: 210)
 
             VStack(spacing: 16) {
+                // The one hero moment, and the only place the brand colour is
+                // spent on something that is not an action. branding.md allows
+                // exactly this: "To express your brand through color, consider
+                // moving it into the content layer." A welcome headline is the
+                // content layer, and this is the defining moment.
+                //
+                // Set at the hero size with tracking pulled in, because the
+                // phrase carries two e-diaereses and they are the whole idea
+                // of the art direction. At this size they are shapes.
                 Text("Mirë se vini")
-                    .font(.gjuha.displayLarge)
+                    .font(.gjuha.displayHero)
+                    .gjuhaDisplayTracking(-1.5)
                     .foregroundStyle(Color.gjuha.accentStrong)
                     .opacity(reveal ? 1 : 0)
                     .offset(y: reveal ? 0 : 8)
@@ -144,6 +154,7 @@ private struct WelcomeStepView: View {
             Button(action: onNext) {
                 Text("Get started")
                     .font(.gjuha.labelBold)
+                    .accessibilityIdentifier("onboarding.start")
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
@@ -194,6 +205,7 @@ private struct ReasonStepView: View {
                     Button(action: { onSelect(reason) }) {
                         HStack {
                             Text(reason.displayName)
+                                .accessibilityIdentifier("onboarding.reason.\(index)")
                                 .font(.gjuha.bodyRegular)
                                 .foregroundStyle(Color.gjuha.textPrimary)
                             Spacer()
@@ -234,6 +246,7 @@ private struct ReasonStepView: View {
 
             Button(action: onNext) {
                 Text("Continue")
+                    .accessibilityIdentifier("onboarding.continue")
                     .font(.gjuha.labelBold)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
@@ -283,6 +296,7 @@ private struct GoalStepView: View {
                                 Text(goal.displayName)
                                     .font(.gjuha.labelBold)
                                     .foregroundStyle(Color.gjuha.textPrimary)
+                                    .accessibilityIdentifier("onboarding.goal.\(index)")
                                 Text("\(goal.minutesPerDay) min / day")
                                     .font(.gjuha.caption)
                                     .foregroundStyle(Color.gjuha.textSecondary)
@@ -326,6 +340,7 @@ private struct GoalStepView: View {
             Button(action: onNext) {
                 Text("Start learning")
                     .font(.gjuha.labelBold)
+                    .accessibilityIdentifier("onboarding.finish")
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
@@ -415,7 +430,7 @@ private struct OrbitSparkleView: View {
 
     var body: some View {
         Image(systemName: "sparkle")
-            .font(.system(size: size, weight: .heavy))
+            .font(.gjuha.symbol(size, .heavy))
             .foregroundStyle(Color.gjuha.warning)
             .shadow(color: Color.gjuha.glassTint.opacity(0.6), radius: 4)
             .opacity(opacity)

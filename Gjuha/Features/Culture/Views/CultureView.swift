@@ -70,7 +70,7 @@ private struct CultureEmptyStateView: View {
     var body: some View {
         VStack(spacing: 12) {
             Image(systemName: "hourglass")
-                .font(.system(size: 34, weight: .semibold))
+                .font(.gjuha.symbol(34, .semibold))
                 .foregroundStyle(Color.gjuha.accentStrong)
             Text("In native-speaker review")
                 .font(.gjuha.headingSmall)
@@ -94,7 +94,7 @@ private struct CulturalUnitRow: View {
     var body: some View {
         HStack(spacing: 14) {
             Image(systemName: "cup.and.saucer.fill")
-                .font(.system(size: 24, weight: .semibold))
+                .font(.gjuha.symbol(24, .semibold))
                 .foregroundStyle(Color.gjuha.accentStrong)
                 .frame(width: 34)
             VStack(alignment: .leading, spacing: 4) {
@@ -107,7 +107,7 @@ private struct CulturalUnitRow: View {
             }
             Spacer(minLength: 8)
             Image(systemName: "chevron.right")
-                .font(.system(size: 14, weight: .bold))
+                .font(.gjuha.symbol(14, .bold))
                 .foregroundStyle(Color.gjuha.textTertiary)
         }
         .padding(16)
@@ -121,7 +121,7 @@ private struct DialectPackRow: View {
     var body: some View {
         HStack(spacing: 14) {
             Image(systemName: "character.book.closed.fill")
-                .font(.system(size: 24, weight: .semibold))
+                .font(.gjuha.symbol(24, .semibold))
                 .foregroundStyle(Color.gjuha.accentStrong)
                 .frame(width: 34)
             VStack(alignment: .leading, spacing: 4) {
@@ -134,7 +134,7 @@ private struct DialectPackRow: View {
             }
             Spacer(minLength: 8)
             Image(systemName: "chevron.right")
-                .font(.system(size: 14, weight: .bold))
+                .font(.gjuha.symbol(14, .bold))
                 .foregroundStyle(Color.gjuha.textTertiary)
         }
         .padding(16)

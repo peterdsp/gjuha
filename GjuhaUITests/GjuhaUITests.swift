@@ -55,7 +55,7 @@ final class GjuhaUITests: XCTestCase {
             scrollIntoView(element)
         }
 
-        guard element.isHittable else {
+        guard canBeTapped(element) else {
             XCTFail(
                 "\(description) existed but never became tappable, even after scrolling.",
                 file: file,
@@ -71,20 +71,54 @@ final class GjuhaUITests: XCTestCase {
     /// `opacity(0.001)`: every control under it already reports `exists == true`
     /// while still being covered, and a tap in that window is swallowed.
     private func waitForHittable(_ element: XCUIElement, timeout: TimeInterval = 8) -> Bool {
-        let hittable = XCTNSPredicateExpectation(
-            predicate: NSPredicate(format: "isHittable == true"),
-            object: element
-        )
-        return XCTWaiter.wait(for: [hittable], timeout: timeout) == .completed
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if canBeTapped(element) { return true }
+            RunLoop.current.run(until: Date().addingTimeInterval(0.25))
+        }
+        return false
+    }
+
+    /// Whether an element can be tapped right now, without raising.
+    ///
+    /// `isHittable` does not return false for an element that has no usable
+    /// frame: it raises "Activation point invalid and no suggested hit points
+    /// based on element frame" and fails the test outright. SwiftUI's lazy
+    /// containers publish a row to the accessibility tree before laying it out,
+    /// so a control below the fold is in exactly that state, and the query
+    /// meant to discover that fact is the thing that fails.
+    ///
+    /// Checking the frame first turns an unanswerable question into "not yet",
+    /// which is what the callers can actually act on by scrolling.
+    private func canBeTapped(_ element: XCUIElement) -> Bool {
+        guard element.exists else { return false }
+        let frame = element.frame
+        guard frame.width > 0, frame.height > 0 else { return false }
+        return element.isHittable
     }
 
     /// Scrolls an off-screen control into view. Profile in particular is longer
     /// than one screen, so the reset control sits below the fold.
-    private func scrollIntoView(_ element: XCUIElement, maxSwipes: Int = 8) {
+    private func scrollIntoView(_ element: XCUIElement, maxSwipes: Int = 24) {
         let scrollView = XCUIApplication().scrollViews.firstMatch
         let scroller: XCUIElement = scrollView.exists ? scrollView : XCUIApplication()
-        for _ in 0..<maxSwipes where !element.isHittable {
+
+        // Stops on whichever comes first: the element is reachable, or the
+        // screen stopped moving because there is nothing left to scroll.
+        //
+        // A fixed number of swipes was enough at the default text size and not
+        // at the largest one, where everything above the target is two or three
+        // times taller. That failed as "the element never appeared", which
+        // reads like a missing view rather than a scroll that gave up early.
+        var previous = ""
+        for _ in 0..<maxSwipes where !canBeTapped(element) {
+            let current = scroller.debugDescription
+            if current == previous { return }
+            previous = current
             scroller.swipeUp()
+            // Let the swipe settle, so the next check reads a laid out frame
+            // rather than one mid animation.
+            RunLoop.current.run(until: Date().addingTimeInterval(0.3))
         }
     }
 

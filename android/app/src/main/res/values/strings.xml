@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Gjuha</string>
+
+    <!-- Shown in the widget picker, so it says what the widget is for rather
+         than repeating the app name. -->
+    <string name="widget_description">Your streak, the words due for review, and the next lesson waiting for you.</string>
+
+    <!-- Example figures for the picker preview only. Never shown live. -->
+    <string name="widget_preview_streak">🔥 7</string>
+    <string name="widget_preview_xp">⭐ 540</string>
+    <string name="widget_preview_today">80/120 XP</string>
+    <string name="widget_preview_due">3 words to review</string>
+</resources>

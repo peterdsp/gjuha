@@ -59,16 +59,31 @@ final class ScreenshotCapture: XCTestCase {
         settle()
         capture(named: "04-Grammar-guides")
 
+        // Into a guide, because the conjugation table is behind a push and the
+        // list above it shows none of what the screen is actually for.
+        let guideRow = app.buttons
+            .matching(NSPredicate(format: "label CONTAINS %@", "to be"))
+            .firstMatch
+        if guideRow.waitForExistence(timeout: 8) {
+            tap(guideRow, "The first grammar guide")
+            settle()
+            capture(named: "05-Grammar-conjugation")
+            if app.navigationBars.buttons.firstMatch.waitForExistence(timeout: 5) {
+                app.navigationBars.buttons.firstMatch.tap()
+                settle()
+            }
+        }
+
         tap(tabElement("Profile", in: app), "Profile tab")
         settle()
-        capture(named: "05-Profile-honest-progress")
+        capture(named: "06-Profile-honest-progress")
 
         // Profile runs past one screen. One swipe lands on the achievement grid;
         // two carried straight past it to the settings blocks, which are not
         // what this capture is for.
         app.scrollViews.firstMatch.swipeUp()
         settle()
-        capture(named: "06-Profile-achievements")
+        capture(named: "07-Profile-achievements")
     }
 
     // MARK: - Capturing
@@ -90,15 +105,31 @@ final class ScreenshotCapture: XCTestCase {
 
     // MARK: - Driving
 
+    /// Walks onboarding by identifier, not by the words on the buttons.
+    ///
+    /// It used to tap "Get started", "Travel", "Continue" and "Regular", which
+    /// meant the capture could only ever run in English. Pointing it at any
+    /// other language failed with four errors and produced no screenshots, so
+    /// nobody could see what the app looks like in Albanian, which is the one
+    /// language it exists to teach.
     private func completeOnboarding(on app: XCUIApplication) {
-        tap(app.buttons["Get started"], "Onboarding welcome")
-        tap(app.buttons["Travel"], "A learning reason")
-        tap(app.buttons["Continue"], "Continue past the reason step")
-        tap(
-            app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Regular")).firstMatch,
-            "A daily goal"
-        )
-        tap(app.buttons["Start learning"], "Finish onboarding")
+        tap(identified("onboarding.start", in: app), "Onboarding welcome")
+        tap(identified("onboarding.reason.0", in: app), "A learning reason")
+        tap(identified("onboarding.continue", in: app), "Continue past the reason step")
+        tap(identified("onboarding.goal.1", in: app), "A daily goal")
+        tap(identified("onboarding.finish", in: app), "Finish onboarding")
+    }
+
+    /// An element by identifier, whichever kind of element the system built.
+    private func identified(_ identifier: String, in app: XCUIApplication) -> XCUIElement {
+        let candidates = [
+            app.buttons[identifier].firstMatch,
+            app.staticTexts[identifier].firstMatch,
+            app.otherElements[identifier].firstMatch
+        ]
+        if let hittable = candidates.first(where: { $0.exists && $0.isHittable }) { return hittable }
+        if let existing = candidates.first(where: { $0.exists }) { return existing }
+        return app.descendants(matching: .any)[identifier].firstMatch
     }
 
     /// Opens the first unlocked lesson on the map.
@@ -128,6 +159,24 @@ final class ScreenshotCapture: XCTestCase {
     /// See the note on the same helper in `GjuhaUITests`: iPadOS publishes each
     /// tab button twice, so every query resolves `.firstMatch`.
     private func tabElement(_ name: String, in app: XCUIApplication) -> XCUIElement {
+        // By position, because a tab's label is translated and this capture has
+        // to run in every language the app ships. Naming them failed as "Words
+        // tab never appeared" in Albanian, where it reads Fjalë.
+        //
+        // An identifier would be the obvious fix, but `.accessibilityIdentifier`
+        // on a `Tab` tags the tab's content rather than its button in the bar,
+        // so it never reaches the thing being tapped. Order is what the app
+        // actually guarantees here: the four destinations are declared once, in
+        // one order, and that order is the same in every language.
+        let order = ["Learn": 0, "Words": 1, "Grammar": 2, "Profile": 3]
+        if let index = order[name] {
+            let bar = app.tabBars.firstMatch
+            if bar.exists, bar.buttons.count > index {
+                let button = bar.buttons.element(boundBy: index)
+                if button.exists { return button }
+            }
+        }
+
         let candidates = [
             app.tabBars.buttons[name].firstMatch,
             app.buttons[name].firstMatch,

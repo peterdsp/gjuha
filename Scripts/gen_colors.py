@@ -48,78 +48,104 @@ ASSETS_DIR = os.path.join(
 # name: (light, dark, light_high_contrast, dark_high_contrast)
 # Each value is (r, g, b) or (r, g, b, alpha), all 0-1 sRGB.
 COLORS: dict[str, tuple] = {
+    # The direction: Albanian material, not the flag. A bold identity built from
+    # flag red on black is the cliche every Albanian product reaches for, so the
+    # hues here come from the things the language lives among instead: limestone
+    # and bone in light, basalt in dark, madder from the weaving, saffron, kiln
+    # terracotta, and the pine of the northern valleys. Red stays, because it is
+    # the brand and it is honestly Albanian, but it is the deep madder of a dyed
+    # thread rather than the bright red of a flag.
+
     # --- Brand ------------------------------------------------------------
     # `Accent` is the fill (buttons, gradients, lesson nodes) and carries
     # `OnAccent` white. `AccentStrong` is the on-surface text and icon member.
     # The two move in opposite directions in dark appearance: a fill under white
     # text has to stay deep, while text on a dark surface has to go light.
-    "Accent":           ((0.839, 0.192, 0.165), (0.839, 0.196, 0.169),
-                         (0.722, 0.133, 0.110), (0.722, 0.133, 0.110)),
-    "AccentStrong":     ((0.722, 0.133, 0.110), (1.000, 0.455, 0.420),
-                         (0.588, 0.078, 0.063), (1.000, 0.588, 0.561)),
-    "AccentSubtle":     ((0.984, 0.910, 0.906), (0.200, 0.071, 0.063),
-                         (0.973, 0.855, 0.847), (0.251, 0.086, 0.075)),
+    "Accent":           ((0.706, 0.129, 0.102), (0.729, 0.149, 0.118),
+                         (0.600, 0.078, 0.059), (0.616, 0.086, 0.067)),
+    "AccentStrong":     ((0.616, 0.090, 0.071), (1.000, 0.478, 0.431),
+                         (0.494, 0.047, 0.035), (1.000, 0.608, 0.561)),
+    "AccentSubtle":     ((0.976, 0.925, 0.914), (0.173, 0.075, 0.063),
+                         (0.961, 0.871, 0.855), (0.220, 0.090, 0.075)),
 
     # --- Background hierarchy --------------------------------------------
-    "Background":       ((0.961, 0.957, 0.953), (0.063, 0.063, 0.071),
+    # Limestone and bone rather than a cool grey, and a warm basalt rather than
+    # a blue black. The whole app sits on these two, so they carry more of the
+    # new direction than the accent does.
+    "Background":       ((0.969, 0.961, 0.945), (0.059, 0.055, 0.051),
                          (1.000, 1.000, 1.000), (0.000, 0.000, 0.000)),
-    "Surface":          ((1.000, 1.000, 1.000), (0.118, 0.118, 0.133),
-                         (1.000, 1.000, 1.000), (0.149, 0.149, 0.165)),
-    "SurfaceSecondary": ((0.933, 0.929, 0.922), (0.169, 0.169, 0.188),
-                         (0.898, 0.894, 0.886), (0.212, 0.212, 0.235)),
+    "Surface":          ((1.000, 0.996, 0.988), (0.110, 0.102, 0.094),
+                         (1.000, 1.000, 1.000), (0.141, 0.133, 0.125)),
+    "SurfaceSecondary": ((0.937, 0.925, 0.902), (0.161, 0.149, 0.137),
+                         (0.894, 0.878, 0.851), (0.204, 0.192, 0.180)),
 
     # --- Text -------------------------------------------------------------
+    # A warm ink, so text sits in the same material world as the grounds.
     # Tertiary was 0.620 light / 0.380 dark, which measured 2.70:1 and 2.99:1
     # against its own background: below the 4.5:1 text floor in both
     # appearances, on real captions ("Complete all lessons above to unlock").
-    "TextPrimary":      ((0.102, 0.102, 0.118), (0.953, 0.953, 0.961),
+    "TextPrimary":      ((0.090, 0.082, 0.075), (0.961, 0.953, 0.941),
                          (0.000, 0.000, 0.000), (1.000, 1.000, 1.000)),
-    "TextSecondary":    ((0.400, 0.400, 0.420), (0.580, 0.580, 0.600),
-                         (0.251, 0.251, 0.271), (0.722, 0.722, 0.741)),
-    "TextTertiary":     ((0.431, 0.431, 0.451), (0.561, 0.561, 0.580),
-                         (0.329, 0.329, 0.349), (0.702, 0.702, 0.722)),
+    # Dark secondary was 0.596 and measured 5.75:1 against the Surface token,
+    # which passed. It measured 4.25:1 against what a card actually renders,
+    # which does not. A card is Surface with the elevation material on top, so
+    # it comes out at (51,50,49) rather than the token's (28,26,24), and every
+    # pair measured here is measured against the token. Raised until it clears
+    # the floor against the rendered card, sampled from a screenshot.
+    "TextSecondary":    ((0.388, 0.373, 0.353), (0.624, 0.608, 0.588),
+                         (0.243, 0.231, 0.216), (0.733, 0.718, 0.698)),
+    # Dark tertiary was 0.569: 5.26:1 against the Surface token and 3.88:1
+    # against a rendered card, which is where it is actually drawn. Raised on
+    # the same evidence as secondary above.
+    "TextTertiary":     ((0.420, 0.404, 0.384), (0.624, 0.608, 0.584),
+                         (0.318, 0.306, 0.290), (0.714, 0.698, 0.678)),
 
     # --- State: fill (carries OnAccent), then the on-surface member -------
-    "Success":          ((0.086, 0.510, 0.290), (0.086, 0.510, 0.290),
-                         (0.059, 0.420, 0.239), (0.059, 0.420, 0.239)),
-    "SuccessStrong":    ((0.055, 0.455, 0.251), (0.400, 0.871, 0.600),
-                         (0.027, 0.361, 0.196), (0.549, 0.922, 0.702)),
-    "Error":            ((0.820, 0.137, 0.110), (0.820, 0.137, 0.110),
-                         (0.690, 0.094, 0.075), (0.690, 0.094, 0.075)),
-    "ErrorStrong":      ((0.722, 0.102, 0.078), (1.000, 0.486, 0.451),
-                         (0.588, 0.055, 0.039), (1.000, 0.612, 0.580)),
+    # Success is the pine of the northern valleys rather than a signal green.
+    # Error stays a brighter, more orange red than the madder accent, so the
+    # two do not read as the same colour on a screen that shows both.
+    "Success":          ((0.071, 0.439, 0.282), (0.071, 0.439, 0.282),
+                         (0.047, 0.365, 0.231), (0.047, 0.365, 0.231)),
+    "SuccessStrong":    ((0.051, 0.400, 0.251), (0.400, 0.843, 0.580),
+                         (0.024, 0.318, 0.192), (0.545, 0.906, 0.690)),
+    "Error":            ((0.839, 0.227, 0.129), (0.839, 0.227, 0.129),
+                         (0.714, 0.161, 0.086), (0.714, 0.161, 0.086)),
+    "ErrorStrong":      ((0.733, 0.176, 0.090), (1.000, 0.514, 0.439),
+                         (0.600, 0.114, 0.047), (1.000, 0.635, 0.573)),
 
-    # `Warning` and `XP` keep their bright amber and gold in every appearance
+    # `Warning` and `XP` keep their bright saffron and gold in every appearance
     # and take the dark `OnWarning` foreground. Deepening either far enough to
     # carry white turns it brown and costs the reward signal its meaning.
-    "Warning":          ((0.988, 0.718, 0.145), (0.988, 0.741, 0.165),
-                         (0.941, 0.667, 0.078), (1.000, 0.796, 0.247)),
-    "WarningStrong":    ((0.561, 0.376, 0.000), (1.000, 0.816, 0.400),
-                         (0.451, 0.298, 0.000), (1.000, 0.878, 0.561)),
-    "XP":               ((0.988, 0.718, 0.145), (1.000, 0.780, 0.196),
-                         (0.941, 0.667, 0.078), (1.000, 0.831, 0.286)),
-    "XPStrong":         ((0.573, 0.388, 0.000), (1.000, 0.839, 0.400),
-                         (0.459, 0.306, 0.000), (1.000, 0.894, 0.561)),
+    "Warning":          ((0.973, 0.686, 0.149), (0.973, 0.710, 0.173),
+                         (0.922, 0.631, 0.082), (1.000, 0.765, 0.251)),
+    "WarningStrong":    ((0.541, 0.357, 0.000), (1.000, 0.796, 0.400),
+                         (0.435, 0.282, 0.000), (1.000, 0.863, 0.561)),
+    "XP":               ((0.980, 0.690, 0.102), (1.000, 0.753, 0.176),
+                         (0.929, 0.639, 0.047), (1.000, 0.808, 0.267)),
+    "XPStrong":         ((0.549, 0.365, 0.000), (1.000, 0.816, 0.400),
+                         (0.439, 0.290, 0.000), (1.000, 0.875, 0.561)),
 
     # --- Gamification -----------------------------------------------------
-    "Streak":           ((0.769, 0.286, 0.020), (0.769, 0.286, 0.020),
-                         (0.651, 0.235, 0.012), (0.651, 0.235, 0.012)),
-    "StreakStrong":     ((0.667, 0.263, 0.000), (1.000, 0.651, 0.329),
-                         (0.541, 0.208, 0.000), (1.000, 0.741, 0.490)),
+    # Kiln terracotta. The streak is the besa, the kept word, so it reads as
+    # fired earth rather than as a cartoon flame.
+    "Streak":           ((0.745, 0.306, 0.059), (0.745, 0.306, 0.059),
+                         (0.627, 0.251, 0.035), (0.627, 0.251, 0.035)),
+    "StreakStrong":     ((0.647, 0.278, 0.024), (1.000, 0.635, 0.325),
+                         (0.522, 0.220, 0.000), (1.000, 0.729, 0.482)),
 
     # --- Separators, edges and overlay fills ------------------------------
-    "Border":           ((0.867, 0.863, 0.855), (0.220, 0.220, 0.240),
-                         (0.651, 0.647, 0.639), (0.420, 0.420, 0.447)),
-    "Hairline":         ((0.102, 0.102, 0.118, 0.140), (1.000, 1.000, 1.000, 0.220),
-                         (0.102, 0.102, 0.118, 0.400), (1.000, 1.000, 1.000, 0.480)),
-    "GlassTint":        ((1.000, 1.000, 1.000, 0.560), (1.000, 1.000, 1.000, 0.060),
-                         (1.000, 1.000, 1.000, 0.820), (0.149, 0.149, 0.165, 0.760)),
-    "Track":            ((0.102, 0.102, 0.118, 0.120), (1.000, 1.000, 1.000, 0.160),
-                         (0.102, 0.102, 0.118, 0.320), (1.000, 1.000, 1.000, 0.380)),
-    "ChipFill":         ((0.102, 0.102, 0.118, 0.060), (1.000, 1.000, 1.000, 0.120),
-                         (0.102, 0.102, 0.118, 0.140), (1.000, 1.000, 1.000, 0.220)),
-    "ControlFill":      ((0.102, 0.102, 0.118, 0.050), (1.000, 1.000, 1.000, 0.100),
-                         (1.000, 1.000, 1.000, 1.000), (0.149, 0.149, 0.165, 1.000)),
+    "Border":           ((0.863, 0.847, 0.820), (0.216, 0.204, 0.192),
+                         (0.639, 0.624, 0.600), (0.412, 0.400, 0.384)),
+    "Hairline":         ((0.090, 0.082, 0.075, 0.140), (1.000, 1.000, 1.000, 0.220),
+                         (0.090, 0.082, 0.075, 0.400), (1.000, 1.000, 1.000, 0.480)),
+    "GlassTint":        ((1.000, 0.996, 0.988, 0.560), (1.000, 1.000, 1.000, 0.060),
+                         (1.000, 0.996, 0.988, 0.820), (0.141, 0.133, 0.125, 0.760)),
+    "Track":            ((0.090, 0.082, 0.075, 0.120), (1.000, 1.000, 1.000, 0.160),
+                         (0.090, 0.082, 0.075, 0.320), (1.000, 1.000, 1.000, 0.380)),
+    "ChipFill":         ((0.090, 0.082, 0.075, 0.060), (1.000, 1.000, 1.000, 0.120),
+                         (0.090, 0.082, 0.075, 0.140), (1.000, 1.000, 1.000, 0.220)),
+    "ControlFill":      ((0.090, 0.082, 0.075, 0.050), (1.000, 1.000, 1.000, 0.100),
+                         (1.000, 0.996, 0.988, 1.000), (0.141, 0.133, 0.125, 1.000)),
 
     # --- Foreground on a fill ---------------------------------------------
     # These exist as tokens so a view drawing on a brand fill says so, instead
@@ -127,7 +153,7 @@ COLORS: dict[str, tuple] = {
     # it was deliberate or an accident that happens to look right in dark mode.
     "OnAccent":         ((1.000, 1.000, 1.000), (1.000, 1.000, 1.000),
                          (1.000, 1.000, 1.000), (1.000, 1.000, 1.000)),
-    "OnWarning":        ((0.102, 0.102, 0.118), (0.102, 0.102, 0.118),
+    "OnWarning":        ((0.090, 0.082, 0.075), (0.090, 0.082, 0.075),
                          (0.000, 0.000, 0.000), (0.000, 0.000, 0.000)),
 }
 
@@ -139,6 +165,20 @@ APPEARANCES = [
 ]
 
 APPEARANCE_NAMES = ["light", "dark", "light+HC", "dark+HC"]
+
+# A card is not its Surface token. The card views draw Surface and then put an
+# elevation material on top, so in dark appearance a card renders about
+# (51,50,49) where the token is (28,26,24). Measuring text against the token
+# therefore flatters it: secondary text read 5.75:1 against the token and
+# 4.25:1 against the card a screenshot actually showed.
+#
+# This is the rendered value, sampled from a capture, so the pairs below can be
+# checked against what the app draws rather than only against what the palette
+# declares. If the card material changes, re-sample it.
+RENDERED_CARD = {
+    "light": (0.922, 0.918, 0.906),
+    "dark": (0.200, 0.196, 0.192),
+}
 
 # Pairs the app actually renders. Index 0/2 are light appearances, 1/3 dark.
 # Everything here is text or an icon that must stay legible, so all of it is
@@ -232,6 +272,21 @@ def report_contrast() -> int:
                 failures += 1
             cells.append(f"{ratio:>9.2f}{flag}")
         print(f"{fg_name + ' on ' + bg_name:<34} " + "".join(cells))
+
+    # The same text against a card as it actually renders, which is Surface
+    # plus the elevation material rather than Surface alone.
+    print("\nAgainst a card as it renders, not as the Surface token declares:")
+    for fg_name in ("TextPrimary", "TextSecondary", "TextTertiary"):
+        cells = []
+        for index in range(4):
+            card = RENDERED_CARD["dark" if index in (1, 3) else "light"]
+            ratio = contrast_ratio(COLORS[fg_name][index], card)
+            flag = "" if ratio >= TEXT_FLOOR else "!"
+            if flag:
+                failures += 1
+            cells.append(f"{ratio:>9.2f}{flag}")
+        print(f"{fg_name + ' on a card':<34} " + "".join(cells))
+
     return failures
 
 

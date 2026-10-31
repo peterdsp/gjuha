@@ -313,7 +313,7 @@ private struct DailyGoalCard: View {
         VStack(alignment: .leading, spacing: .gjuha.snug) {
             HStack(spacing: .gjuha.tight) {
                 Image(systemName: stats.hasMetDailyGoal ? "checkmark.circle.fill" : "target")
-                    .font(.system(size: 20, weight: .semibold))
+                    .font(.gjuha.symbol(20, .semibold))
                     .foregroundStyle(stats.hasMetDailyGoal ? Color.gjuha.successStrong : Color.gjuha.accentStrong)
 
                 Text("Today")
@@ -432,7 +432,7 @@ private struct NextAchievementRow: View {
     var body: some View {
         HStack(spacing: .gjuha.snug) {
             Image(systemName: achievement.symbolName)
-                .font(.system(size: 16, weight: .semibold))
+                .font(.gjuha.symbol(16, .semibold))
                 .foregroundStyle(Color.gjuha.accentStrong)
                 .frame(width: 32, height: 32)
                 .background(Color.gjuha.chipFill)
@@ -492,7 +492,7 @@ private struct AchievementBadge: View {
                 }
 
                 Image(systemName: isUnlocked ? achievement.symbolName : "lock.fill")
-                    .font(.system(size: isUnlocked ? 22 : 17, weight: .semibold))
+                    .font(.gjuha.symbol(isUnlocked ? 22 : 17, .semibold))
                     .foregroundStyle(isUnlocked ? Color.gjuha.onWarning : Color.gjuha.textTertiary)
             }
 

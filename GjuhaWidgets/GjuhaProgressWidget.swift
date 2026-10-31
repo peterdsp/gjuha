@@ -132,8 +132,12 @@ private struct SmallWidgetView: View {
 
             Spacer(minLength: 0)
 
+            // Scales with the text beside it. The accessory families below
+            // keep fixed sizes on purpose: the system sets their container and
+            // it cannot grow, so a scaling glyph would be clipped rather than
+            // read more easily.
             Image(systemName: action.symbol)
-                .font(.system(size: 20, weight: .semibold))
+                .font(.system(.title3, weight: .semibold))
                 .foregroundStyle(WidgetPalette.accent)
 
             Text(action.headline)
@@ -170,7 +174,7 @@ private struct MediumWidgetView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
                 Image(systemName: action.symbol)
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.system(.callout, weight: .semibold))
                     .foregroundStyle(WidgetPalette.accent)
 
                 Text(action.headline)
@@ -242,8 +246,14 @@ private struct StatCell: View {
                     .foregroundStyle(WidgetPalette.textPrimary)
                     .contentTransition(.numericText())
             }
+            // 11 points is Apple's floor for widget text: "display text using
+            // fonts at 11 points or larger. Text in a font that's smaller than
+            // 11 points can be too hard for many people to read." This caption
+            // was 10. Using the caption2 style rather than a fixed size also
+            // lets it follow Dynamic Type, which widgets support from Large to
+            // AX5.
             Text(caption)
-                .font(.system(size: 10, weight: .medium, design: .rounded))
+                .font(.system(.caption2, design: .rounded, weight: .medium))
                 .foregroundStyle(WidgetPalette.textSecondary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
@@ -277,8 +287,11 @@ private struct DailyGoalDot: View {
                 .rotationEffect(.degrees(-90))
 
             if snapshot.hasMetDailyGoal {
+                // A glyph, so the 11 point text floor does not apply, but it
+                // still scales with the text beside it rather than staying
+                // pinned while that grows.
                 Image(systemName: "checkmark")
-                    .font(.system(size: 9, weight: .heavy))
+                    .font(.system(.caption2, weight: .heavy))
                     .foregroundStyle(WidgetPalette.success)
             }
         }
@@ -308,8 +321,9 @@ private struct CircularAccessoryView: View {
                 VStack(spacing: -2) {
                     Text(entry.snapshot.dueReviewCount, format: .number)
                         .font(.system(.title3, design: .rounded, weight: .bold))
+                    // Was 9 points, below the widget floor.
                     Text("due")
-                        .font(.system(size: 9, weight: .medium, design: .rounded))
+                        .font(.system(.caption2, design: .rounded, weight: .medium))
                 }
             } else if showCount, entry.snapshot.dailyGoalXP > 0 {
                 // Nothing due, but today's goal is still open or just met. A

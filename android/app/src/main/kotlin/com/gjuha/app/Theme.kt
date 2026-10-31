@@ -6,6 +6,9 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 
 /**
  * The Gjuha palette, taken from the values `Scripts/gen_colors.py` generates for
@@ -104,5 +107,44 @@ fun GjuhaTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = if (isSystemInDarkTheme()) DarkScheme else LightScheme,
         content = content,
+    )
+}
+
+/**
+ * The type scale, matching iOS.
+ *
+ * The art direction is the alphabet: the marks Albanian adds to the Latin one
+ * and the nine digraphs that are single letters. So display type is set large
+ * enough for an e with a diaeresis to be a shape rather than a speck, and
+ * tracking is pulled in on the big sizes only. Body text keeps its natural
+ * tracking, because an Albanian word carrying two diacritics needs the room
+ * and tightening it costs legibility for nothing.
+ */
+object GjuhaType {
+    val displayHero = TextStyle(
+        fontSize = 56.sp,
+        lineHeight = 60.sp,
+        fontWeight = FontWeight.Black,
+        letterSpacing = (-1.5).sp,
+    )
+    val displayLarge = TextStyle(
+        fontSize = 44.sp,
+        lineHeight = 48.sp,
+        fontWeight = FontWeight.Black,
+        letterSpacing = (-1.2).sp,
+    )
+    val prompt = TextStyle(
+        fontSize = 28.sp,
+        lineHeight = 32.sp,
+        fontWeight = FontWeight.SemiBold,
+        letterSpacing = (-0.6).sp,
+    )
+
+    /** A vocabulary entry: the taught language, not its gloss. */
+    val word = TextStyle(
+        fontSize = 22.sp,
+        lineHeight = 26.sp,
+        fontWeight = FontWeight.SemiBold,
+        letterSpacing = (-0.4).sp,
     )
 }

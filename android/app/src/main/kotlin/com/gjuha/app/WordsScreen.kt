@@ -77,7 +77,11 @@ private fun WordCard(word: SeedWord) {
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.fillMaxWidth().padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(word.albanian, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                // The taught language, not its gloss. It was a step smaller
+                // than the English beneath it, which put the translation above
+                // the language on a screen whose whole purpose is the
+                // language. At this size the diacritics are shapes.
+                Text(word.albanian, style = GjuhaType.word)
                 Spacer(Modifier.width(8.dp))
                 Text(
                     word.partOfSpeech,

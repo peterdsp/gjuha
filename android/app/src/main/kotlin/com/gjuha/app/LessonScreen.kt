@@ -286,11 +286,13 @@ private fun LessonHeader(progress: Float, hearts: Int?, combo: Int, onQuit: () -
 @Composable
 private fun ExerciseBody(exercise: Exercise, enabled: Boolean, onAnswer: (String) -> Unit) {
     Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
+        // The question is the screen, as on iOS: left aligned on the same
+        // margin the answers use, with its tracking pulled in and its leading
+        // tightened so two lines read as one block.
         Text(
             localizedPrompt(exercise),
-            fontSize = 22.sp,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center,
+            style = GjuhaType.prompt,
+            textAlign = TextAlign.Start,
             modifier = Modifier.fillMaxWidth(),
         )
         Spacer(Modifier.height(24.dp))

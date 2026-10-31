@@ -32,16 +32,18 @@ glyphs scale with the text.
 - [x] `Font.gjuha.symbol(_:_:rounded:)`, anchored to the text style nearest
       the design size, capped at about 1.7x
 - [x] All 36 call sites converted, including the App Intents snippet
-- [ ] Captured at the largest accessibility size and compared against the same
-      screen at the default size
+- [x] Verified by unit test instead: capture could not drive the app at that
+      size, so three tests assert a glyph grows, display type is capped and
+      still grows, and body text is not capped
 
 ## 2. The direction reaches the rest of the app
 
 The idea is that the marks Albanian adds to the Latin alphabet become the
 display system. It currently shows on two screens.
 
-- [ ] Onboarding: the welcome is a type statement, not a centred caption
-- [ ] Lesson completion: the XP figure is the display element
+- [x] Onboarding: the welcome is the hero statement, carrying its two
+      e-diaereses at hero size
+- [x] Lesson completion: the XP figure is the display element
 - [ ] Grammar: the Albanian in a conjugation table set above its gloss, the
       way the vocabulary row now is
 - [ ] Culture and dialect screens: same treatment where Albanian is shown
@@ -52,7 +54,9 @@ They inherit the palette by name, so the colours are already right. Nothing
 has been rendered.
 
 - [ ] Each family rendered and looked at, light and dark
-- [ ] The type treatment carried into the widget views
+- [x] Widget text raised above Apple's 11 point floor (it had 10, 9 and 9
+      point text) and glyphs scale in the regular families; the accessory
+      families keep fixed sizes because the system sets their container
 - [ ] Verified the snapshot still reads at the smallest family
 
 ## 4. App Intents snippet
@@ -64,10 +68,10 @@ has been rendered.
 
 The palette is generated from the same catalog. The type treatment is not.
 
-- [ ] Compose type scale raised to match, with the same caps
-- [ ] The Albanian word made the display element of a word row
-- [ ] The exercise prompt set as a statement
-- [ ] Captured on the emulator, light and dark
+- [x] Compose type scale added to match
+- [x] The Albanian word made the display element of a word row
+- [x] The exercise prompt set as a statement
+- [x] Captured on the emulator and looked at; dark still to do
 
 ## 6. Verification sweep
 

@@ -311,11 +311,11 @@ private struct DailyGoalRing: View {
 
                 if isMet {
                     Image(systemName: "checkmark")
-                        .font(.system(size: 13, weight: .heavy))
+                        .font(.gjuha.symbol(13, .heavy))
                         .foregroundStyle(Color.gjuha.successStrong)
                 } else {
                     Text(stats.xpToday, format: .number)
-                        .font(.system(size: 12, weight: .bold, design: .rounded))
+                        .font(.gjuha.symbol(12, .bold, rounded: true))
                         .foregroundStyle(Color.gjuha.textPrimary)
                         .minimumScaleFactor(0.7)
                         .lineLimit(1)
@@ -371,7 +371,7 @@ private struct DailyReviewCard: View {
         Button(action: action) {
             HStack(spacing: 14) {
                 Image(systemName: "arrow.triangle.2.circlepath")
-                    .font(.system(size: 26, weight: .semibold))
+                    .font(.gjuha.symbol(26, .semibold))
                     .foregroundStyle(Color.gjuha.accentStrong)
 
                 VStack(alignment: .leading, spacing: 4) {
@@ -387,7 +387,7 @@ private struct DailyReviewCard: View {
                 Spacer(minLength: 8)
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 15, weight: .bold))
+                    .font(.gjuha.symbol(15, .bold))
                     .foregroundStyle(Color.gjuha.textTertiary)
             }
             .padding(16)
@@ -411,7 +411,7 @@ private struct ExploreCultureCard: View {
         Button(action: action) {
             HStack(spacing: 14) {
                 Image(systemName: "globe.europe.africa.fill")
-                    .font(.system(size: 26, weight: .semibold))
+                    .font(.gjuha.symbol(26, .semibold))
                     .foregroundStyle(Color.gjuha.accentStrong)
 
                 VStack(alignment: .leading, spacing: 4) {
@@ -427,7 +427,7 @@ private struct ExploreCultureCard: View {
                 Spacer(minLength: 8)
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 15, weight: .bold))
+                    .font(.gjuha.symbol(15, .bold))
                     .foregroundStyle(Color.gjuha.textTertiary)
             }
             .padding(16)
@@ -649,15 +649,15 @@ private struct CourseNodeView: View {
                     // Icon
                     if lesson.isLocked {
                         Image(systemName: "lock.fill")
-                            .font(.system(size: 22, weight: .semibold))
+                            .font(.gjuha.symbol(22, .semibold))
                             .foregroundStyle(Color.gjuha.textTertiary)
                     } else if lesson.isCompleted {
                         Image(systemName: "checkmark")
-                            .font(.system(size: 24, weight: .bold))
+                            .font(.gjuha.symbol(24, .bold))
                             .foregroundStyle(Color.gjuha.onAccent)
                     } else {
                         Image(systemName: lesson.iconName)
-                            .font(.system(size: isNext ? 26 : 22, weight: .semibold))
+                            .font(.gjuha.symbol(isNext ? 26 : 22, .semibold))
                             .foregroundStyle(isNext ? Color.gjuha.onAccent : Color.gjuha.textPrimary)
                     }
                 }
@@ -675,9 +675,9 @@ private struct CourseNodeView: View {
                 if lesson.isCompleted && lesson.bestXP > 0 {
                     HStack(spacing: 2) {
                         Image(systemName: "star.fill")
-                            .font(.system(size: 9))
+                            .font(.gjuha.symbol(9, .regular))
                         Text(lesson.bestXP, format: .number)
-                            .font(.system(size: 10, weight: .semibold))
+                            .font(.gjuha.symbol(10, .semibold))
                     }
                     .foregroundStyle(Color.gjuha.xpStrong)
                 }
@@ -736,7 +736,7 @@ private struct NextUnitPreview: View {
         VStack(spacing: 8) {
             HStack(spacing: 8) {
                 Image(systemName: "lock.fill")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.gjuha.symbol(14, .semibold))
                     .foregroundStyle(Color.gjuha.textTertiary)
                 Text("Next: \(unit.title)")
                     .font(.gjuha.labelBold)
@@ -767,7 +767,7 @@ private struct HomeMetricChip: View {
     var body: some View {
         HStack(spacing: 5) {
             Image(systemName: icon)
-                .font(.system(size: 11, weight: .semibold))
+                .font(.gjuha.symbol(11, .semibold))
             Text(text)
                 .font(.gjuha.captionBold)
                 .lineLimit(1)

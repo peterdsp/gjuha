@@ -59,6 +59,41 @@ struct GjuhaFonts {
     // Keyboard / answer option
     var answerOption: Font { Self.scaled(18, .medium, .rounded, relativeTo: .body) }
 
+    /// A symbol or glyph that grows with the text beside it.
+    ///
+    /// SF Symbols set with a fixed point size do not respond to Dynamic Type,
+    /// so at the larger accessibility sizes the words grow and the status
+    /// glyph, the chevron and the review icon stay where they were. Apple's
+    /// typography guidance is explicit that meaningful glyphs scale with the
+    /// text; a glyph that carries state or an affordance is meaningful.
+    ///
+    /// The anchor is chosen from the design size so each glyph keeps the
+    /// scaling curve of text its own size, and the ceiling is roughly 1.7x,
+    /// which keeps a 26 point icon from becoming a 70 point one.
+    func symbol(
+        _ size: CGFloat,
+        _ weight: UIFont.Weight = .semibold,
+        rounded: Bool = false
+    ) -> Font {
+        let style: UIFont.TextStyle
+        switch size {
+        case ..<13: style = .caption1
+        case ..<15: style = .footnote
+        case ..<17: style = .subheadline
+        case ..<20: style = .body
+        case ..<24: style = .title3
+        case ..<30: style = .title2
+        default: style = .title1
+        }
+        return Self.scaled(
+            size,
+            weight,
+            rounded ? .rounded : .default,
+            relativeTo: style,
+            cappedAt: size * 1.7
+        )
+    }
+
     /// Builds a Dynamic Type aware `Font` that starts at `size` and scales with
     /// the given text style. Preserves weight and (rounded/default) design.
     static func scaled(

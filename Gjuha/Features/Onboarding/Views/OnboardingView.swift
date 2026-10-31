@@ -415,7 +415,7 @@ private struct OrbitSparkleView: View {
 
     var body: some View {
         Image(systemName: "sparkle")
-            .font(.system(size: size, weight: .heavy))
+            .font(.gjuha.symbol(size, .heavy))
             .foregroundStyle(Color.gjuha.warning)
             .shadow(color: Color.gjuha.glassTint.opacity(0.6), radius: 4)
             .opacity(opacity)

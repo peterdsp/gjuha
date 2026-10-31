@@ -215,7 +215,7 @@ private struct WordRowView: View {
             if canPlay {
                 Button(action: onPlay) {
                     Image(systemName: "speaker.wave.2.fill")
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.gjuha.symbol(16, .semibold))
                         .foregroundStyle(Color.gjuha.accentStrong)
                         .frame(width: 34, height: 34)
                         .background(Color.gjuha.accent.opacity(0.12))

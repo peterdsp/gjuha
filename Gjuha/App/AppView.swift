@@ -300,11 +300,11 @@ private struct LaunchExperienceView: View {
 
                 VStack(spacing: 6) {
                     Text("Gjuha")
-                        .font(.system(size: 44, weight: .black, design: .rounded))
+                        .font(.gjuha.symbol(44, .black, rounded: true))
                         .foregroundStyle(.white)
 
                     Text("Learn Albanian. Feel Albanian.")
-                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        .font(.gjuha.symbol(17, .semibold, rounded: true))
                         .foregroundStyle(.white.opacity(0.94))
                 }
 
@@ -350,7 +350,7 @@ private struct SparkleGlyph: View {
 
     var body: some View {
         Image(systemName: "sparkle")
-            .font(.system(size: size, weight: .heavy))
+            .font(.gjuha.symbol(size, .heavy))
             .foregroundStyle(Color.gjuha.warning)
             .shadow(color: .white.opacity(0.4), radius: 4)
             .opacity(opacity)

@@ -131,7 +131,7 @@ private struct AnswerFeedbackBanner: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 12) {
                 Image(systemName: iconName)
-                    .font(.system(size: 28, weight: .bold))
+                    .font(.gjuha.symbol(28, .bold))
                     .foregroundStyle(bannerForeground)
                     .scaleEffect(scale)
                     .accessibilityHidden(true)
@@ -458,7 +458,7 @@ private struct MultipleChoiceAnswers: View {
                         .overlay(alignment: .topTrailing) {
                             if let symbol = statusSymbol(for: option) {
                                 Image(systemName: symbol.name)
-                                    .font(.system(size: 18, weight: .bold))
+                                    .font(.gjuha.symbol(18, .bold))
                                     .foregroundStyle(symbol.color)
                                     .padding(6)
                                     .accessibilityHidden(true)
@@ -839,7 +839,7 @@ private struct ListeningAnswer: View {
         VStack(spacing: 24) {
             Button(action: onPlay) {
                 Image(systemName: "speaker.wave.3.fill")
-                    .font(.system(size: 34, weight: .bold))
+                    .font(.gjuha.symbol(34, .bold))
                     .foregroundStyle(Color.gjuha.onAccent)
                     .frame(width: 96, height: 96)
                     .background(
@@ -975,7 +975,7 @@ private struct LessonCompletedView: View {
             }
 
             Image(systemName: "star.fill")
-                .font(.system(size: 72))
+                .font(.gjuha.symbol(72, .regular))
                 .foregroundStyle(Color.gjuha.xpStrong)
                 .scaleEffect(starScale)
         }
@@ -1052,7 +1052,7 @@ private struct SessionStatTile: View {
     var body: some View {
         VStack(spacing: .gjuha.hairline) {
             Image(systemName: icon)
-                .font(.system(size: 18, weight: .semibold))
+                .font(.gjuha.symbol(18, .semibold))
                 .foregroundStyle(tint)
             Text(value)
                 .font(.gjuha.headingMedium)
@@ -1077,7 +1077,7 @@ private struct DailyGoalMetBanner: View {
     var body: some View {
         HStack(spacing: .gjuha.snug) {
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 24, weight: .bold))
+                .font(.gjuha.symbol(24, .bold))
                 .foregroundStyle(Color.gjuha.onAccent)
 
             VStack(alignment: .leading, spacing: 2) {
@@ -1118,7 +1118,7 @@ private struct UnlockedAchievementsCard: View {
             ForEach(achievements) { achievement in
                 HStack(spacing: .gjuha.snug) {
                     Image(systemName: achievement.symbolName)
-                        .font(.system(size: 20, weight: .semibold))
+                        .font(.gjuha.symbol(20, .semibold))
                         .foregroundStyle(Color.gjuha.onWarning)
                         .frame(width: 40, height: 40)
                         .background(Color.gjuha.xp)
@@ -1156,7 +1156,7 @@ private struct LessonFailedView: View {
         VStack(spacing: 32) {
             Spacer()
             Image(systemName: "heart.slash.fill")
-                .font(.system(size: 72))
+                .font(.gjuha.symbol(72, .regular))
                 .foregroundStyle(Color.gjuha.errorStrong)
                 .scaleEffect(heartScale)
 

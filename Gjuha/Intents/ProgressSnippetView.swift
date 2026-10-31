@@ -59,13 +59,13 @@ private struct SnippetStat: View {
     var body: some View {
         VStack(spacing: 4) {
             Image(systemName: symbol)
-                .font(.system(size: 15, weight: .semibold))
+                .font(.gjuha.symbol(15, .semibold))
                 .foregroundStyle(tint)
             Text(value, format: .number)
                 .font(.system(.title3, design: .rounded, weight: .bold))
                 .foregroundStyle(Color.gjuha.textPrimary)
             Text(caption)
-                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .font(.gjuha.symbol(11, .medium, rounded: true))
                 .foregroundStyle(Color.gjuha.textSecondary)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)

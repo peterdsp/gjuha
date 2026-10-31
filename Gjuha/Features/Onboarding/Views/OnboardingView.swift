@@ -154,6 +154,7 @@ private struct WelcomeStepView: View {
             Button(action: onNext) {
                 Text("Get started")
                     .font(.gjuha.labelBold)
+                    .accessibilityIdentifier("onboarding.start")
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
@@ -204,6 +205,7 @@ private struct ReasonStepView: View {
                     Button(action: { onSelect(reason) }) {
                         HStack {
                             Text(reason.displayName)
+                                .accessibilityIdentifier("onboarding.reason.\(index)")
                                 .font(.gjuha.bodyRegular)
                                 .foregroundStyle(Color.gjuha.textPrimary)
                             Spacer()
@@ -244,6 +246,7 @@ private struct ReasonStepView: View {
 
             Button(action: onNext) {
                 Text("Continue")
+                    .accessibilityIdentifier("onboarding.continue")
                     .font(.gjuha.labelBold)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
@@ -293,6 +296,7 @@ private struct GoalStepView: View {
                                 Text(goal.displayName)
                                     .font(.gjuha.labelBold)
                                     .foregroundStyle(Color.gjuha.textPrimary)
+                                    .accessibilityIdentifier("onboarding.goal.\(index)")
                                 Text("\(goal.minutesPerDay) min / day")
                                     .font(.gjuha.caption)
                                     .foregroundStyle(Color.gjuha.textSecondary)
@@ -336,6 +340,7 @@ private struct GoalStepView: View {
             Button(action: onNext) {
                 Text("Start learning")
                     .font(.gjuha.labelBold)
+                    .accessibilityIdentifier("onboarding.finish")
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)

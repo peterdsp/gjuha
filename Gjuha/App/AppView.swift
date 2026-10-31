@@ -147,18 +147,22 @@ private struct RootTabView: View {
             Tab("Learn", systemImage: "bolt.fill", value: AppFeature.State.RootTab.home) {
                 HomeView(store: store.scope(state: \.home, action: \.home))
             }
+            .accessibilityIdentifier("tab.learn")
 
             Tab("Words", systemImage: "text.book.closed.fill", value: AppFeature.State.RootTab.vocabulary) {
                 VocabularyView(store: store.scope(state: \.vocabulary, action: \.vocabulary))
             }
+            .accessibilityIdentifier("tab.words")
 
             Tab("Grammar", systemImage: "book.pages.fill", value: AppFeature.State.RootTab.grammar) {
                 GrammarView(store: store.scope(state: \.grammar, action: \.grammar))
             }
+            .accessibilityIdentifier("tab.grammar")
 
             Tab("Profile", systemImage: "person.crop.circle.fill", value: AppFeature.State.RootTab.profile) {
                 ProfileView(store: store.scope(state: \.profile, action: \.profile))
             }
+            .accessibilityIdentifier("tab.profile")
         }
         // iPad is a listed device family for this app, and a four-destination
         // learning course reads better in a sidebar on a 13" screen than as a

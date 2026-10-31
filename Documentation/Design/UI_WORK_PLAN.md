@@ -79,7 +79,14 @@ The palette is generated from the same catalog. The type treatment is not.
 
 - [ ] Light, dark and Increase Contrast, every screen, looked at
 - [ ] The largest accessibility size, every screen
-- [ ] Albanian locale, every screen
+- [~] Albanian locale. Onboarding is locale independent now and the run
+      reaches the lesson map, but the tab bar lookup still fails as "Words tab
+      never appeared", where Albanian reads Fjalë. `app.tabBars` does not
+      resolve under `.tabViewStyle(.sidebarAdaptable)`, and
+      `.accessibilityIdentifier` on a `Tab` tags the tab's content rather than
+      its button in the bar, so neither route reaches the thing being tapped.
+      Next thing to try: find the bar through its containing element rather
+      than through `tabBars`
 - [ ] Reduce Motion honoured
 - [ ] VoiceOver: a screenshot cannot establish spoken names or focus order, so
       this is a device pass and is recorded as not run until someone runs it
